@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - CollegeNotes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="assets/js/script.js"></script>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navbar (Same as index.html) -->
+
+  <main class="flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-md p-8">
+      <!-- Tabs -->
+      <div class="flex mb-8 border-b">
+        <button data-tab="login" class="tab-btn active px-4 py-2 font-medium">Login</button>
+        <button data-tab="signup" class="tab-btn px-4 py-2 font-medium text-gray-500">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block mb-2">Email</label>
+          <input type="email" required class="w-full p-3 border rounded-lg">
+        </div>
+        <div>
+          <label class="block mb-2">Password</label>
+          <input type="password" required class="w-full p-3 border rounded-lg">
+        </div>
+        <button class="w-full bg-black text-white p-3 rounded-lg hover:bg-gray-800">Login</button>
+      </form>
+
+      <!-- Signup Form (Hidden) -->
+      <form id="signupForm" class="space-y-4 hidden">
+        <div>
+          <label class="block mb-2">Full Name</label>
+          <input type="text" required class="w-full p-3 border rounded-lg">
+        </div>
+        <div>
+          <label class="block mb-2">Email</label>
+          <input type="email" required class="w-full p-3 border rounded-lg">
+        </div>
+        <div>
+          <label class="block mb-2">Password</label>
+          <input type="password" required class="w-full p-3 border rounded-lg">
+        </div>
+        <button class="w-full bg-black text-white p-3 rounded-lg hover:bg-gray-800">Create Account</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // Tab Switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active', 'text-black'));
+        btn.classList.add('active', 'text-black');
+        
+        document.getElementById('loginForm').classList.toggle('hidden');
+        document.getElementById('signupForm').classList.toggle('hidden');
+      });
+    });
+  </script>
+<script type="module">
+  import { 
+    auth, 
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword 
+  } from '../assets/js/firebase-init.js';
+
+  // Login
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = 'notes.html';
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+
+  // Signup
+  document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert('Account created! Please login');
+      document.querySelector('[data-tab="login"]').click();
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+</script>
+</body>
+</html>

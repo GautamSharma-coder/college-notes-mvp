@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Request Notes - CollegeNotes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="assets/js/script.js"></script>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navbar (Same as index.html) -->
+  <nav class="px-6 py-4 border-b bg-white sticky top-0">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold flex items-center">
+        CollegeNotes
+      </a>
+      <div class="space-x-2">
+        <a href="notes.html" class="hover:text-gray-600">Notes</a>
+        <a href="lectures.html" class="hover:text-gray-600">Lectures</a>
+        <a href="contact.html" class="hover:text-gray-600">Contact</a>
+        <a href="login.html" class="bg-black text-white px-2 py-2 rounded hover:bg-gray-800">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <div class="text-center mb-12">
+      <h1 class="text-3xl font-bold mb-4">Request Study Materials</h1>
+      <p class="text-gray-600">Can't find what you need? Let us know and our community will help!</p>
+    </div>
+
+    <!-- Request Form -->
+    <form id="requestForm" class="space-y-6 bg-gray-50 p-8 rounded-xl">
+      <div>
+        <label class="block text-lg font-medium mb-2">Subject/Course</label>
+        <input 
+          type="text" 
+          required
+          placeholder="e.g., Advanced Calculus"
+          class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+      </div>
+
+      <div>
+        <label class="block text-lg font-medium mb-2">Detailed Description</label>
+        <textarea 
+          rows="4"
+          required
+          placeholder="Describe exactly what you need..."
+          class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-lg font-medium mb-2">Urgency</label>
+        <select class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+          <option>Within 1 Week</option>
+          <option>Within 3 Days</option>
+          <option>Urgent (24 Hours)</option>
+        </select>
+      </div>
+
+      <button 
+        type="submit"
+        class="w-full bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+        Submit Request
+      </button>
+    </form>
+
+    <!-- Previous Requests (Mock Data) -->
+    <section class="mt-16">
+      <h2 class="text-2xl font-bold mb-6">Recent Requests</h2>
+      <div class="space-y-4">
+        <div class="border p-4 rounded-lg">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-medium">Quantum Mechanics Lecture Notes</h3>
+            <span class="text-sm text-gray-500">2 days ago</span>
+          </div>
+          <p class="text-gray-600">Need detailed notes on Schrödinger equation applications</p>
+          <div class="mt-2 text-sm text-gray-500">Status: <span class="text-green-600">Fulfilled</span></div>
+        </div>
+
+        <div class="border p-4 rounded-lg">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-medium">Machine Learning Tutorials</h3>
+            <span class="text-sm text-gray-500">5 hours ago</span>
+          </div>
+          <p class="text-gray-600">Looking for neural networks implementation guides</p>
+          <div class="mt-2 text-sm text-gray-500">Status: <span class="text-yellow-600">Pending</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+<script type="module">
+  import { auth, db, collection, addDoc } from '../assets/js/firebase-init.js';
+
+  document.getElementById('requestForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    
+    if (!user) {
+      alert('Please login first');
+      return;
+    }
+
+    const requestData = {
+      subject: document.getElementById('requestSubject').value,
+      description: document.getElementById('requestDescription').value,
+      userId: user.uid,
+      createdAt: new Date()
+    };
+
+    try {
+      await addDoc(collection(db, 'requests'), requestData);
+      alert('Request submitted successfully!');
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+</script>
+  <!-- Footer (Same as index.html) -->
+  <footer class="border-t bg-gray-50">
+    <!-- Copy footer from index.html -->
+  </footer>
+</body>
+</html>

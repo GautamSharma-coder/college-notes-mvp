@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Video Lectures - CollegeNotes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navbar -->
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Featured Lectures</h1>
+    
+    <!-- Video Player -->
+    <div class="aspect-w-16 aspect-h-9 mb-8 rounded-xl overflow-hidden shadow-lg">
+      <iframe 
+        src="https://www.youtube.com/embed/9Q--oX5muxw" 
+        class="w-full" 
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <!-- Lecture List -->
+    <div class="grid gap-4">
+      <div class="border p-4 rounded-lg hover:bg-gray-50 cursor-pointer">
+        <div class="flex items-center gap-4">
+          <div class="w-32 h-20 bg-gray-100 rounded-lg"></div>
+          <div>
+            <h3 class="font-bold mb-1">Introduction to Machine Learning</h3>
+            <p class="text-sm text-gray-600">Stanford University • 45 min</p>
+          </div>
+        </div>
+      </div>
+      <!-- Add more lectures -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+</body>
+</html>

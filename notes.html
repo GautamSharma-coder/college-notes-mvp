@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Study Notes - CollegeNotes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="assets/js/script.js"></script>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navbar (Same as index.html) -->
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <div class="mb-8 flex justify-between items-center">
+      <h1 class="text-3xl font-bold">All Study Notes</h1>
+      <a href="request.html" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Request Notes</a>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="mb-8 grid gap-4 md:grid-cols-2">
+      <input type="text" placeholder="Search notes..." 
+             class="p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-black">
+      <select class="p-3 border rounded-lg">
+        <option>All Subjects</option>
+        <option>Mathematics</option>
+        <option>Computer Science</option>
+        <option>Physics</option>
+      </select>
+    </div>
+
+    <!-- Notes Grid -->
+    <div class="grid gap-6 md:grid-cols-3">
+      <!-- Note Card 1 -->
+      <div class="border rounded-lg p-6 hover:shadow-lg transition-shadow">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h3 class="text-xl font-bold">Calculus I</h3>
+            <p class="text-sm text-gray-500 mt-1">MIT Mathematics</p>
+          </div>
+          <span class="bg-gray-100 px-2 py-1 rounded text-sm">New</span>
+        </div>
+        <p class="text-gray-600 mb-4">Comprehensive notes covering limits, derivatives, and integrals</p>
+        <div class="flex justify-between items-center">
+          <div class="text-sm">
+            <span class="text-gray-500">PDF • 2.4MB</span>
+          </div>
+          <a href="download.html" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Download</a>
+        </div>
+      </div>
+
+      <!-- Add more note cards -->
+    </div>
+  </main>
+<script type="module">
+  import { auth, db, collection, addDoc } from '../assets/js/firebase-init.js';
+
+  document.getElementById('requestForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    
+    if (!user) {
+      alert('Please login first');
+      return;
+    }
+
+    const requestData = {
+      subject: document.getElementById('requestSubject').value,
+      description: document.getElementById('requestDescription').value,
+      userId: user.uid,
+      createdAt: new Date()
+    };
+
+    try {
+      await addDoc(collection(db, 'requests'), requestData);
+      alert('Request submitted successfully!');
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+</script>
+  <!-- Footer (Same as index.html) -->
+</body>
+</html>

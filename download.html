@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Downloads - CollegeNotes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navbar -->
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Downloads</h1>
+    
+    <!-- Downloads List -->
+    <div class="grid gap-4">
+      <div class="border p-4 rounded-lg flex justify-between items-center">
+        <div>
+          <h3 class="font-bold">Calculus 101 Notes</h3>
+          <p class="text-gray-600">PDF • 2.4MB</p>
+        </div>
+        <a href="#" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Download</a>
+      </div>
+
+      <div class="border p-4 rounded-lg flex justify-between items-center">
+        <div>
+          <h3 class="font-bold">Physics Formulas Sheet</h3>
+          <p class="text-gray-600">DOCX • 1.1MB</p>
+        </div>
+        <a href="#" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Download</a>
+      </div>
+    </div>
+  </main>
+<script type="module">
+  import { storage, ref, getDownloadURL } from '../assets/js/firebase-init.js';
+
+  async function loadDownloads() {
+    const downloadsRef = ref(storage, 'notes/');
+    
+    // You'll need to list files properly in real implementation
+    const sampleFileRef = ref(storage, 'notes/sample.pdf');
+    
+    try {
+      const url = await getDownloadURL(sampleFileRef);
+      document.getElementById('downloadLink').href = url;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  loadDownloads();
+</script>
+  <!-- Footer -->
+</body>
+</html>

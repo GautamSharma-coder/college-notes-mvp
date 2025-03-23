@@ -1,0 +1,94 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    color: #000000;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+/* Navbar */
+nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background: #000;
+    color: #fff;
+    align-items: center;
+}
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 15px;
+}
+.nav-links a {
+    text-decoration: none;
+    color: #fff;
+}
+.nav-links button {
+    background: none;
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* Hero Section */
+.hero {
+    padding: 100px 20px;
+    background: linear-gradient(120deg, #f4f4f4, #e0e0e0);
+}
+.hero h1 {
+    font-size: 2.5rem;
+}
+.hero p {
+    font-size: 1.2rem;
+    margin: 15px 0;
+}
+.cta-button {
+    display: inline-block;
+    background: black;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+.cta-button:hover {
+    background: gray;
+}
+
+/* Features Section */
+.features {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 50px;
+}
+.feature {
+    width: 30%;
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+}
+.feature h2 {
+    font-size: 1.5rem;
+}
+
+/* Footer */
+footer {
+    padding: 15px;
+    background: black;
+    color: white;
+}
