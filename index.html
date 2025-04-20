@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CollegeNotes - Your ultimate academic companion for notes, lectures, and study resources">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+
+    </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <title>CollegeNotes - Study Smarter</title>
+</head>
+<body class="font-sans text-gray-800 bg-white">
+  <!-- Navigation - Minimalist Style -->
+  <nav class="py-6 border-b border-gray-100 sticky top-0 z-50 bg-white/30 backdrop-blur-sm ">
+    <div class="max-w-6xl mx-auto px-6 flex justify-between items-center">
+      <a href="index.html"  id="logo" class="text-2xl font-bold tracking-tight">CollegeNotes</a>
+
+      <div class="hidden md:flex space-x-10">
+        <a href="notes.html" class="text-gray-700 hover:text-black transition-colors">Notes</a>
+        <a href="lectures.html" class="text-gray-700 hover:text-black transition-colors">Lectures</a>
+        <a href="contact.html" class="text-gray-700 hover:text-black transition-colors">Contact</a>
+        <a href="./discussion/index.html" class="text-gray-700 hover:text-black transition-colors">Discussion</a>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="hidden md:block relative">
+          <input type="text" placeholder="Search..." class="pl-10 pr-4 py-2 w-36 border-b border-gray-200 focus:border-black focus:outline-none">
+          <i class="fas fa-search absolute left-0 top-3 text-gray-400"></i>
+        </div>
+        <a href="login.html" id="authBtn" class="bg-black text-white px-5 py-2 rounded-full text-sm hover:bg-gray-900 transition-colors">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section - Minimalist -->
+  <section class="pt-20 pb-32">
+    <div class="max-w-5xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-12 items-center">
+        <div class="md:col-span-3 space-y-8">
+          <h1 class="text-5xl md:text-6xl font-bold leading-tight">Study smarter, not harder.</h1>
+          <p class="text-xl text-gray-600 max-w-xl">Access premium study materials from top universities and ace your exams with CollegeNotes.</p>
+          <div class="flex flex-wrap gap-4">
+            <a href="notes.html" class="bg-black text-white px-8 py-3 rounded-md hover:bg-gray-900 transition-colors">Explore Notes</a>
+            <a href="lectures.html" class="bg-white text-black px-8 py-3 rounded-md border border-black hover:bg-gray-50 transition-colors">Watch Lectures</a>
+          </div>
+        </div>
+        <div class="md:col-span-2">
+          <img src="../assets/image/student.jpg" alt="Student studying" class="w-full h-auto rounded-xl shadow-lg">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div>
+          <div class="text-4xl font-bold mb-2">5,000+</div>
+          <p class="text-gray-600">Study Notes</p>
+        </div>
+        <div>
+          <div class="text-4xl font-bold mb-2">350+</div>
+          <p class="text-gray-600">Video Lectures</p>
+        </div>
+        <div>
+          <div class="text-4xl font-bold mb-2">50,000+</div>
+          <p class="text-gray-600">Active Students</p>
+        </div>
+        <div>
+          <div class="text-4xl font-bold mb-2">100+</div>
+          <p class="text-gray-600">Universities</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Categories -->
+  <section class="py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl font-bold mb-12 text-center">Browse by Category</h2>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <a href="#" class="group">
+          <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center transition-all group-hover:bg-gray-200">
+            <i class="fas fa-laptop-code text-4xl text-gray-800"></i>
+          </div>
+          <h3 class="mt-4 text-xl font-semibold">Computer Science</h3>
+          <p class="text-gray-600 mt-1">142 resources</p>
+        </a>
+        
+        <a href="#" class="group">
+          <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center transition-all group-hover:bg-gray-200">
+            <i class="fas fa-flask text-4xl text-gray-800"></i>
+          </div>
+          <h3 class="mt-4 text-xl font-semibold">Chemistry</h3>
+          <p class="text-gray-600 mt-1">98 resources</p>
+        </a>
+        
+        <a href="#" class="group">
+          <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center transition-all group-hover:bg-gray-200">
+            <i class="fas fa-calculator text-4xl text-gray-800"></i>
+          </div>
+          <h3 class="mt-4 text-xl font-semibold">Mathematics</h3>
+          <p class="text-gray-600 mt-1">215 resources</p>
+        </a>
+        
+        <a href="#" class="group">
+          <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center transition-all group-hover:bg-gray-200">
+            <i class="fas fa-book-open text-4xl text-gray-800"></i>
+          </div>
+          <h3 class="mt-4 text-xl font-semibold">Literature</h3>
+          <p class="text-gray-600 mt-1">76 resources</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <section class="py-16 bg-black text-white">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to boost your academic performance?</h2>
+      <p class="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">Join thousands of students who have transformed their grades with CollegeNotes.</p>
+      <a href="signup.html" id="ctaBtn" class="inline-block bg-white text-black font-bold px-8 py-4 rounded-md hover:bg-gray-100 transition-colors">Start for Free</a>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="py-20">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-3xl font-bold mb-16 text-center">How CollegeNotes Works</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl font-bold">1</span>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Create an Account</h3>
+          <p class="text-gray-600">Sign up for free and get immediate access to thousands of study materials.</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl font-bold">2</span>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Browse Resources</h3>
+          <p class="text-gray-600">Search for notes, lectures, and study guides by subject, course, or university.</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl font-bold">3</span>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Ace Your Exams</h3>
+          <p class="text-gray-600">Study efficiently with our organized materials and watch your grades improve.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer - Minimalist -->
+  <footer class="py-12 border-t border-gray-100">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
+        <div class="col-span-2">
+          <a href="index.html" class="text-2xl font-bold tracking-tight">CollegeNotes</a>
+          <p class="mt-4 text-gray-600 max-w-xs">Your trusted academic resource platform. Access quality notes, lectures, and study materials.</p>
+          <div class="flex space-x-4 mt-6">
+            <a href="#" class="text-gray-600 hover:text-black transition-colors">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="text-gray-600 hover:text-black transition-colors">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="text-gray-600 hover:text-black transition-colors">
+              <i class="fab fa-facebook"></i>
+            </a>
+            <a href="#" class="text-gray-600 hover:text-black transition-colors">
+              <i class="fab fa-linkedin"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="font-bold text-sm uppercase tracking-wider text-gray-500 mb-4">Resources</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Notes</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Lectures</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Downloads</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Premium</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-bold text-sm uppercase tracking-wider text-gray-500 mb-4">Company</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">About</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Contact</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Careers</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Blog</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="font-bold text-sm uppercase tracking-wider text-gray-500 mb-4">Legal</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Privacy</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Terms</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Copyright</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-100 mt-12 pt-8 text-sm text-gray-500 flex flex-col md:flex-row justify-between">
+        <p>© 2024 CollegeNotes. All rights reserved.</p>
+        <p class="mt-2 md:mt-0">Made with ♥ for students worldwide</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Firebase Authentication Script -->
+  <script type="module">
+    import { auth, signOut, db, doc, getDoc, onAuthStateChanged } from './assets/js/firebase-init.js';
+
+document.addEventListener("DOMContentLoaded", () => {
+    const authBtn = document.getElementById("authBtn");
+    const ctaBtn = document.getElementById("ctaBtn");
+
+    if (!authBtn || !ctaBtn) return;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const docRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(docRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    if (userData.role === "admin") {
+                        authBtn.textContent = "Admin Dashboard";
+                        authBtn.href = "admin-dashboard.html";
+                        return;
+                    }
+                }
+
+                authBtn.textContent = "Dashboard";
+                authBtn.href = "dashboard.html";
+                ctaBtn.textContent = "Go to Dashboard";
+                ctaBtn.href = "dashboard.html";
+            } catch (e) {
+                console.error("Error fetching user data", e);
+            }
+        } else {
+            console.log("❌ User is logged out.");
+            authBtn.textContent = "Login";
+            authBtn.href = "login.html"; 
+            ctaBtn.textContent = "Start for Free";
+            ctaBtn.href = "signup.html"; 
+        }
+    });
+});
+  </script>
+  <!--
+  <script type="module" src="./assets/js/auth-check.js"></script>
+  <script type="module" src="../assets/js/protected-route.js"></script>
+  -->
+</body>
+</html>

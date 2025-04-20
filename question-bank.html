@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Bank</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Header -->
+  <header class="bg-blue-600 text-white shadow-md">
+    <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+      <div class="flex items-center mb-4 md:mb-0">
+        <i class="fas fa-book-open text-2xl mr-3"></i>
+        <h1 class="text-2xl font-bold">Question Bank</h1>
+      </div>
+      <div class="flex items-center">
+        <div id="user-profile" class="hidden">
+          <span id="user-email" class="mr-4"></span>
+          <button id="logout-btn" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">
+            Logout
+          </button>
+        </div>
+        <div id="login-section">
+          <button id="login-btn" class="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">
+            Login
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <!-- Filters Section -->
+    <section class="mb-8 bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-xl font-bold mb-4">Filters</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Search Box -->
+        <div class="col-span-1 md:col-span-2">
+          <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+          <div class="relative">
+            <input type="text" id="search" name="search" placeholder="Search questions..." 
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            <button class="absolute right-2 top-2 text-gray-400">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Subject Filter -->
+        <div>
+          <label for="subject-filter" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+          <select id="subject-filter" name="subject-filter" 
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            <option value="">All Subjects</option>
+            <option value="mathematics">Mathematics</option>
+            <option value="physics">Physics</option>
+            <option value="chemistry">Chemistry</option>
+            <option value="biology">Biology</option>
+          </select>
+        </div>
+        
+        <!-- Topic Filter (will be populated based on subject) -->
+        <div>
+          <label for="topic-filter" class="block text-sm font-medium text-gray-700 mb-1">Topic</label>
+          <select id="topic-filter" name="topic-filter" 
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            <option value="">All Topics</option>
+          </select>
+        </div>
+        
+        <!-- Difficulty Filter -->
+        <div class="col-span-1 md:col-span-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+          <div class="flex space-x-4">
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="easy-filter" class="form-checkbox text-blue-600" checked>
+              <span class="ml-2 text-green-600 font-medium">Easy</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="medium-filter" class="form-checkbox text-blue-600" checked>
+              <span class="ml-2 text-yellow-600 font-medium">Medium</span>
+            </label>
+            <label class="inline-flex items-center">
+              <input type="checkbox" id="hard-filter" class="form-checkbox text-blue-600" checked>
+              <span class="ml-2 text-red-600 font-medium">Hard</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Questions Display -->
+    <section class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Questions</h2>
+        <div class="flex items-center">
+          <button id="grid-view-btn" class="px-3 py-1 rounded-l-lg bg-blue-600 text-white hover:bg-blue-700">
+            <i class="fas fa-th-large"></i>
+          </button>
+          <button id="list-view-btn" class="px-3 py-1 rounded-r-lg bg-gray-200 text-gray-700 hover:bg-gray-300">
+            <i class="fas fa-list"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Questions Grid View (default) -->
+      <div id="questions-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Cards will be dynamically added here -->
+      </div>
+      
+      <!-- Questions List View (hidden by default) -->
+      <div id="questions-list" class="hidden space-y-4">
+        <!-- List items will be dynamically added here -->
+      </div>
+      
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-12">
+        <i class="fas fa-search text-4xl text-gray-400 mb-3"></i>
+        <h3 class="text-xl font-medium text-gray-500">No questions found</h3>
+        <p class="text-gray-400">Try adjusting your filters or add a new question</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Floating Action Button (FAB) -->
+  <button id="add-question-fab" class="fixed bottom-6 right-6 bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+    <i class="fas fa-plus text-xl"></i>
+  </button>
+
+  <!-- Add/Edit Question Modal -->
+  <div id="question-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-screen overflow-y-auto p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 id="modal-title" class="text-2xl font-bold">Add New Question</h2>
+        <button id="close-modal" class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <form id="question-form">
+        <input type="hidden" id="question-id">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <!-- Left Column -->
+          <div class="space-y-6">
+            <!-- Question Text -->
+            <div>
+              <label for="question-text" class="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
+              <textarea id="question-text" name="question-text" rows="4" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+            </div>
+            
+            <!-- Options -->
+            <div class="space-y-4">
+              <h3 class="text-lg font-medium">Options</h3>
+              
+              <div>
+                <label for="option-a" class="block text-sm font-medium text-gray-700 mb-1">Option A</label>
+                <input type="text" id="option-a" name="option-a" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="option-b" class="block text-sm font-medium text-gray-700 mb-1">Option B</label>
+                <input type="text" id="option-b" name="option-b" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="option-c" class="block text-sm font-medium text-gray-700 mb-1">Option C</label>
+                <input type="text" id="option-c" name="option-c" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label for="option-d" class="block text-sm font-medium text-gray-700 mb-1">Option D</label>
+                <input type="text" id="option-d" name="option-d" required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Column -->
+          <div class="space-y-6">
+            <!-- Correct Answer -->
+            <div>
+              <label for="correct-answer" class="block text-sm font-medium text-gray-700 mb-1">Correct Answer</label>
+              <select id="correct-answer" name="correct-answer" required
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select correct answer</option>
+                <option value="A">Option A</option>
+                <option value="B">Option B</option>
+                <option value="C">Option C</option>
+                <option value="D">Option D</option>
+              </select>
+            </div>
+            
+            <!-- Subject -->
+            <div>
+              <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+              <select id="subject" name="subject" required
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select subject</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="physics">Physics</option>
+                <option value="chemistry">Chemistry</option>
+                <option value="biology">Biology</option>
+              </select>
+            </div>
+            
+            <!-- Topic (will be populated based on subject) -->
+            <div>
+              <label for="topic" class="block text-sm font-medium text-gray-700 mb-1">Topic</label>
+              <select id="topic" name="topic" required
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select topic</option>
+              </select>
+            </div>
+            
+            <!-- Difficulty -->
+            <div>
+              <label for="difficulty" class="block text-sm font-medium text-gray-700 mb-1">Difficulty</label>
+              <select id="difficulty" name="difficulty" required
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select difficulty</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-end space-x-4">
+          <button type="button" id="cancel-btn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">
+            Cancel
+          </button>
+          <button type="submit" id="save-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            Save Question
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div class="text-center mb-6">
+        <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+        <h2 class="text-2xl font-bold mb-2">Delete Question</h2>
+        <p class="text-gray-600">Are you sure you want to delete this question? This action cannot be undone.</p>
+      </div>
+      
+      <div class="flex justify-center space-x-4">
+        <button id="cancel-delete" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">
+          Cancel
+        </button>
+        <button id="confirm-delete" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Firebase Configuration
+  const firebaseConfig = {
+  apiKey: "AIzaSyDbwE7hFNe4eqDIOllJL99QUyHCxgzpS-o",
+  authDomain: "datacoll-36cec.firebaseapp.com",
+  databaseURL: "https://datacoll-36cec-default-rtdb.firebaseio.com",
+  projectId: "datacoll-36cec",
+  storageBucket: "datacoll-36cec.appspot.com",
+  messagingSenderId: "1016604814091",
+  appId: "1:1016604814091:web:413f4f753259580060d00e"
+};
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    
+    // DOM Elements
+    const questionForm = document.getElementById('question-form');
+    const addQuestionFab = document.getElementById('add-question-fab');
+    const questionModal = document.getElementById('question-modal');
+    const closeModal = document.getElementById('close-modal');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const modalTitle = document.getElementById('modal-title');
+    const questionsGrid = document.getElementById('questions-grid');
+    const questionsList = document.getElementById('questions-list');
+    const gridViewBtn = document.getElementById('grid-view-btn');
+    const listViewBtn = document.getElementById('list-view-btn');
+    const emptyState = document.getElementById('empty-state');
+    const deleteModal = document.getElementById('delete-modal');
+    const cancelDelete = document.getElementById('cancel-delete');
+    const confirmDelete = document.getElementById('confirm-delete');
+    const searchInput = document.getElementById('search');
+    const subjectFilter = document.getElementById('subject-filter');
+    const topicFilter = document.getElementById('topic-filter');
+    const easyFilter = document.getElementById('easy-filter');
+    const mediumFilter = document.getElementById('medium-filter');
+    const hardFilter = document.getElementById('hard-filter');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const userProfile = document.getElementById('user-profile');
+    const loginSection = document.getElementById('login-section');
+    const userEmail = document.getElementById('user-email');
+
+    // Topics by Subject
+    const topicsBySubject = {
+      mathematics: ['Algebra', 'Geometry', 'Calculus', 'Statistics', 'Trigonometry'],
+      physics: ['Mechanics', 'Electricity', 'Magnetism', 'Optics', 'Thermodynamics'],
+      chemistry: ['Organic Chemistry', 'Inorganic Chemistry', 'Physical Chemistry', 'Biochemistry'],
+      biology: ['Cell Biology', 'Genetics', 'Ecology', 'Evolution', 'Physiology']
+    };
+
+    // Current questions state
+    let currentQuestions = [];
+    let deleteQuestionId = null;
+    
+    // Handle authentication state changes
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        // User is signed in
+        userProfile.classList.remove('hidden');
+        loginSection.classList.add('hidden');
+        userEmail.textContent = user.email;
+        loadQuestions();
+      } else {
+        // User is signed out
+        userProfile.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+        // For demo purposes, allow access without login
+        loadQuestions();
+      }
+    });
+
+    // Login functionality
+    loginBtn.addEventListener('click', function() {
+      // In a real app, use Firebase UI or custom auth flow
+      // For demo, we'll simulate login
+      auth.signInAnonymously()
+        .catch(error => {
+          console.error("Error signing in:", error);
+        });
+    });
+
+    // Logout functionality
+    logoutBtn.addEventListener('click', function() {
+      auth.signOut()
+        .catch(error => {
+          console.error("Error signing out:", error);
+        });
+    });
+
+    // Populate topics based on subject selection
+    function populateTopics(selectElement, subjectValue) {
+      const topicSelect = selectElement;
+      topicSelect.innerHTML = '<option value="">All Topics</option>';
+      
+      if (subjectValue && topicsBySubject[subjectValue]) {
+        topicsBySubject[subjectValue].forEach(topic => {
+          const option = document.createElement('option');
+          option.value = topic.toLowerCase();
+          option.textContent = topic;
+          topicSelect.appendChild(option);
+        });
+      }
+    }
+
+    // Subject change handlers
+    subjectFilter.addEventListener('change', function() {
+      populateTopics(topicFilter, this.value);
+      filterQuestions();
+    });
+
+    document.getElementById('subject').addEventListener('change', function() {
+      populateTopics(document.getElementById('topic'), this.value);
+    });
+
+    // Filter questions based on current filters
+    function filterQuestions() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const subject = subjectFilter.value.toLowerCase();
+      const topic = topicFilter.value.toLowerCase();
+      const easyChecked = easyFilter.checked;
+      const mediumChecked = mediumFilter.checked;
+      const hardChecked = hardFilter.checked;
+      
+      const filteredQuestions = currentQuestions.filter(question => {
+        // Check search term
+        const matchesSearch = question.text.toLowerCase().includes(searchTerm) ||
+                             question.optionA.toLowerCase().includes(searchTerm) ||
+                             question.optionB.toLowerCase().includes(searchTerm) ||
+                             question.optionC.toLowerCase().includes(searchTerm) ||
+                             question.optionD.toLowerCase().includes(searchTerm);
+        
+        // Check subject
+        const matchesSubject = !subject || question.subject === subject;
+        
+        // Check topic
+        const matchesTopic = !topic || question.topic === topic;
+        
+        // Check difficulty
+        const matchesDifficulty = (question.difficulty === 'easy' && easyChecked) ||
+                                 (question.difficulty === 'medium' && mediumChecked) ||
+                                 (question.difficulty === 'hard' && hardChecked);
+        
+        return matchesSearch && matchesSubject && matchesTopic && matchesDifficulty;
+      });
+      
+      renderQuestions(filteredQuestions);
+    }
+
+    // Add filter change listeners
+    searchInput.addEventListener('input', filterQuestions);
+    topicFilter.addEventListener('change', filterQuestions);
+    easyFilter.addEventListener('change', filterQuestions);
+    mediumFilter.addEventListener('change', filterQuestions);
+    hardFilter.addEventListener('change', filterQuestions);
+
+    // Toggle between grid and list views
+    gridViewBtn.addEventListener('click', function() {
+      questionsGrid.classList.remove('hidden');
+      questionsList.classList.add('hidden');
+      gridViewBtn.classList.replace('bg-gray-200', 'bg-blue-600');
+      gridViewBtn.classList.replace('text-gray-700', 'text-white');
+      listViewBtn.classList.replace('bg-blue-600', 'bg-gray-200');
+      listViewBtn.classList.replace('text-white', 'text-gray-700');
+    });
+
+    listViewBtn.addEventListener('click', function() {
+      questionsGrid.classList.add('hidden');
+      questionsList.classList.remove('hidden');
+      listViewBtn.classList.replace('bg-gray-200', 'bg-blue-600');
+      listViewBtn.classList.replace('text-gray-700', 'text-white');
+      gridViewBtn.classList.replace('bg-blue-600', 'bg-gray-200');
+      gridViewBtn.classList.replace('text-white', 'text-gray-700');
+    });
+
+    // Load questions from Firestore
+    function loadQuestions() {
+      db.collection('questions').get()
+        .then(snapshot => {
+          currentQuestions = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          filterQuestions();
+        })
+        .catch(error => {
+          console.error("Error getting questions:", error);
+          // For demo purposes, load sample data
+          loadSampleQuestions();
+        });
+    }
+
+    // Load sample questions (for demo)
+    function loadSampleQuestions() {
+      currentQuestions = [
+        {
+          id: '1',
+          text: 'What is the derivative of f(x) = x²?',
+          optionA: 'f\'(x) = x',
+          optionB: 'f\'(x) = 2x',
+          optionC: 'f\'(x) = 2',
+          optionD: 'f\'(x) = x²',
+          correctAnswer: 'B',
+          subject: 'mathematics',
+          topic: 'calculus',
+          difficulty: 'easy'
+        },
+        {
+          id: '2',
+          text: 'Which of the following is Newton\'s First Law?',
+          optionA: 'F = ma',
+          optionB: 'For every action, there is an equal and opposite reaction',
+          optionC: 'An object in motion stays in motion unless acted upon by an external force',
+          optionD: 'Energy cannot be created or destroyed',
+          correctAnswer: 'C',
+          subject: 'physics',
+          topic: 'mechanics',
+          difficulty: 'medium'
+        },
+        {
+          id: '3',
+          text: 'What is the chemical formula for methane?',
+          optionA: 'CH₄',
+          optionB: 'CO₂',
+          optionC: 'H₂O',
+          optionD: 'C₂H₆',
+          correctAnswer: 'A',
+          subject: 'chemistry',
+          topic: 'organic chemistry',
+          difficulty: 'easy'
+        },
+        {
+          id: '4',
+          text: 'Which organelle is responsible for protein synthesis?',
+          optionA: 'Mitochondria',
+          optionB: 'Golgi apparatus',
+          optionC: 'Ribosomes',
+          optionD: 'Lysosome',
+          correctAnswer: 'C',
+          subject: 'biology',
+          topic: 'cell biology',
+          difficulty: 'medium'
+        },
+        {
+          id: '5',
+          text: 'Solve for x: 2x + 3 = 11',
+          optionA: 'x = 4',
+          optionB: 'x = 5',
+          optionC: 'x = 3',
+          optionD: 'x = 7',
+          correctAnswer: 'A',
+          subject: 'mathematics',
+          topic: 'algebra',
+          difficulty: 'easy'
+        },
+        {
+          id: '6',
+          text: 'Which of the following is a primary constituent of the cell membrane?',
+          optionA: 'DNA',
+          optionB: 'Phospholipid bilayer',
+          optionC: 'Cellulose',
+          optionD: 'Glucose',
+          correctAnswer: 'B',
+          subject: 'biology',
+          topic: 'cell biology',
+          difficulty: 'hard'
+        }
+      ];
+      
+      filterQuestions();
+    }
+
+    // Render questions based on current view mode
+    function renderQuestions(questions) {
+      // Clear current questions
+      questionsGrid.innerHTML = '';
+      questionsList.innerHTML = '';
+      
+      if (questions.length === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        
+        // Render questions in both views
+        questions.forEach(question => {
+          // Grid view
+          const questionCard = createQuestionCard(question);
+          questionsGrid.appendChild(questionCard);
+          
+          // List view
+          const questionListItem = createQuestionListItem(question);
+          questionsList.appendChild(questionListItem);
+        });
+      }
+    }
+
+    // Create a question card for grid view
+    function createQuestionCard(question) {
+      const card = document.createElement('div');
+      card.className = 'bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow';
+      
+      // Difficulty badge color
+      let difficultyColor = 'bg-green-100 text-green-800';
+      if (question.difficulty === 'medium') {
+        difficultyColor = 'bg-yellow-100 text-yellow-800';
+      } else if (question.difficulty === 'hard') {
+        difficultyColor = 'bg-red-100 text-red-800';
+      }
+      
+      card.innerHTML = `
+        <div class="p-6">
+          <div class="flex justify-between items-start mb-4">
+            <span class="px-2 py-1 ${difficultyColor} text-xs font-medium rounded-full">
+              ${question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}
+            </span>
+            <div class="flex space-x-2">
+              <button class="edit-btn text-blue-600 hover:text-blue-800" data-id="${question.id}">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="delete-btn text-red-600 hover:text-red-800" data-id="${question.id}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+          <h3 class="text-lg font-semibold mb-3">${question.text}</h3>
+          
+          <div class="space-y-2 mb-4">
+            <div class="flex">
+              <span class="font-medium w-6">A.</span>
+              <span class="${question.correctAnswer === 'A' ? 'text-green-600 font-medium' : ''}">${question.optionA}</span>
+            </div>
+            <div class="flex">
+              <span class="font-medium w-6">B.</span>
+              <span class="${question.correctAnswer === 'B' ? 'text-green-600 font-medium' : ''}">${question.optionB}</span>
+            </div>
+            <div class="flex">
+              <span class="font-medium w-6">C.</span>
+              <span class="${question.correctAnswer === 'C' ? 'text-green-600 font-medium' : ''}">${question.optionC}</span>
+            </div>
+            <div class="flex">
+              <span class="font-medium w-6">D.</span>
+              <span class="${question.correctAnswer === 'D' ? 'text-green-600 font-medium' : ''}">${question.optionD}</span>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center text-sm text-gray-600">
+            <span>${question.subject.charAt(0).toUpperCase() + question.subject.slice(1)}</span>
+            <span>${question.topic.charAt(0).toUpperCase() + question.topic.slice(1)}</span>
+          </div>
+        </div>
+      `;
+      
+      // Add event listeners to buttons
+      card.querySelector('.edit-btn').addEventListener('click', () => editQuestion(question.id));
+      card.querySelector('.delete-btn').addEventListener('click', () => showDeleteModal(question.id));
+      
+      return card;
+    }
+
+    // Create a question list item for list view
+    function createQuestionListItem(question) {
+      const listItem = document.createElement('div');
+      listItem.className = 'bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow';
+      
+      let difficultyColor = 'bg-green-100 text-green-800';
+      if (question.difficulty === 'medium') {
+        difficultyColor = 'bg-yellow-100 text-yellow-800';
+      } else if (question.difficulty === 'hard') {
+        difficultyColor = 'bg-red-100 text-red-800';
+      }
+      
+      listItem.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div class="flex items-center mb-2">
+              <span class="px-2 py-1 ${difficultyColor} text-xs font-medium rounded-full mr-2">
+                ${question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}
+              </span>
+              <span class="font-semibold text-gray-800">${question.text}</span>
+            </div>
+            <ul class="list-disc list-inside text-sm text-gray-700">
+              <li><strong>A:</strong> ${question.optionA}</li>
+              <li><strong>B:</strong> ${question.optionB}</li>
+              <li><strong>C:</strong> ${question.optionC}</li>
+              <li><strong>D:</strong> ${question.optionD}</li>
+            </ul>
+            <div class="mt-2 text-sm text-gray-500">
+              Subject: ${question.subject} | Topic: ${question.topic}
+            </div>
+          </div>
+          <div class="flex flex-col space-y-2 ml-4">
+            <button class="edit-btn text-blue-600 hover:text-blue-800" data-id="${question.id}">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="delete-btn text-red-600 hover:text-red-800" data-id="${question.id}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      `;
+
+      listItem.querySelector('.edit-btn').addEventListener('click', () => editQuestion(question.id));
+      listItem.querySelector('.delete-btn').addEventListener('click', () => showDeleteModal(question.id));
+
+      return listItem;
+    }
+
+    // Show delete confirmation modal
+    function showDeleteModal(id) {
+      deleteQuestionId = id;
+      deleteModal.classList.remove('hidden');
+    }
+
+    // Cancel delete
+    cancelDelete.addEventListener('click', () => {
+      deleteQuestionId = null;
+      deleteModal.classList.add('hidden');
+    });
+
+    // Confirm delete
+    confirmDelete.addEventListener('click', () => {
+      if (deleteQuestionId) {
+        db.collection('questions').doc(deleteQuestionId).delete().then(() => {
+          deleteQuestionId = null;
+          deleteModal.classList.add('hidden');
+          loadQuestions();
+        });
+      }
+    });
+
+    // Edit question
+    function editQuestion(id) {
+      const question = currentQuestions.find(q => q.id === id);
+      if (question) {
+        modalTitle.textContent = 'Edit Question';
+        document.getElementById('question-id').value = question.id;
+        document.getElementById('question-text').value = question.text;
+        document.getElementById('option-a').value = question.optionA;
+        document.getElementById('option-b').value = question.optionB;
+        document.getElementById('option-c').value = question.optionC;
+        document.getElementById('option-d').value = question.optionD;
+        document.getElementById('correct-answer').value = question.correctAnswer;
+        document.getElementById('subject').value = question.subject;
+        populateTopics(document.getElementById('topic'), question.subject);
+        document.getElementById('topic').value = question.topic;
+        document.getElementById('difficulty').value = question.difficulty;
+        questionModal.classList.remove('hidden');
+      }
+    }
+
+    // Show modal to add question
+    addQuestionFab.addEventListener('click', () => {
+      modalTitle.textContent = 'Add New Question';
+      questionForm.reset();
+      document.getElementById('question-id').value = '';
+      questionModal.classList.remove('hidden');
+    });
+
+    // Close modal
+    closeModal.addEventListener('click', () => questionModal.classList.add('hidden'));
+    cancelBtn.addEventListener('click', () => questionModal.classList.add('hidden'));
+
+    // Handle question form submission
+    questionForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('question-id').value;
+      const data = {
+        text: document.getElementById('question-text').value,
+        optionA: document.getElementById('option-a').value,
+        optionB: document.getElementById('option-b').value,
+        optionC: document.getElementById('option-c').value,
+        optionD: document.getElementById('option-d').value,
+        correctAnswer: document.getElementById('correct-answer').value,
+        subject: document.getElementById('subject').value,
+        topic: document.getElementById('topic').value,
+        difficulty: document.getElementById('difficulty').value
+      };
+
+      if (id) {
+        db.collection('questions').doc(id).update(data).then(() => {
+          questionModal.classList.add('hidden');
+          loadQuestions();
+        });
+      } else {
+        db.collection('questions').add(data).then(() => {
+          questionModal.classList.add('hidden');
+          loadQuestions();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

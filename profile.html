@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - CollegeNotes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900"><!-- Navbar -->
+<nav class="px-6 py-4 bg-white border-b sticky top-0">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <a href="index.html" class="text-2xl font-bold">CollegeNotes</a>
+        <a href="dashboard.html" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Dashboard</a>
+    </div>
+</nav>
+
+<!-- Profile Section -->
+<div class="max-w-4xl mx-auto mt-10 bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-3xl font-bold mb-6 text-center">My Profile</h2>
+
+    <!-- Profile Picture -->
+    <div class="flex justify-center">
+        <img id="profileImage" src="https://via.placeholder.com/100" alt="Profile" class="w-24 h-24 rounded-full border">
+    </div>
+
+    <!-- User Details -->
+    <div class="mt-4 text-center">
+        <h3 id="userName" class="text-xl font-semibold"></h3>
+        <p id="userEmail" class="text-gray-600"></p>
+        <p id="joinedDate" class="text-sm text-gray-500"></p>
+        <p id="lastLogin" class="text-sm text-gray-500"></p>
+        <p id="emailVerified" class="text-sm"></p>
+        <p id="notesCount" class="text-sm text-gray-500"></p>
+    </div>
+
+    <!-- Edit Profile -->
+    <div class="mt-6">
+        <label class="block text-gray-700">Change Profile Picture</label>
+        <input type="file" id="profilePicInput" class="border p-2 w-full mt-2">
+
+        <label class="block text-gray-700 mt-4">Your Name</label>
+        <input type="text" id="nameInput" class="border p-2 w-full mt-1">
+
+        <label class="block text-gray-700 mt-4">Short Bio</label>
+        <textarea id="bioInput" class="border p-2 w-full mt-1" rows="3"></textarea>
+
+        <button id="updateProfileBtn" class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Update Profile</button>
+        <button id="saveDetailsBtn" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save Details</button>
+    </div>
+
+    <!-- Recent Uploads -->
+    <div class="mt-8 text-left">
+        <h4 class="font-semibold mb-2">Recent Notes</h4>
+        <ul id="recentNotesList" class="list-disc ml-5 text-sm text-blue-600"></ul>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <div class="mt-6">
+        <label class="flex items-center cursor-pointer">
+            <input type="checkbox" id="darkModeToggle" class="hidden">
+            <div class="w-10 h-5 bg-gray-300 rounded-full shadow-inner"></div>
+            <span class="ml-3 text-sm">Dark Mode</span>
+        </label>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="mt-10 border-t pt-6 text-left">
+        <h4 class="text-red-600 font-semibold mb-2">Danger Zone</h4>
+        <button id="deleteAccountBtn" class="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-800">Delete Account</button>
+    </div>
+
+    <!-- Logout Button -->
+    <div class="mt-6 text-center">
+        <button id="logoutBtn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Logout</button>
+    </div>
+</div>
+
+<script type="module" src="./assets/js/profile.js"></script>
+
+</body>
+</html>

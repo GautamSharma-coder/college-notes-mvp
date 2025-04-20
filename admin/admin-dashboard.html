@@ -1,0 +1,985 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Notes - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="bg-black text-white w-60 flex flex-col">
+            <div class="p-5 border-b border-gray-700">
+                <h1 class="text-2xl font-bold">College Notes</h1>
+                <p class="text-xs text-gray-400">Admin Dashboard</p>
+            </div>
+            <nav class="flex-1 overflow-y-auto py-4">
+                <a href="#" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-tachometer-alt mr-3"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 bg-gray-800 text-white">
+                    <i class="fas fa-file-alt mr-3"></i>
+                    <span>Notes Management</span>
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-users mr-3"></i>
+                    <span>User Management</span>
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-chart-bar mr-3"></i>
+                    <span>Analytics</span>
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white">
+                    <i class="fas fa-cog mr-3"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-gray-700">
+                <div class="flex items-center" id="userProfile">
+                    <img id="adminPhoto" class="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="Admin avatar">
+                    <div class="ml-3">
+                        <p class="text-sm font-medium">Admin User</p>
+                        <a href="#" class="text-xs text-gray-400 hover:text-white">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="px-6 py-4 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button class="text-gray-500 focus:outline-none">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h2 class="ml-4 text-xl font-semibold text-gray-800">Dashboard Overview</h2>
+                    </div>
+                    <div class="flex items-center">
+                        <button class="flex items-center text-gray-500 hover:text-gray-700 focus:outline-none mr-4">
+                            <i class="fas fa-bell"></i>
+                            <span class="ml-1 bg-red-500 text-white text-xs rounded-full px-2 py-1">3</span>
+                        </button>
+                        <div class="relative">
+                            <input class="bg-gray-100 rounded-lg px-4 py-2 pr-8 w-64 focus:outline-none focus:ring-2 focus:ring-black" type="text" placeholder="Search..." id="searchInput">
+                            <button class="absolute right-2 top-2 text-gray-500">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto bg-gray-100 p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Total Users</p>
+                                <h3 id="userCount" class="text-3xl font-bold text-gray-800">2,456</h3>
+                            </div>
+                            <div class="bg-black rounded-full p-3">
+                                <i class="fas fa-users text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center mt-4 text-green-500 text-sm">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span>12% increase</span>
+                            <span class="text-gray-400 ml-2">since last month</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Total Notes</p>
+                                <h3 id="notesCount" class="text-3xl font-bold text-gray-800">1,823</h3>
+                            </div>
+                            <div class="bg-black rounded-full p-3">
+                                <i class="fas fa-file-alt text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center mt-4 text-green-500 text-sm">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span>8% increase</span>
+                            <span class="text-gray-400 ml-2">since last month</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Pending Approvals</p>
+                                <h3 class="text-3xl font-bold text-gray-800">42</h3>
+                            </div>
+                            <div class="bg-black rounded-full p-3">
+                                <i class="fas fa-clock text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center mt-4 text-red-500 text-sm">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span>15% increase</span>
+                            <span class="text-gray-400 ml-2">since last week</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500 text-sm">Total Downloads</p>
+                                <h3 class="text-3xl font-bold text-gray-800">28.5k</h3>
+                            </div>
+                            <div class="bg-black rounded-full p-3">
+                                <i class="fas fa-download text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center mt-4 text-green-500 text-sm">
+                            <i class="fas fa-arrow-up mr-1"></i>
+                            <span>24% increase</span>
+                            <span class="text-gray-400 ml-2">since last month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Approval Section -->
+                <div class="bg-white rounded-lg shadow-sm mb-8">
+                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-800">Notes Pending Approval</h3>
+                        <button class="bg-black text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">View All</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uploaded By</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                                            <div class="text-sm font-medium text-gray-900">Quantum Mechanics Notes</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Physics</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img class="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="User avatar">
+                                            <div class="ml-2 text-sm font-medium text-gray-900">John Doe</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 2, 2025</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs mr-2 hover:bg-green-200">Approve</button>
+                                        <button class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs hover:bg-red-200">Reject</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-file-word text-blue-500 mr-2"></i>
+                                            <div class="text-sm font-medium text-gray-900">Macroeconomics Summary</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Economics</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img class="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="User avatar">
+                                            <div class="ml-2 text-sm font-medium text-gray-900">Jane Smith</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 1, 2025</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs mr-2 hover:bg-green-200">Approve</button>
+                                        <button class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs hover:bg-red-200">Reject</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-file-powerpoint text-orange-500 mr-2"></i>
+                                            <div class="text-sm font-medium text-gray-900">Data Structures Review</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Computer Science</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <img class="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="User avatar">
+                                            <div class="ml-2 text-sm font-medium text-gray-900">Alex Johnson</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Mar 30, 2025</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs mr-2 hover:bg-green-200">Approve</button>
+                                        <button class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs hover:bg-red-200">Reject</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+                        <span class="text-sm text-gray-500">Showing 3 of 42 notes</span>
+                        <div class="flex space-x-1">
+                            <button class="px-3 py-1 text-sm bg-black text-white rounded-lg">1</button>
+                            <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-200 rounded-lg">2</button>
+                            <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-200 rounded-lg">3</button>
+                            <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-200 rounded-lg">...</button>
+                            <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-200 rounded-lg">8</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Management Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-800">Recent Users</h3>
+                            <button class="bg-black text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">Manage Users</button>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img class="h-10 w-10 rounded-full" src="/api/placeholder/40/40" alt="User avatar">
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Sarah Wilson</div>
+                                            <div class="text-sm text-gray-500">sarah.wilson@example.com</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Active</span>
+                                        <button class="text-gray-400 hover:text-gray-500">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img class="h-10 w-10 rounded-full" src="/api/placeholder/40/40" alt="User avatar">
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Michael Brown</div>
+                                            <div class="text-sm text-gray-500">michael.brown@example.com</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Active</span>
+                                        <button class="text-gray-400 hover:text-gray-500">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img class="h-10 w-10 rounded-full" src="/api/placeholder/40/40" alt="User avatar">
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Emily Davis</div>
+                                            <div class="text-sm text-gray-500">emily.davis@example.com</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">Pending</span>
+                                        <button class="text-gray-400 hover:text-gray-500">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <img class="h-10 w-10 rounded-full" src="/api/placeholder/40/40" alt="User avatar">
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Robert Johnson</div>
+                                            <div class="text-sm text-gray-500">robert.johnson@example.com</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Suspended</span>
+                                        <button class="text-gray-400 hover:text-gray-500">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Popular Notes Section -->
+                    <div class="bg-white rounded-lg shadow-sm">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-semibold text-gray-800">Most Downloaded Notes</h3>
+                            <button class="bg-black text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">View All</button>
+                        </div>
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="bg-blue-100 p-3 rounded-lg">
+                                            <i class="fas fa-file-alt text-blue-500"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Organic Chemistry Fundamentals</div>
+                                            <div class="text-sm text-gray-500">Chemistry • 42 Pages</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-medium text-gray-900">4,521</div>
+                                        <div class="text-xs text-gray-500">downloads</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="bg-green-100 p-3 rounded-lg">
+                                            <i class="fas fa-file-excel text-green-500"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Statistical Analysis Methods</div>
+                                            <div class="text-sm text-gray-500">Mathematics • 36 Pages</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-medium text-gray-900">3,712</div>
+                                        <div class="text-xs text-gray-500">downloads</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="bg-purple-100 p-3 rounded-lg">
+                                            <i class="fas fa-file-word text-purple-500"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Modern Literature Review</div>
+                                            <div class="text-sm text-gray-500">English • 28 Pages</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-medium text-gray-900">2,845</div>
+                                        <div class="text-xs text-gray-500">downloads</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="bg-red-100 p-3 rounded-lg">
+                                            <i class="fas fa-file-pdf text-red-500"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">Neural Networks Explained</div>
+                                            <div class="text-sm text-gray-500">Computer Science • 53 Pages</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-sm font-medium text-gray-900">2,631</div>
+                                        <div class="text-xs text-gray-500">downloads</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+  <!--
+    <script src="../assets/js/admin.js"></script>
+    -->
+    
+    
+    <script type="module">
+      // Import Firebase modules
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signOut ,
+  getFirestore,
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  doc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  getStorage, 
+  ref, 
+  getDownloadURL ,
+  auth,
+  storage,
+  db
+} from "../assets/js/firebase-init.js";
+
+
+
+// DOM Elements
+const userCountElement = document.getElementById('userCount');
+const notesCountElement = document.getElementById('notesCount');
+const pendingApprovalsElement = document.getElementById('pendingApprovals');
+const totalDownloadsElement = document.getElementById('totalDownloads');
+const pendingNotesTableBody = document.getElementById('pendingNotesTableBody');
+const recentUsersContainer = document.getElementById('recentUsersContainer');
+const popularNotesContainer = document.getElementById('popularNotesContainer');
+const logoutButton = document.getElementById('logoutButton');
+const userProfileElement = document.getElementById('userProfile');
+
+// Authentication state observer
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in
+    checkAdminRole(user.uid);
+    displayUserProfile(user.uid);
+  } else {
+    // User is signed out, redirect to login
+    window.location.href = 'login.html';
+  }
+});
+
+// Check if user has admin role
+async function checkAdminRole(userId) {
+  try {
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+      if (userData.role !== "admin" ) {
+        // Not an admin, redirect to home
+        alert("You don't have permission to access the admin dashboard");
+        window.location.href = 'index.html';
+      } else {
+        // User is admin, load dashboard data
+        loadDashboardData();
+      }
+    } else {
+      console.error("No user found!");
+      window.location.href = 'login.html';
+    }
+  } catch (error) {
+    console.error("Error checking admin role:", error);
+  }
+}
+
+// Display user profile information
+function displayUserProfile(user) {
+  if (userProfileElement) {
+    getDoc(doc(db, "users", user.uid)).then((docSnap) => {
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        userProfileElement.innerHTML = `
+          <p class="text-sm font-medium">${userData.displayName || user.email}</p>
+          <a href="#" id="logoutButton" class="text-xs text-gray-400 hover:text-white">Logout</a>
+        `;
+        document.getElementById("adminPhoto").src = user.photoURL;
+        // Add event listener to logout button
+        document.getElementById('logoutButton').addEventListener('click', handleLogout);
+      }
+    });
+  }
+}
+
+// Handle user logout
+function handleLogout() {
+  signOut(auth).then(() => {
+    window.location.href = 'login.html';
+  }).catch((error) => {
+    console.error("Error signing out:", error);
+  });
+}
+
+// Load all dashboard data
+async function loadDashboardData() {
+  fetchUserStatistics();
+  fetchNotesStatistics();
+  fetchPendingApprovals();
+  fetchRecentUsers();
+  fetchPopularNotes();
+}
+
+// Fetch user statistics
+async function fetchUserStatistics() {
+  try {
+    const usersRef = collection(db, "users");
+    const usersSnap = await getDocs(usersRef);
+    const totalUsers = usersSnap.size;
+    
+    if (userCountElement) {
+      userCountElement.textContent = totalUsers.toLocaleString();
+    }
+    
+    // Get last month's user count for comparison
+    const lastMonthDate = new Date();
+    lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+    
+    const lastMonthQuery = query(
+      collection(db, "users"),
+      where("createdAt", "<", lastMonthDate)
+    );
+    
+    const lastMonthSnap = await getDocs(lastMonthQuery);
+    const lastMonthCount = lastMonthSnap.size;
+    
+    // Calculate growth percentage
+    if (lastMonthCount > 0) {
+      const growthPercentage = ((totalUsers - lastMonthCount) / lastMonthCount) * 100;
+      document.getElementById('userGrowth').textContent = `${growthPercentage.toFixed(1)}% increase`;
+    }
+  } catch (error) {
+    console.error("Error fetching user statistics:", error);
+  }
+}
+
+// Fetch notes statistics
+async function fetchNotesStatistics() {
+  try {
+    // Total notes count
+    const notesRef = collection(db, "notes");
+    const notesSnap = await getDocs(notesRef);
+    const totalNotes = notesSnap.size;
+    
+    if (notesCountElement) {
+      notesCountElement.textContent = totalNotes.toLocaleString();
+    }
+    
+    // Pending approvals count
+    const pendingQuery = query(
+      collection(db, "notes"),
+      where("status", "==", "pending")
+    );
+    
+    const pendingSnap = await getDocs(pendingQuery);
+    const pendingCount = pendingSnap.size;
+    
+    if (pendingApprovalsElement) {
+      pendingApprovalsElement.textContent = pendingCount;
+    }
+    
+    // Total downloads count
+    const statsRef = doc(db, "statistics", "downloads");
+    const statsSnap = await getDoc(statsRef);
+    
+    if (statsSnap.exists() && totalDownloadsElement) {
+      const totalDownloads = statsSnap.data().total;
+      totalDownloadsElement.textContent = (totalDownloads / 1000).toFixed(1) + "k";
+    }
+  } catch (error) {
+    console.error("Error fetching notes statistics:", error);
+  }
+}
+
+// Fetch pending approval notes
+async function fetchPendingApprovals() {
+  try {
+    const pendingQuery = query(
+      collection(db, "notes"),
+      where("status", "==", "pending"),
+      orderBy("uploadDate", "desc"),
+      limit(10)
+    );
+    
+    const pendingSnap = await getDocs(pendingQuery);
+    
+    if (pendingNotesTableBody) {
+      pendingNotesTableBody.innerHTML = ''; // Clear existing content
+      
+      if (pendingSnap.empty) {
+        pendingNotesTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+              No pending notes found
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      // Process each pending note
+      pendingSnap.forEach(async (noteDoc) => {
+        const noteData = noteDoc.data();
+        const noteId = noteDoc.id;
+        
+        // Get uploader data
+        const uploaderRef = doc(db, "users", noteData.uploaderId);
+        const uploaderSnap = await getDoc(uploaderRef);
+        const uploaderData = uploaderSnap.exists() ? uploaderSnap.data() : { displayName: "Unknown User" };
+        
+        // Format date
+        const uploadDate = noteData.uploadDate.toDate ? noteData.uploadDate.toDate() : new Date(noteData.uploadDate);
+        const formattedDate = uploadDate.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+        
+        // Get file icon based on file type
+        let fileIcon = 'fas fa-file';
+        switch (noteData.fileType) {
+          case 'pdf':
+            fileIcon = 'fas fa-file-pdf text-red-500';
+            break;
+          case 'doc':
+          case 'docx':
+            fileIcon = 'fas fa-file-word text-blue-500';
+            break;
+          case 'ppt':
+          case 'pptx':
+            fileIcon = 'fas fa-file-powerpoint text-orange-500';
+            break;
+          case 'xls':
+          case 'xlsx':
+            fileIcon = 'fas fa-file-excel text-green-500';
+            break;
+        }
+        
+        // Create table row
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <i class="${fileIcon} mr-2"></i>
+              <div class="text-sm font-medium text-gray-900">${noteData.title}</div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${noteData.subject}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <img class="h-8 w-8 rounded-full" src="${uploaderData.photoURL || '/api/placeholder/32/32'}" alt="User avatar">
+              <div class="ml-2 text-sm font-medium text-gray-900">${uploaderData.displayName}</div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <button class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs mr-2 hover:bg-green-200" 
+                    data-note-id="${noteId}" 
+                    onclick="approveNote('${noteId}')">Approve</button>
+            <button class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs hover:bg-red-200" 
+                    data-note-id="${noteId}" 
+                    onclick="rejectNote('${noteId}')">Reject</button>
+          </td>
+        `;
+        
+        pendingNotesTableBody.appendChild(row);
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching pending approvals:", error);
+  }
+}
+
+// Approve a note
+window.approveNote = async function(noteId) {
+  try {
+    const noteRef = doc(db, "notes", noteId);
+    await updateDoc(noteRef, {
+      status: "approved",
+      approvedAt: new Date(),
+      approvedBy: auth.currentUser.uid
+    });
+    
+    // Refresh the pending approvals list
+    fetchPendingApprovals();
+    fetchNotesStatistics();
+    
+    // Show success message
+    showNotification("Note approved successfully", "success");
+  } catch (error) {
+    console.error("Error approving note:", error);
+    showNotification("Failed to approve note", "error");
+  }
+}
+
+// Reject a note
+window.rejectNote = async function(noteId) {
+  try {
+    const noteRef = doc(db, "notes", noteId);
+    await updateDoc(noteRef, {
+      status: "rejected",
+      rejectedAt: new Date(),
+      rejectedBy: auth.currentUser.uid
+    });
+    
+    // Refresh the pending approvals list
+    fetchPendingApprovals();
+    fetchNotesStatistics();
+    
+    // Show success message
+    showNotification("Note rejected", "success");
+  } catch (error) {
+    console.error("Error rejecting note:", error);
+    showNotification("Failed to reject note", "error");
+  }
+}
+
+// Fetch recent users
+async function fetchRecentUsers() {
+  try {
+    const usersQuery = query(
+      collection(db, "users"),
+      orderBy("createdAt", "desc"),
+      limit(4)
+    );
+    
+    const usersSnap = await getDocs(usersQuery);
+    
+    if (recentUsersContainer) {
+      recentUsersContainer.innerHTML = ''; // Clear existing content
+      
+      usersSnap.forEach((userDoc) => {
+        const userData = userDoc.data();
+        const userId = userDoc.id;
+        
+        // Determine user status class
+        let statusClass = "bg-green-100 text-green-800";
+        let statusText = "Active";
+        
+        if (userData.status === "suspended") {
+          statusClass = "bg-red-100 text-red-800";
+          statusText = "Suspended";
+        } else if (userData.status === "pending") {
+          statusClass = "bg-yellow-100 text-yellow-800";
+          statusText = "Pending";
+        }
+        
+        // Create user card
+        const userCard = document.createElement('div');
+        userCard.className = "flex items-center justify-between";
+        userCard.innerHTML = `
+          <div class="flex items-center">
+            <img class="h-10 w-10 rounded-full" src="${userData.photoURL || '/api/placeholder/40/40'}" alt="User avatar">
+            <div class="ml-4">
+              <div class="text-sm font-medium text-gray-900">${userData.displayName || userData.email}</div>
+              <div class="text-sm text-gray-500">${userData.email}</div>
+            </div>
+          </div>
+          <div class="flex space-x-2">
+            <span class="${statusClass} text-xs px-2 py-1 rounded-full">${statusText}</span>
+            <div class="dropdown relative">
+              <button class="text-gray-400 hover:text-gray-500" id="user-dropdown-${userId}">
+                <i class="fas fa-ellipsis-v"></i>
+              </button>
+              <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" 
+                   id="dropdown-content-${userId}">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                   onclick="viewUserDetails('${userId}')">View Details</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                   onclick="toggleUserStatus('${userId}', '${userData.status}')">
+                   ${userData.status === 'suspended' ? 'Activate User' : 'Suspend User'}
+                </a>
+                <a href="#" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100" 
+                   onclick="deleteUser('${userId}')">Delete User</a>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        recentUsersContainer.appendChild(userCard);
+        
+        // Add dropdown toggle functionality
+        document.getElementById(`user-dropdown-${userId}`).addEventListener('click', function() {
+          document.getElementById(`dropdown-content-${userId}`).classList.toggle('hidden');
+        });
+        
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(event) {
+          if (!event.target.matches(`#user-dropdown-${userId}`) && 
+              !event.target.closest(`#user-dropdown-${userId}`)) {
+            const dropdown = document.getElementById(`dropdown-content-${userId}`);
+            if (!dropdown.classList.contains('hidden')) {
+              dropdown.classList.add('hidden');
+            }
+          }
+        });
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching recent users:", error);
+  }
+}
+
+// View user details
+window.viewUserDetails = function(userId) {
+  // Redirect to user details page with user ID
+  window.location.href = `user-details.html?id=${userId}`;
+}
+
+// Toggle user status (activate/suspend)
+window.toggleUserStatus = async function(userId, currentStatus) {
+  try {
+    const newStatus = currentStatus === 'suspended' ? 'active' : 'suspended';
+    
+    await updateDoc(doc(db, "users", userId), {
+      status: newStatus,
+      updatedAt: new Date()
+    });
+    
+    // Refresh recent users
+    fetchRecentUsers();
+    
+    // Show success message
+    showNotification(`User ${newStatus === 'active' ? 'activated' : 'suspended'} successfully`, "success");
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    showNotification("Failed to update user status", "error");
+  }
+}
+
+// Delete user (this would typically require additional checks and confirmations)
+window.deleteUser = async function(userId) {
+  // Show confirmation dialog
+  if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
+    return;
+  }
+  
+  try {
+    // In a real app, you might want to:
+    // 1. Delete user's content (notes, comments, etc.)
+    // 2. Update statistics
+    // 3. Delete user authentication record
+    
+    // For now, just delete the user document
+    await deleteDoc(doc(db, "users", userId));
+    
+    // Refresh recent users
+    fetchRecentUsers();
+    fetchUserStatistics();
+    
+    // Show success message
+    showNotification("User deleted successfully", "success");
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    showNotification("Failed to delete user", "error");
+  }
+}
+
+// Fetch popular notes
+async function fetchPopularNotes() {
+  try {
+    const notesQuery = query(
+      collection(db, "notes"),
+      where("status", "==", "approved"),
+      orderBy("downloadCount", "desc"),
+      limit(4)
+    );
+    
+    const notesSnap = await getDocs(notesQuery);
+    
+    if (popularNotesContainer) {
+      popularNotesContainer.innerHTML = ''; // Clear existing content
+      
+      notesSnap.forEach((noteDoc) => {
+        const noteData = noteDoc.data();
+        
+        // Determine file icon class based on file type
+        let fileIconClass = "bg-blue-100";
+        let fileIcon = "fas fa-file-alt text-blue-500";
+        
+        switch (noteData.fileType) {
+          case 'pdf':
+            fileIconClass = "bg-red-100";
+            fileIcon = "fas fa-file-pdf text-red-500";
+            break;
+          case 'doc':
+          case 'docx':
+            fileIconClass = "bg-purple-100";
+            fileIcon = "fas fa-file-word text-purple-500";
+            break;
+          case 'xls':
+          case 'xlsx':
+            fileIconClass = "bg-green-100";
+            fileIcon = "fas fa-file-excel text-green-500";
+            break;
+          case 'ppt':
+          case 'pptx':
+            fileIconClass = "bg-orange-100";
+            fileIcon = "fas fa-file-powerpoint text-orange-500";
+            break;
+        }
+        
+        // Create note card
+        const noteCard = document.createElement('div');
+        noteCard.className = "flex items-center justify-between";
+        noteCard.innerHTML = `
+          <div class="flex items-center">
+            <div class="${fileIconClass} p-3 rounded-lg">
+              <i class="${fileIcon}"></i>
+            </div>
+            <div class="ml-4">
+              <div class="text-sm font-medium text-gray-900">${noteData.title}</div>
+              <div class="text-sm text-gray-500">${noteData.subject} • ${noteData.pageCount || 'N/A'} Pages</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm font-medium text-gray-900">${noteData.downloadCount.toLocaleString()}</div>
+            <div class="text-xs text-gray-500">downloads</div>
+          </div>
+        `;
+        
+        popularNotesContainer.appendChild(noteCard);
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching popular notes:", error);
+  }
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 ${
+    type === 'success' ? 'bg-green-600' : 
+    type === 'error' ? 'bg-red-600' : 
+    'bg-blue-600'
+  }`;
+  notification.innerHTML = message;
+  document.body.appendChild(notification);
+  
+  // Remove notification after 3 seconds
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  // Logout button
+  if (logoutButton) {
+    logoutButton.addEventListener('click', handleLogout);
+  }
+  
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        // Implement search functionality here
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm) {
+          console.log("Searching for:", searchTerm);
+          // Implement search logic
+        }
+      }
+    });
+  }
+});
+
+// Export functions for global access
+window.handleLogout = handleLogout;
+    </script>
+    
+</body>
+</html>

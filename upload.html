@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Notes - CollegeNotes</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <!--
+    <div class="max-w-3xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-3xl font-bold mb-6 text-center">Upload Notes</h2>
+        
+        <label class="block font-semibold">Title:</label>
+        <input id="noteTitle" type="text" class="w-full border p-2 rounded" placeholder="Enter title">
+
+        <label class="block font-semibold mt-4">Category:</label>
+        <select id="noteCategory" class="w-full border p-2 rounded">
+            <option value="Mathematics">Mathematics</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Physics">Physics</option>
+            <option value="Chemistry">Chemistry</option>
+        </select>
+
+        <label class="block font-semibold mt-4">Upload File:</label>
+        <input type="file" id="noteFile" class="w-full border p-2 rounded">
+
+        <button id="uploadBtn" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded w-full">Upload Note</button>
+    </div>
+
+    <script type="module">
+        import { auth, db, storage } from './assets/js/firebase-init.js';
+        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        document.getElementById("uploadBtn").addEventListener("click", async () => {
+            const noteTitle = document.getElementById("noteTitle").value;
+            const noteCategory = document.getElementById("noteCategory").value;
+            const noteFile = document.getElementById("noteFile").files[0];
+
+            if (!noteTitle || !noteFile) {
+                alert("Please enter title and select a file.");
+                return;
+            }
+
+            const fileRef = ref(storage, `notes/${auth.currentUser.uid}/${noteFile.name}`);
+            await uploadBytes(fileRef, noteFile);
+            const fileURL = await getDownloadURL(fileRef);
+
+            await addDoc(collection(db, "notes"), {
+                title: noteTitle,
+                category: noteCategory,
+                fileURL: fileURL,
+                userId: auth.currentUser.uid,
+                uploadedAt: new Date()
+            });
+
+            alert("Note uploaded successfully!");
+            window.location.href = "dashboard.html";
+        });
+    </script>
+    -->
+    <form id="uploadForm" class="space-y-4">
+  <input type="text" id="noteTitle" placeholder="Note Title2" class="p-2 border rounded w-full" required>
+  <select id="noteSubject" class="p-2 border rounded w-full" required>
+    <option value="Mathematics">Mathematics</option>
+    <option value="Computer Science">Computer Science</option>
+    <option value="Physics">Physics</option>
+  </select>
+  <input type="file" id="noteFile" class="p-2 border rounded w-full" required>
+  <button type="submit" class="bg-black text-white px-4 py-2 rounded">Upload</button>
+</form>
+
+<div id="uploadStatus" class="mt-4 text-sm text-gray-600"></div>
+
+<script type="module">
+  import { auth, storage, db } from './assets/js/firebase-init.js';
+  import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+  import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user) {
+      alert("You must be logged in to upload notes.");
+      return;
+    }
+
+    const title = document.getElementById("noteTitle").value;
+    const subject = document.getElementById("noteSubject").value;
+    const file = document.getElementById("noteFile").files[0];
+
+    if (!file) {
+      alert("Please select a file.");
+      return;
+    }
+
+    const storageRef = ref(storage, `notes/${user.uid}/${file.name}`);
+    document.getElementById("uploadStatus").textContent = "Uploading...";
+
+    try {
+      const snapshot = await uploadBytes(storageRef, file);
+      const fileURL = await getDownloadURL(snapshot.ref);
+      
+      await addDoc(collection(db, "notes"), {
+        title,
+        subject,
+        fileURL,
+        userId: user.uid,
+        uploadedAt: new Date()
+      });
+
+      document.getElementById("uploadStatus").textContent = "Upload successful!";
+      document.getElementById("uploadForm").reset();
+    } catch (error) {
+      document.getElementById("uploadStatus").textContent = "Upload failed.";
+      console.error(error);
+    }
+  });
+</script>
+</body>
+</html>

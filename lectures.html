@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My College Notes - Lectures</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f1f1f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Notes editor styles */
+        .note-timestamp {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .note-timestamp:hover {
+            color: #fff;
+            background-color: #111;
+        }
+
+        /* Animation for lecture cards */
+        .lecture-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .lecture-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-black shadow-md">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838l-2.727 1.169 1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"></path>
+                    </svg>
+                    <h1 class="text-xl font-bold text-white">College Notes Hub</h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <button class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition">
+                        <i class="fas fa-sync-alt mr-2"></i>Sync Notes
+                    </button>
+                    <div class="relative">
+                        <img class="h-10 w-10 rounded-full object-cover" src="/api/placeholder/40/40" alt="User profile">
+                        <div class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-400 border-2 border-black"></div>
+                    </div>
+                </div>
+                <button class="md:hidden text-white">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center space-x-8">
+                <a href="index.html" class="py-4 text-gray-400 hover:text-white transition">Home</a>
+                <a href="lectures.html" class="py-4 text-white border-b-2 border-white font-medium">Lectures</a>
+                <a href="assignments.html" class="py-4 text-gray-400 hover:text-white transition">Assignments</a>
+                <a href="resources.html" class="py-4 text-gray-400 hover:text-white transition">Resources</a>
+                <a href="calendar.html" class="py-4 text-gray-400 hover:text-white transition">Calendar</a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <!-- Lecture Player Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fas fa-play-circle mr-3 text-white"></i>
+                Currently Watching
+            </h2>
+            
+            <div class="bg-black rounded-lg shadow-xl overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-0">
+                    <!-- Video Player -->
+                    <div class="lg:col-span-2 bg-black relative">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <iframe class="w-full h-full min-h-[300px] lg:min-h-[450px]" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        
+                        <!-- Video Controls -->
+                        <div class="p-4 bg-gray-900 border-b border-gray-800">
+                            <div class="flex flex-wrap items-center justify-between">
+                                <div>
+                                    <h3 class="text-xl font-medium text-white">Advanced Data Structures</h3>
+                                    <p class="text-gray-400 text-sm">Prof. Zhang • Lecture 5 • April 15, 2025</p>
+                                </div>
+                                <div class="flex space-x-4 mt-2 md:mt-0">
+                                    <button class="flex items-center text-gray-400 hover:text-white transition">
+                                        <i class="fas fa-thumbs-up mr-1"></i> 
+                                        <span>142</span>
+                                    </button>
+                                    <button class="flex items-center text-gray-400 hover:text-white transition">
+                                        <i class="fas fa-bookmark mr-1"></i>
+                                        <span>Save</span>
+                                    </button>
+                                    <button class="flex items-center text-gray-400 hover:text-white transition">
+                                        <i class="fas fa-share mr-1"></i>
+                                        <span>Share</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Notes Panel -->
+                    <div class="border-l border-gray-800">
+                        <div class="h-full flex flex-col">
+                            <div class="p-4 bg-gray-900 border-b border-gray-800 flex justify-between items-center">
+                                <h3 class="font-medium">Lecture Notes</h3>
+                                <div class="flex items-center space-x-2">
+                                    <button class="p-1 text-gray-400 hover:text-white transition" title="Auto-timestamp">
+                                        <i class="fas fa-clock"></i>
+                                    </button>
+                                    <button class="p-1 text-gray-400 hover:text-white transition" title="Download Notes">
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                    <button class="p-1 text-gray-400 hover:text-white transition" title="Settings">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-grow overflow-auto bg-gray-900 p-2">
+                                <div class="flex flex-col space-y-2">
+                                    <div class="note-timestamp flex space-x-2 p-2 rounded bg-gray-800">
+                                        <span class="text-sm text-gray-400">00:15</span>
+                                        <p class="text-sm">Introduction to binary trees and their properties</p>
+                                    </div>
+                                    
+                                    <div class="note-timestamp flex space-x-2 p-2 rounded bg-gray-800">
+                                        <span class="text-sm text-gray-400">02:42</span>
+                                        <p class="text-sm">Types of binary trees: full, complete, and perfect</p>
+                                    </div>
+                                    
+                                    <div class="note-timestamp flex space-x-2 p-2 rounded bg-gray-800">
+                                        <span class="text-sm text-gray-400">07:15</span>
+                                        <p class="text-sm">Traversal algorithms: in-order, pre-order, post-order</p>
+                                    </div>
+                                    
+                                    <div class="note-timestamp flex space-x-2 p-2 rounded bg-gray-800">
+                                        <span class="text-sm text-gray-400">12:30</span>
+                                        <p class="text-sm">Time complexity of binary tree operations</p>
+                                    </div>
+                                    
+                                    <div class="note-timestamp flex space-x-2 p-2 rounded bg-gray-800">
+                                        <span class="text-sm text-gray-400">18:05</span>
+                                        <p class="text-sm">Implementation of binary search trees in Python</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-3 bg-gray-800 border-t border-gray-700">
+                                <div class="flex">
+                                    <input type="text" placeholder="Add a new note..." class="flex-grow bg-gray-700 text-white placeholder-gray-400 rounded-l px-3 py-2 focus:outline-none focus:ring-1 focus:ring-white">
+                                    <button class="bg-gray-600 hover:bg-gray-500 text-white px-4 rounded-r transition">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Browse Lectures Section -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-list-ul mr-3 text-white"></i>
+                    All Lectures
+                </h2>
+                
+                <div class="flex space-x-3">
+                    <div class="relative">
+                        <input type="text" placeholder="Search lectures..." class="bg-gray-800 text-white placeholder-gray-400 px-4 py-2 pr-10 rounded focus:outline-none focus:ring-1 focus:ring-white">
+                        <div class="absolute right-3 top-2.5 text-gray-400">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+                    
+                    <select class="bg-gray-800 text-white px-3 py-2 rounded focus:outline-none focus:ring-1 focus:ring-white">
+                        <option value="">All Subjects</option>
+                        <option value="cs">Computer Science</option>
+                        <option value="math">Mathematics</option>
+                        <option value="physics">Physics</option>
+                        <option value="chem">Chemistry</option>
+                        <option value="bio">Biology</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Lecture Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Lecture Card 1 -->
+                <div class="lecture-card bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="relative">
+                        <img src="/api/placeholder/400/200" alt="Data Structures lecture thumbnail" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
+                            <span class="bg-gray-900 text-xs font-semibold px-2 py-1 rounded">Computer Science</span>
+                        </div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-black bg-opacity-70 text-xs px-2 py-1 rounded-full flex items-center">
+                                <i class="fas fa-clock mr-1"></i> 1:15:42
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium text-white">Advanced Data Structures</h3>
+                        <p class="text-gray-400 text-sm mb-2">Prof. Zhang • Lecture 5</p>
+                        <p class="text-gray-300 text-sm mb-4">Deep dive into binary trees, heaps, and priority queues with implementation examples.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-400">April 15, 2025</span>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-play-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lecture Card 2 -->
+                <div class="lecture-card bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="relative">
+                        <img src="/api/placeholder/400/200" alt="Calculus lecture thumbnail" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
+                            <span class="bg-gray-900 text-xs font-semibold px-2 py-1 rounded">Mathematics</span>
+                        </div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-black bg-opacity-70 text-xs px-2 py-1 rounded-full flex items-center">
+                                <i class="fas fa-clock mr-1"></i> 1:08:23
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium text-white">Multivariable Calculus</h3>
+                        <p class="text-gray-400 text-sm mb-2">Prof. Johnson • Lecture 7</p>
+                        <p class="text-gray-300 text-sm mb-4">Partial derivatives, gradient vectors, and applications in optimization problems.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-400">April 12, 2025</span>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-play-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lecture Card 3 -->
+                <div class="lecture-card bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="relative">
+                        <img src="/api/placeholder/400/200" alt="Quantum Physics lecture thumbnail" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
+                            <span class="bg-gray-900 text-xs font-semibold px-2 py-1 rounded">Physics</span>
+                        </div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-black bg-opacity-70 text-xs px-2 py-1 rounded-full flex items-center">
+                                <i class="fas fa-clock mr-1"></i> 1:23:15
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium text-white">Quantum Mechanics</h3>
+                        <p class="text-gray-400 text-sm mb-2">Prof. Feynman • Lecture 4</p>
+                        <p class="text-gray-300 text-sm mb-4">Wave functions, Schrödinger equation, and quantum probability interpretations.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-400">April 10, 2025</span>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-play-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lecture Card 4 -->
+                <div class="lecture-card bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="relative">
+                        <img src="/api/placeholder/400/200" alt="Biochemistry lecture thumbnail" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
+                            <span class="bg-gray-900 text-xs font-semibold px-2 py-1 rounded">Chemistry</span>
+                        </div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-black bg-opacity-70 text-xs px-2 py-1 rounded-full flex items-center">
+                                <i class="fas fa-clock mr-1"></i> 0:58:37
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium text-white">Biochemistry Fundamentals</h3>
+                        <p class="text-gray-400 text-sm mb-2">Prof. Davis • Lecture 3</p>
+                        <p class="text-gray-300 text-sm mb-4">Enzymes, metabolic pathways, and cellular energy production processes.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-400">April 8, 2025</span>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-play-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lecture Card 5 -->
+                <div class="lecture-card bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="relative">
+                        <img src="/api/placeholder/400/200" alt="Machine Learning lecture thumbnail" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
+                            <span class="bg-gray-900 text-xs font-semibold px-2 py-1 rounded">Computer Science</span>
+                        </div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-black bg-opacity-70 text-xs px-2 py-1 rounded-full flex items-center">
+                                <i class="fas fa-clock mr-1"></i> 1:42:08
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium text-white">Neural Networks</h3>
+                        <p class="text-gray-400 text-sm mb-2">Prof. Garcia • Lecture 8</p>
+                        <p class="text-gray-300 text-sm mb-4">Deep learning architectures, backpropagation, and CNN implementations.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-400">April 5, 2025</span>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-play-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lecture Card 6 -->
+                <div class="lecture-card bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <div class="relative">
+                        <img src="/api/placeholder/400/200" alt="Molecular Biology lecture thumbnail" class="w-full h-48 object-cover">
+                        <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black to-transparent">
+                            <span class="bg-gray-900 text-xs font-semibold px-2 py-1 rounded">Biology</span>
+                        </div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-black bg-opacity-70 text-xs px-2 py-1 rounded-full flex items-center">
+                                <i class="fas fa-clock mr-1"></i> 1:05:51
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-4">
+                        <h3 class="text-lg font-medium text-white">Genetics & Gene Expression</h3>
+                        <p class="text-gray-400 text-sm mb-2">Prof. Morgan • Lecture 6</p>
+                        <p class="text-gray-300 text-sm mb-4">DNA replication, transcription, and translation mechanisms in eukaryotes.</p>
+                        
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs text-gray-400">April 2, 2025</span>
+                            <div class="flex space-x-2">
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-bookmark"></i>
+                                </button>
+                                <button class="text-gray-400 hover:text-white transition">
+                                    <i class="fas fa-play-circle"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="mt-8 text-center">
+                <button class="bg-gray-800 hover:bg-gray-700 text-white px-6 py-3 rounded transition">
+                    Load More Lectures
+                </button>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Floating Action Button -->
+    <div class="fixed bottom-6 right-6">
+        <button class="bg-white text-black p-4 rounded-full shadow-lg hover:bg-gray-200 transition">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-black text-gray-400 py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 College Notes Hub | Made with <span class="text-white">♥</span> by Your Name</p>
+        </div>
+    </footer>
+</body>
+</html>

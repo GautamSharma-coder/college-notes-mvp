@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reviews - CollegeNotes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="assets/js/script.js"></script>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navbar -->
+  <nav class="px-6 py-4 border-b bg-white sticky top-0">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold flex items-center">
+        CollegeNotes
+      </a>
+      <div class="space-x-2">
+        <a href="notes.html" class="hover:text-gray-600">Notes</a>
+        <a href="lectures.html" class="hover:text-gray-600">Lectures</a>
+        <a href="contact.html" class="hover:text-gray-600">Contact</a>
+        <a href="login.html" class="bg-black text-white px-2 py-2 rounded hover:bg-gray-800">Login</a>
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-3xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">User Reviews</h1>
+
+    <!-- Review Form -->
+    <form id="reviewForm" class="mb-12 bg-gray-50 p-6 rounded-xl">
+      <div class="mb-4">
+        <label class="block mb-2">Rating</label>
+        <div class="rating-stars flex gap-2">
+          <span class="text-2xl cursor-pointer" data-rating="1">☆</span>
+          <span class="text-2xl cursor-pointer" data-rating="2">☆</span>
+          <span class="text-2xl cursor-pointer" data-rating="3">☆</span>
+          <span class="text-2xl cursor-pointer" data-rating="4">☆</span>
+          <span class="text-2xl cursor-pointer" data-rating="5">☆</span>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="block mb-2">Review</label>
+        <textarea rows="4" class="w-full p-3 border rounded-lg"></textarea>
+      </div>
+      <button class="bg-black text-white px-6 py-2 rounded hover:bg-gray-800">Submit Review</button>
+    </form>
+
+    <!-- Reviews List -->
+    <div class="space-y-6">
+      <div class="border p-4 rounded-lg">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="text-yellow-400">★★★★☆</div>
+          <span class="text-sm text-gray-500">John D. • 2 days ago</span>
+        </div>
+        <p class="text-gray-800">Excellent quality notes, helped me ace my exams!</p>
+      </div>
+
+      <div class="border p-4 rounded-lg">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="text-yellow-400">★★★★★</div>
+          <span class="text-sm text-gray-500">Sarah M. • 1 week ago</span>
+        </div>
+        <p class="text-gray-800">The video lectures are incredibly well-organized.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Star Rating System
+    document.querySelectorAll('[data-rating]').forEach(star => {
+      star.addEventListener('click', function() {
+        const rating = parseInt(this.dataset.rating);
+        document.querySelectorAll('[data-rating]').forEach((s, index) => {
+          s.textContent = index < rating ? '★' : '☆';
+        });
+      });
+    });
+  </script>
+</body>
+</html>

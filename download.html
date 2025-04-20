@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Downloads - CollegeNotes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-800">
+  <!-- Navbar -->
+  <nav class="px-6 py-4 border-b bg-white sticky top-0">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold flex items-center">
+        CollegeNotes
+      </a>
+      <div class="space-x-2">
+        <a href="notes.html" class="hover:text-gray-600">Notes</a>
+        <a href="lectures.html" class="hover:text-gray-600">Lectures</a>
+        <a href="contact.html" class="hover:text-gray-600">Contact</a>
+        <a href="login.html" class="bg-black text-white px-2 py-2 rounded hover:bg-gray-800">Login</a>
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Downloads</h1>
+    
+    <!-- Downloads List -->
+    <div class="grid gap-4">
+      <div class="border p-4 rounded-lg flex justify-between items-center">
+        <div>
+          <h3 class="font-bold">Calculus 101 Notes</h3>
+          <p class="text-gray-600">PDF • 2.4MB</p>
+        </div>
+        <a href="#" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Download</a>
+      </div>
+
+      <div class="border p-4 rounded-lg flex justify-between items-center">
+        <div>
+          <h3 class="font-bold">Physics Formulas Sheet</h3>
+          <p class="text-gray-600">DOCX • 1.1MB</p>
+        </div>
+        <a href="#" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Download</a>
+      </div>
+    </div>
+  </main>
+<script type="module">
+  import { storage, ref, getDownloadURL } from '../assets/js/firebase-init.js';
+
+  async function loadDownloads() {
+    const downloadsRef = ref(storage, 'notes/');
+    
+    // You'll need to list files properly in real implementation
+    const sampleFileRef = ref(storage, 'notes/sample.pdf');
+    
+    try {
+      const url = await getDownloadURL(sampleFileRef);
+      document.getElementById('downloadLink').href = url;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  loadDownloads();
+</script>
+  <!-- Footer -->
+    <footer class="border-t bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <h4 class="font-bold mb-4">CollegeNotes</h4>
+          <p class="text-gray-600">Your trusted academic resource hub since 2024</p>
+        </div>
+        <div>
+          <h4 class="font-bold mb-4">Resources</h4>
+          <ul class="space-y-2">
+            <li><a href="notes.html" class="text-gray-600 hover:text-black">Notes</a></li>
+            <li><a href="lectures.html" class="text-gray-600 hover:text-black">Lectures</a></li>
+            <li><a href="download.html" class="text-gray-600 hover:text-black">Downloads</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold mb-4">Support</h4>
+          <ul class="space-y-2">
+            <li><a href="contact.html" class="text-gray-600 hover:text-black">Contact</a></li>
+            <li><a href="request.html" class="text-gray-600 hover:text-black">Request Notes</a></li>
+            <li><a href="review.html" class="text-gray-600 hover:text-black">Reviews</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold mb-4">Legal</h4>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-600 hover:text-black">Privacy Policy</a></li>
+            <li><a href="#" class="text-gray-600 hover:text-black">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="mt-8 pt-8 border-t text-center text-gray-600">
+        © 2024 CollegeNotes. All rights reserved.
+      </div>
+    </div>
+  </footer>
+  <!-- In download.html -->
+<script type="module">
+  import { protectedRoute } from './assets/js/protected-route.js';
+  
+  protectedRoute((user) => {
+    // Page-specific initialization
+    console.log('User authenticated:', user.email);
+    loadDownloads(user.uid);
+  });
+</script>
+</body>
+</html>

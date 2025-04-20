@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Notes - CollegeNotes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style type="text/tailwindcss">
+    @theme {
+      --color-primary: #4f46e5;
+    }
+    /*
+    .input-focus-effect:focus {
+      @apply ring-2 ring-indigo-500 ring-opacity-50;
+    }
+    */
+    
+    .loading-spinner {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <script type="module">
+    import { auth, db, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, getDocs, where } from './assets/js/firebase-init.js';
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const requestForm = document.getElementById('requestForm');
+      const requestList = document.getElementById('requestList');
+      const loginBtn = document.getElementById('loginBtn');
+      const userDisplay = document.getElementById('userDisplay');
+      const searchInput = document.getElementById('searchInput');
+      const formSubmitBtn = document.getElementById('formSubmitBtn');
+      const formLoader = document.getElementById('formLoader');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+      const noResultsMessage = document.getElementById('noResultsMessage');
+      const uploadFile = document.getElementById('uploadFile');
+      const filePreview = document.getElementById('filePreview');
+      let currentUserRequests = [];
+      
+      // Display loading state initially
+      loadingSpinner.classList.remove('hidden');
+      
+      // Auth state observer
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          // User is signed in
+          loginBtn.innerHTML = `<span class="flex items-center">Logout <i class="fas fa-sign-out-alt ml-2"></i></span>`;
+          loginBtn.classList.remove('bg-black');
+          loginBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+          loginBtn.onclick = () => auth.signOut();
+          
+          userDisplay.innerHTML = `
+            <div class="flex items-center space-x-2">
+              <img src="${user.photoURL || '/api/placeholder/32/32'}" alt="Profile" class="w-8 h-8 rounded-full">
+              <span>${user.displayName || user.email}</span>
+            </div>
+          `;
+          userDisplay.classList.remove('hidden');
+          
+          // Filter for user's own requests
+          document.getElementById('myRequestsToggle').classList.remove('hidden');
+          
+          // Enable form
+          enableForm();
+        } else {
+          // User is signed out
+          loginBtn.innerHTML = `<span class="flex items-center">Login <i class="fas fa-sign-in-alt ml-2"></i></span>`;
+          loginBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+          loginBtn.classList.add('bg-black', 'hover:bg-gray-800');
+          loginBtn.onclick = () => window.location.href = "login.html";
+          
+          userDisplay.classList.add('hidden');
+          document.getElementById('myRequestsToggle').classList.add('hidden');
+          
+          // Disable form
+          disableForm();
+        }
+      });
+      
+      function enableForm() {
+        const formElements = requestForm.querySelectorAll('input, textarea, select, button');
+        formElements.forEach(el => el.disabled = false);
+        document.getElementById('loginRequired').classList.add('hidden');
+      }
+      
+      function disableForm() {
+        const formElements = requestForm.querySelectorAll('input, textarea, select, button');
+        formElements.forEach(el => el.disabled = true);
+        document.getElementById('loginRequired').classList.remove('hidden');
+      }
+      
+      // File upload preview
+      uploadFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            filePreview.innerHTML = `
+              <div class="flex items-center p-2 bg-gray-100 rounded mt-2">
+                <i class="fas fa-file-alt text-indigo-600 mr-2"></i>
+                <span class="truncate">${file.name}</span>
+                <button type="button" id="removeFile" class="ml-auto text-red-500 hover:text-red-700">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            `;
+            
+            document.getElementById('removeFile').addEventListener('click', () => {
+              filePreview.innerHTML = '';
+              uploadFile.value = '';
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // 📌 Handle Form Submission
+      requestForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const user = auth.currentUser;
+        
+        if (!user) {
+          showNotification('Please login first', 'error');
+          return;
+        }
+        
+        // Form validation
+        const subject = document.getElementById('requestSubject').value.trim();
+        const description = document.getElementById('requestDescription').value.trim();
+        
+        if (subject.length < 3) {
+          showNotification('Subject must be at least 3 characters', 'error');
+          return;
+        }
+        
+        if (description.length < 10) {
+          showNotification('Please provide a more detailed description (at least 10 characters)', 'error');
+          return;
+        }
+        
+        // Show loading state
+        formSubmitBtn.classList.add('hidden');
+        formLoader.classList.remove('hidden');
+
+        const requestData = {
+          subject: subject,
+          description: description,
+          urgency: document.getElementById('requestUrgency').value,
+          userId: user.uid,
+          userEmail: user.email,
+          userName: user.displayName || user.email.split('@')[0],
+          createdAt: serverTimestamp(),
+          status: 'pending',
+          courseTags: generateTags(subject),
+          hasAttachment: uploadFile.files.length > 0
+          // Note: In a real app, you would upload the file to storage
+          // and store the reference here
+        };
+
+        try {
+          await addDoc(collection(db, 'requests'), requestData);
+          showNotification('Request submitted successfully!', 'success');
+          requestForm.reset();
+          filePreview.innerHTML = '';
+        } catch (error) {
+          showNotification('Error submitting request: ' + error.message, 'error');
+          console.error('Error adding request:', error);
+        } finally {
+          // Hide loading state
+          formSubmitBtn.classList.remove('hidden');
+          formLoader.classList.add('hidden');
+        }
+      });
+
+      // Generate tags for better searching
+      function generateTags(subject) {
+        const words = subject.toLowerCase().split(/\s+/);
+        const tags = [...words];
+        
+        // Add combinations of words as tags
+        for (let i = 0; i < words.length - 1; i++) {
+          tags.push(`${words[i]} ${words[i+1]}`);
+        }
+        
+        return tags;
+      }
+      
+      // Show notification
+      function showNotification(message, type = 'info') {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const notificationIcon = document.getElementById('notificationIcon');
+        
+        // Set message
+        notificationText.textContent = message;
+        
+        // Set icon and color based on type
+        notification.className = 'fixed top-4 right-4 flex items-center p-4 rounded-lg shadow-lg transition-opacity duration-300 z-50';
+        
+        if (type === 'success') {
+          notification.classList.add('bg-green-100', 'text-green-800');
+          notificationIcon.className = 'fas fa-check-circle mr-2 text-green-600';
+        } else if (type === 'error') {
+          notification.classList.add('bg-red-100', 'text-red-800');
+          notificationIcon.className = 'fas fa-exclamation-circle mr-2 text-red-600';
+        } else {
+          notification.classList.add('bg-blue-100', 'text-blue-800');
+          notificationIcon.className = 'fas fa-info-circle mr-2 text-blue-600';
+        }
+        
+        // Show notification
+        notification.classList.remove('opacity-0', 'hidden');
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+          notification.classList.add('opacity-0');
+          setTimeout(() => {
+            notification.classList.add('hidden');
+          }, 300);
+        }, 3000);
+      }
+
+      // 📌 Load Real-Time Requests
+      function loadRequests(filterMyRequests = false) {
+        const user = auth.currentUser;
+        let requestsRef;
+        
+        if (filterMyRequests && user) {
+          requestsRef = query(
+            collection(db, "requests"), 
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc")
+          );
+        } else {
+          requestsRef = query(collection(db, "requests"), orderBy("createdAt", "desc"));
+        }
+        
+        // Display loading state
+        loadingSpinner.classList.remove('hidden');
+        requestList.classList.add('opacity-50');
+
+        onSnapshot(requestsRef, (snapshot) => {
+          // Hide loading state
+          loadingSpinner.classList.add('hidden');
+          requestList.classList.remove('opacity-50');
+          
+          if (snapshot.empty) {
+            noResultsMessage.classList.remove('hidden');
+            requestList.innerHTML = "";
+            return;
+          }
+          
+          noResultsMessage.classList.add('hidden');
+          requestList.innerHTML = ""; // Clear previous data
+          currentUserRequests = [];
+
+          snapshot.forEach((doc) => {
+            const request = doc.data();
+            currentUserRequests.push({
+              id: doc.id,
+              ...request
+            });
+            
+            const createdAt = request.createdAt ? request.createdAt.toDate() : new Date();
+            addRequestToDOM(doc.id, request, createdAt);
+          });
+          
+          // Apply search filter if there's a value
+          if (searchInput.value.trim() !== '') {
+            filterRequests(searchInput.value.trim());
+          }
+        }, (error) => {
+          loadingSpinner.classList.add('hidden');
+          console.error('Error fetching requests:', error);
+          showNotification('Error loading requests: ' + error.message, 'error');
+        });
+      }
+      
+      function addRequestToDOM(id, request, createdAt) {
+        const statusClasses = {
+          'pending': 'text-yellow-600 bg-yellow-100',
+          'in-progress': 'text-blue-600 bg-blue-100',
+          'completed': 'text-green-600 bg-green-100',
+          'rejected': 'text-red-600 bg-red-100'
+        };
+        
+        const statusClass = statusClasses[request.status] || statusClasses.pending;
+        
+        const requestItem = document.createElement("div");
+        requestItem.id = `request-${id}`;
+        requestItem.classList.add("border", "p-4", "rounded-lg", "shadow-sm", "hover:shadow", "transition-shadow", "bg-white");
+
+        requestItem.innerHTML = `
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="font-medium text-lg">${request.subject}</h3>
+            <div class="flex items-center">
+              <span class="text-sm text-gray-500 mr-2">${timeSince(createdAt)}</span>
+              ${request.urgency === 'Urgent (24 Hours)' ? 
+                '<span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded flex items-center"><i class="fas fa-exclamation-circle mr-1"></i>Urgent</span>' : ''}
+            </div>
+          </div>
+          <p class="text-gray-600 mb-3">${request.description}</p>
+          <div class="flex flex-wrap items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <div class="flex items-center">
+                <i class="fas fa-user-circle text-gray-400 mr-1"></i>
+                <span class="text-sm text-gray-500">${request.userName || 'Anonymous'}</span>
+              </div>
+              ${request.hasAttachment ? 
+                '<span class="text-sm text-gray-500 flex items-center"><i class="fas fa-paperclip ml-2 mr-1"></i>Attachment</span>' : ''}
+            </div>
+            <div class="mt-2 text-sm rounded-full px-3 py-1 ${statusClass}">
+              ${request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-gray-100 flex justify-between">
+            <button class="text-sm text-indigo-600 hover:text-indigo-800 flex items-center">
+              <i class="fas fa-comment mr-1"></i> Respond
+            </button>
+            <button class="text-sm text-gray-500 hover:text-gray-700 flex items-center">
+              <i class="fas fa-flag mr-1"></i> Similar Notes
+            </button>
+          </div>
+        `;
+
+        requestList.appendChild(requestItem);
+      }
+
+      // 📌 Convert Timestamp to Readable Time
+      function timeSince(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        const intervals = { 
+          year: 31536000, 
+          month: 2592000, 
+          week: 604800, 
+          day: 86400, 
+          hour: 3600, 
+          minute: 60 
+        };
+        
+        for (const [unit, secondsPerUnit] of Object.entries(intervals)) {
+          const interval = Math.floor(seconds / secondsPerUnit);
+          if (interval >= 1) return `${interval} ${unit}${interval > 1 ? "s" : ""} ago`;
+        }
+        return "Just now";
+      }
+      
+      // Handle search functionality
+      searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.trim();
+        filterRequests(searchTerm);
+      });
+      
+      function filterRequests(searchTerm) {
+        if (!searchTerm) {
+          // If search is cleared, show all current requests
+          document.querySelectorAll('#requestList > div').forEach(el => el.classList.remove('hidden'));
+          noResultsMessage.classList.add('hidden');
+          return;
+        }
+        
+        const searchTermLower = searchTerm.toLowerCase();
+        let hasVisibleResults = false;
+        
+        document.querySelectorAll('#requestList > div').forEach(el => {
+          const requestId = el.id.replace('request-', '');
+          const request = currentUserRequests.find(r => r.id === requestId);
+          
+          if (!request) return;
+          
+          // Search in subject, description and tags if available
+          const matchesSubject = request.subject.toLowerCase().includes(searchTermLower);
+          const matchesDescription = request.description.toLowerCase().includes(searchTermLower);
+          const matchesTags = request.courseTags && request.courseTags.some(tag => tag.includes(searchTermLower));
+          
+          if (matchesSubject || matchesDescription || matchesTags) {
+            el.classList.remove('hidden');
+            hasVisibleResults = true;
+          } else {
+            el.classList.add('hidden');
+          }
+        });
+        
+        // Show/hide no results message
+        if (hasVisibleResults) {
+          noResultsMessage.classList.add('hidden');
+        } else {
+          noResultsMessage.classList.remove('hidden');
+        }
+      }
+      
+      // Toggle my requests filter
+      document.getElementById('myRequestsToggle').addEventListener('change', (e) => {
+        loadRequests(e.target.checked);
+      });
+
+      loadRequests(); // Load requests on page load
+    });
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+  <!-- Toast notification -->
+<div id="notification" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center p-4 rounded-lg shadow-lg transition-opacity duration-300 opacity-0 hidden z-50 pointer-events-none">
+    <i id="notificationIcon" class="fas fa-info-circle mr-2"></i>
+    <span id="notificationText">Notification message</span>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="px-6 py-4 border-b bg-white sticky top-0 shadow-sm z-10">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-bold flex items-center">
+        <i class="fas fa-book text-indigo-600 mr-2"></i>
+        CollegeNotes
+      </a>
+      <div class="hidden md:flex space-x-6">
+        <a href="notes.html" class="hover:text-indigo-600 flex items-center"><i class="fas fa-sticky-note mr-1"></i> Notes</a>
+        <a href="lectures.html" class="hover:text-indigo-600 flex items-center"><i class="fas fa-video mr-1"></i> Lectures</a>
+        <a href="request.html" class="text-indigo-600 font-medium flex items-center"><i class="fas fa-hand-paper mr-1"></i> Request</a>
+        <a href="contact.html" class="hover:text-indigo-600 flex items-center"><i class="fas fa-envelope mr-1"></i> Contact</a>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div id="userDisplay" class="hidden"></div>
+        <a id="loginBtn" class="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center">
+          Login <i class="fas fa-sign-in-alt ml-2"></i>
+        </a>
+        <button class="md:hidden text-gray-600 hover:text-gray-900 focus:outline-none">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-grow">
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+      <div class="relative bg-gradient-to-r from-indigo-600 to-blue-500 px-8 py-10 text-white">
+        <div class="max-w-2xl">
+          <h1 class="text-3xl font-bold mb-2">Request Study Materials</h1>
+          <p class="text-indigo-100">
+            Can't find what you need? Let our community of students and educators help you get the study materials you're looking for.
+          </p>
+        </div>
+        <div class="absolute right-0 bottom-0 opacity-10">
+          <i class="fas fa-file-alt text-9xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two column layout for desktop -->
+    <div class="grid md:grid-cols-2 gap-8">
+      
+      <!-- Request Form -->
+      <div>
+        <div class="bg-white p-6 rounded-xl shadow-sm">
+          <h2 class="text-2xl font-bold mb-6 flex items-center">
+            <i class="fas fa-plus-circle text-indigo-600 mr-2"></i> New Request
+          </h2>
+          
+          <form id="requestForm" class="space-y-6">
+            <div id="loginRequired" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 hidden">
+              <div class="flex items-center text-yellow-800">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <p>Please <a href="login.html" class="underline font-medium">login</a> to submit a request</p>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-gray-700 font-medium mb-2">Subject/Course <span class="text-red-500">*</span></label>
+              <input 
+                type="text" 
+                id="requestSubject" 
+                placeholder="e.g., Advanced Calculus, Computer Science 101" 
+                required 
+                class="w-full p-3 border rounded-lg input-focus-effect transition-colors focus:outline-none"
+              >
+            </div>
+
+            <div>
+              <label class="block text-gray-700 font-medium mb-2">Detailed Description <span class="text-red-500">*</span></label>
+              <textarea 
+                id="requestDescription" 
+                placeholder="Describe exactly what you need... Be specific about topics, chapters, or specific problems you need help with." 
+                required
+                rows="4"
+                class="w-full p-3 border rounded-lg input-focus-effect transition-colors focus:outline-none"
+              ></textarea>
+            </div>
+
+            <div>
+              <label class="block text-gray-700 font-medium mb-2">Urgency</label>
+              <select 
+                id="requestUrgency" 
+                class="w-full p-3 border rounded-lg input-focus-effect transition-colors focus:outline-none"
+              >
+                <option>Within 1 Week</option>
+                <option>Within 3 Days</option>
+                <option>Urgent (24 Hours)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-gray-700 font-medium mb-2">Attach File (Optional)</label>
+              <div class="flex items-center">
+                <label for="uploadFile" class="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg border border-gray-300 transition-colors duration-200 inline-flex items-center">
+                  <i class="fas fa-paperclip mr-2"></i>
+                  <span>Choose File</span>
+                  <input type="file" id="uploadFile" class="hidden" accept=".pdf,.doc,.docx,.jpg,.png">
+                </label>
+                <span class="ml-3 text-gray-500 text-sm">Max 5MB</span>
+              </div>
+              <div id="filePreview" class="mt-1"></div>
+            </div>
+
+            <div class="pt-2">
+              <button 
+                type="submit" 
+                id="formSubmitBtn"
+                class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center justify-center"
+              >
+                <i class="fas fa-paper-plane mr-2"></i> Submit Request
+              </button>
+              
+              <div id="formLoader" class="w-full bg-indigo-600 text-white px-6 py-3 rounded-lg flex items-center justify-center hidden">
+                <svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Submitting...
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Previous Requests (Real-Time) -->
+      <section>
+        <div class="bg-white p-6 rounded-xl shadow-sm">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold flex items-center">
+              <i class="fas fa-list-alt text-indigo-600 mr-2"></i> Recent Requests
+            </h2>
+            
+            <div class="flex items-center">
+              <label class="inline-flex items-center hidden" id="myRequestsToggle">
+                <input type="checkbox" class="form-checkbox text-indigo-600 h-4 w-4">
+                <span class="ml-2 text-sm text-gray-700">My requests only</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <!-- Search -->
+            <div class="mb-4 relative">
+              <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Search requests..." 
+                class="w-full p-3 pl-10 border rounded-lg input-focus-effect transition-colors focus:outline-none"
+              >
+              <span class="absolute left-3 top-3 text-gray-400">
+                <i class="fas fa-search"></i>
+              </span>
+            </div>
+            
+            <!-- Loading spinner -->
+            <div id="loadingSpinner" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10 hidden">
+              <svg class="animate-spin h-10 w-10 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            
+            <!-- No results message -->
+            <div id="noResultsMessage" class="py-8 text-center hidden">
+              <div class="text-gray-400 mb-2"><i class="fas fa-search fa-2x"></i></div>
+              <h3 class="text-lg font-medium text-gray-500">No requests found</h3>
+              <p class="text-gray-500 text-sm">Try adjusting your search or create a new request</p>
+            </div>
+            
+            <div id="requestList" class="space-y-4 max-h-96 overflow-y-auto pr-1 scrollbar-thin">
+              <!-- Real-time requests will appear here -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stats Card -->
+        <div class="grid grid-cols-3 gap-4 mt-6">
+          <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div class="text-2xl font-bold text-indigo-600">24h</div>
+            <div class="text-gray-500 text-sm">Avg. Response Time</div>
+          </div>
+          <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div class="text-2xl font-bold text-indigo-600">94%</div>
+            <div class="text-gray-500 text-sm">Fulfilled Requests</div>
+          </div>
+          <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+            <div class="text-2xl font-bold text-indigo-600">5,420+</div>
+            <div class="text-gray-500 text-sm">Total Materials</div>
+          </div>
+        </div>
+      </section>
+    </div>
+    
+    <!-- FAQ Section -->
+    <section class="mt-16 bg-white p-8 rounded-xl shadow-sm">
+      <h2 class="text-2xl font-bold mb-6 text-center">Frequently Asked Questions</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-medium text-lg mb-2 flex items-center">
+            <i class="fas fa-question-circle text-indigo-600 mr-2"></i> How quickly will I get the materials?
+          </h3>
+          <p class="text-gray-600">Response times vary based on the urgency and complexity of your request, but our community typically responds within 24-48 hours.</p>
+        </div>
+        <div>
+          <h3 class="font-medium text-lg mb-2 flex items-center">
+            <i class="fas fa-question-circle text-indigo-600 mr-2"></i> Is there a limit to how many requests I can make?
+          </h3>
+          <p class="text-gray-600">Free accounts can make up to 3 requests per week. Premium accounts have unlimited requests.</p>
+        </div>
+        <div>
+          <h3 class="font-medium text-lg mb-2 flex items-center">
+            <i class="fas fa-question-circle text-indigo-600 mr-2"></i> Can I request any type of material?
+          </h3>
+          <p class="text-gray-600">Yes, you can request notes, practice problems, study guides, or explanations for specific topics.</p>
+        </div>
+        <div>
+          <h3 class="font-medium text-lg mb-2 flex items-center">
+            <i class="fas fa-question-circle text-indigo-600 mr-2"></i> How can I contribute materials?
+          </h3>
+          <p class="text-gray-600">Visit our <a href="contribute.html" class="text-indigo-600 hover:underline">Contribution</a> page to learn how to share your own study materials with the community.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer
+  <footer class="border-t bg-white mt-16">
+    <div class="max-w-6xl mx-auto px-4 py-12">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <h4 class="font-bold text-lg mb-4
+-->
+</body>
+</html>

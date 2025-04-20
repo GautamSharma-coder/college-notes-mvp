@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Notes - CollegeNotes</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#1e40af',
+            accent: '#eff6ff',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+  <!-- Announcement Banner -->
+  <div class="bg-primary text-black text-center py-2 px-4 text-sm">
+    <p>🎓 Spring Semester Notes Available Now! <a href="#" class="underline font-bold">Check them out</a></p>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="px-6 py-3 border-b bg-white sticky top-0 z-10 shadow-sm">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <a href="index.html" class="flex items-center gap-2">
+        <svg class="h-8 w-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+        </svg>
+        <span class="text-2xl font-bold text-gray-800">CollegeNotes</span>
+      </a>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="index.html" class="text-gray-600 hover:text-primary transition-colors">Home</a>
+        <a href="notes.html" class="text-primary font-medium border-b-2 border-primary pb-1">Notes</a>
+        <a href="lectures.html" class="text-gray-600 hover:text-primary transition-colors">Lectures</a>
+        <a href="tutors.html" class="text-gray-600 hover:text-primary transition-colors">Find Tutors</a>
+        <a href="contact.html" class="text-gray-600 hover:text-primary transition-colors">Contact</a>
+        <div class="ml-4 flex items-center space-x-2">
+          <a href="upload.html" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+            <i class="fas fa-upload mr-1"></i> Upload
+          </a>
+          <a id="authBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors">
+            <i class="fas fa-user mr-1"></i> Login
+          </a>
+        </div>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden text-gray-600" id="mobileMenuBtn">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden mt-4 pb-4">
+      <div class="flex flex-col space-y-3">
+        <a href="index.html" class="text-gray-600 hover:text-primary transition-colors py-2">Home</a>
+        <a href="notes.html" class="text-primary font-medium py-2">Notes</a>
+        <a href="lectures.html" class="text-gray-600 hover:text-primary transition-colors py-2">Lectures</a>
+        <a href="tutors.html" class="text-gray-600 hover:text-primary transition-colors py-2">Find Tutors</a>
+        <a href="contact.html" class="text-gray-600 hover:text-primary transition-colors py-2">Contact</a>
+        <a href="upload.html" class="text-gray-600 hover:text-primary transition-colors py-2">
+          <i class="fas fa-upload mr-1"></i> Upload
+        </a>
+        <a id="mobileAuthBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors text-center">
+          <i class="fas fa-user mr-1"></i> Login
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-grow">
+    <!-- Hero Section -->
+    <div class="bg-accent rounded-xl p-6 mb-8">
+      <div class="md:flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Study Notes Library</h1>
+          <p class="text-gray-600 mt-2 max-w-2xl">Discover high-quality academic resources from top students. Search by subject, course level, or keyword to find exactly what you need.</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex space-x-3">
+          <a href="request.html" class="bg-primary text-white px-5 py-3 rounded-lg hover:bg-secondary transition-colors">
+            <i class="fas fa-file-alt mr-2"></i> Request Notes
+          </a>
+          <a href="upload.html" class="bg-white text-primary border border-primary px-5 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+            <i class="fas fa-upload mr-2"></i> Upload Notes
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="mb-8 bg-white p-6 rounded-xl shadow-sm">
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fas fa-search text-gray-400"></i>
+          </div>
+          <input type="text" id="searchNotes" placeholder="Search notes by title, description, or author..." class="pl-10 p-3 border rounded-lg w-full focus:ring-2 focus:ring-primary focus:border-primary">
+        </div>
+        
+        <select id="filterSubjects" class="p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+          <option value="">All Subjects</option>
+          <option value="Mathematics">Mathematics</option>
+          <option value="Computer Science">Computer Science</option>
+          <option value="Physics">Physics</option>
+          <option value="Chemistry">Chemistry</option>
+          <option value="Biology">Biology</option>
+          <option value="Psychology">Psychology</option>
+          <option value="Economics">Economics</option>
+          <option value="Business">Business</option>
+          <option value="Engineering">Engineering</option>
+        </select>
+        
+        <select id="filterLevel" class="p-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+          <option value="">All Levels</option>
+          <option value="100">100 Level (Freshman)</option>
+          <option value="200">200 Level (Sophomore)</option>
+          <option value="300">300 Level (Junior)</option>
+          <option value="400">400 Level (Senior)</option>
+          <option value="Graduate">Graduate</option>
+        </select>
+      </div>
+      
+      <div class="mt-4 flex flex-wrap gap-2">
+        <span class="text-sm font-medium mr-2 mt-1">Quick filters:</span>
+        <button class="filter-tag bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm py-1 px-3 rounded-full transition-colors">Recent uploads</button>
+        <button class="filter-tag bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm py-1 px-3 rounded-full transition-colors">Top rated</button>
+        <button class="filter-tag bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm py-1 px-3 rounded-full transition-colors">Verified notes</button>
+        <button class="filter-tag bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm py-1 px-3 rounded-full transition-colors">Free only</button>
+      </div>
+    </div>
+
+    <!-- Featured Notes -->
+    <div class="mb-10">
+      <h2 class="text-2xl font-bold mb-6 flex items-center">
+        <i class="fas fa-star text-yellow-400 mr-2"></i> Featured Notes
+      </h2>
+      <div class="grid gap-6 md:grid-cols-3">
+        <div class="bg-white border rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+          <div class="bg-blue-500 text-white px-4 py-1 text-sm font-medium">FEATURED</div>
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-xl font-bold">Calculus II Complete Guide</h3>
+                <p class="text-sm text-gray-500 mt-1">Mathematics • 200 Level</p>
+              </div>
+              <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Verified</span>
+            </div>
+            <p class="text-gray-600 mb-4">Comprehensive study notes covering limits, derivatives, integrals, and series with detailed examples and practice problems.</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <img src="/api/placeholder/32/32" class="rounded-full mr-2" alt="Author avatar">
+                <span class="text-sm">Prof. Johnson</span>
+              </div>
+              <div class="flex items-center text-amber-400 text-sm">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+                <span class="text-gray-600 ml-1">(4.5)</span>
+              </div>
+            </div>
+            <div class="border-t mt-4 pt-4 flex justify-between items-center">
+              <span class="text-gray-500 flex items-center"><i class="fas fa-file-pdf mr-1"></i> 3.2MB</span>
+              <a href="#" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors">Download</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white border rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+          <div class="bg-blue-500 text-white px-4 py-1 text-sm font-medium">FEATURED</div>
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-xl font-bold">Data Structures & Algorithms</h3>
+                <p class="text-sm text-gray-500 mt-1">Computer Science • 300 Level</p>
+              </div>
+              <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Verified</span>
+            </div>
+            <p class="text-gray-600 mb-4">In-depth notes on arrays, linked lists, trees, graphs, sorting algorithms, and time complexity analysis.</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <img src="/api/placeholder/32/32" class="rounded-full mr-2" alt="Author avatar">
+                <span class="text-sm">Sarah Lee</span>
+              </div>
+              <div class="flex items-center text-amber-400 text-sm">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <span class="text-gray-600 ml-1">(5.0)</span>
+              </div>
+            </div>
+            <div class="border-t mt-4 pt-4 flex justify-between items-center">
+              <span class="text-gray-500 flex items-center"><i class="fas fa-file-pdf mr-1"></i> 4.8MB</span>
+              <a href="#" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors">Download</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white border rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+          <div class="bg-blue-500 text-white px-4 py-1 text-sm font-medium">FEATURED</div>
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-xl font-bold">Organic Chemistry Complete Notes</h3>
+                <p class="text-sm text-gray-500 mt-1">Chemistry • 200 Level</p>
+              </div>
+              <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Verified</span>
+            </div>
+            <p class="text-gray-600 mb-4">Detailed notes covering organic compounds, reactions, mechanisms, spectroscopy, and lab techniques.</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <img src="/api/placeholder/32/32" class="rounded-full mr-2" alt="Author avatar">
+                <span class="text-sm">Dr. Martinez</span>
+              </div>
+              <div class="flex items-center text-amber-400 text-sm">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <span class="text-gray-600 ml-1">(4.0)</span>
+              </div>
+            </div>
+            <div class="border-t mt-4 pt-4 flex justify-between items-center">
+              <span class="text-gray-500 flex items-center"><i class="fas fa-file-pdf mr-1"></i> 6.1MB</span>
+              <a href="#" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors">Download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Notes -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">All Study Notes</h2>
+        <div class="flex items-center">
+          <span class="mr-2 text-gray-600">Sort by:</span>
+          <select id="sortNotes" class="border rounded-lg p-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="popular">Most popular</option>
+            <option value="rating">Highest rated</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Notes Grid -->
+      <div id="notesContainer" class="grid gap-6 md:grid-cols-3">
+        <!-- Notes will be loaded dynamically -->
+      </div>
+      
+      <!-- Loading Indicator -->
+      <div id="loadingIndicator" class="hidden my-8 text-center">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
+        <p class="mt-2 text-gray-600">Loading more notes...</p>
+      </div>
+      
+      <!-- Load More Button -->
+      <div class="text-center mt-10">
+        <button id="loadMoreBtn" class="bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+          Load More Notes
+        </button>
+      </div>
+    </div>
+    
+    <!-- Community Section -->
+    <div class="bg-white rounded-xl p-8 mb-10 shadow-sm">
+      <div class="text-center max-w-2xl mx-auto">
+        <h2 class="text-2xl font-bold mb-4">Join Our Academic Community</h2>
+        <p class="text-gray-600 mb-6">Connect with fellow students, share your notes, earn points and rewards for contributing valuable academic resources.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <a href="register.html" class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-secondary transition-colors">
+            <i class="fas fa-user-plus mr-2"></i> Join Now
+          </a>
+          <a href="about.html" class="bg-white text-gray-700 border px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors">
+            Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <svg class="h-8 w-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+            </svg>
+            <span class="text-2xl font-bold">CollegeNotes</span>
+          </div>
+          <p class="text-gray-400">Your trusted academic resource hub since 2024. Helping students excel through shared knowledge.</p>
+          <div class="mt-4 flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fab fa-youtube"></i>
+            </a>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-bold text-lg mb-4">Resources</h4>
+          <ul class="space-y-2">
+            <li><a href="notes.html" class="text-gray-400 hover:text-white transition-colors">Study Notes</a></li>
+            <li><a href="lectures.html" class="text-gray-400 hover:text-white transition-colors">Lecture Materials</a></li>
+            <li><a href="flashcards.html" class="text-gray-400 hover:text-white transition-colors">Flashcards</a></li>
+            <li><a href="practice-quizzes.html" class="text-gray-400 hover:text-white transition-colors">Practice Quizzes</a></li>
+            <li><a href="subject-guides.html" class="text-gray-400 hover:text-white transition-colors">Subject Guides</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-lg mb-4">Support</h4>
+          <ul class="space-y-2">
+            <li><a href="contact.html" class="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+            <li><a href="faq.html" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+            <li><a href="request.html" class="text-gray-400 hover:text-white transition-colors">Request Notes</a></li>
+            <li><a href="report.html" class="text-gray-400 hover:text-white transition-colors">Report Issue</a></li>
+            <li><a href="help-center.html" class="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-lg mb-4">Subscribe to Newsletter</h4>
+          <p class="text-gray-400 mb-4">Get updates on new notes and features</p>
+          <form class="space-y-2">
+            <input type="email" placeholder="Your email address" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-primary focus:border-primary">
+            <button type="submit" class="w-full bg-primary text-white p-3 rounded-lg hover:bg-secondary transition-colors">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="mt-12 pt-8 border-t border-gray-700 text-center text-gray-400">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <p>© 2024 CollegeNotes. All rights reserved.</p>
+          <div class="mt-4 md:mt-0 flex space-x-6">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms of Service</a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">Accessibility</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // Filter tag selection
+    const filterTags = document.querySelectorAll('.filter-tag');
+    filterTags.forEach(tag => {
+      tag.addEventListener('click', function() {
+        this.classList.toggle('bg-primary');
+        this.classList.toggle('text-white');
+        this.classList.toggle('bg-gray-100');
+        this.classList.toggle('text-gray-800');
+      });
+    });
+    
+    // Simulate loading notes
+    document.addEventListener("DOMContentLoaded", async () => {
+      const notesContainer = document.getElementById("notesContainer");
+      const searchInput = document.getElementById("searchNotes");
+      const filterSubjects = document.getElementById("filterSubjects");
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      const loadingIndicator = document.getElementById("loadingIndicator");
+      
+      // Sample notes data
+      const notesData = [
+        {
+          title: "Introduction to Psychology",
+          subject: "Psychology",
+          level: "100",
+          status: "Verified",
+          description: "Covers key concepts in psychology including cognition, behavior, development, and research methods.",
+          fileSize: "2.4",
+          author: "Dr. Emily Chen",
+          rating: 4.2,
+          downloadLink: "#"
+        },
+        {
+          title: "Linear Algebra Fundamentals",
+          subject: "Mathematics",
+          level: "200",
+          status: "Verified",
+          description: "Complete study guide for vectors, matrices, determinants, and linear transformations with examples.",
+          fileSize: "3.7",
+          author: "Prof. Michael Rodriguez",
+          rating: 4.8,
+          downloadLink: "#"
+        },
+        {
+          title: "Principles of Microeconomics",
+          subject: "Economics",
+          level: "100",
+          status: "Community",
+          description: "Detailed notes on supply and demand, market structures, consumer behavior, and economic policy.",
+          fileSize: "1.9",
+          author: "James Wilson",
+          rating: 3.9,
+          downloadLink: "#"
+        },
+        {
+          title: "Quantum Mechanics",
+          subject: "Physics",
+          level: "400",
+          status: "Verified",
+          description: "Advanced notes covering wave functions, operators, Schrödinger's equation, and quantum phenomena.",
+          fileSize: "5.2",
+          author: "Dr. Robert Feynman",
+          rating: 4.9,
+          downloadLink: "#"
+        },
+        {
+          title: "Database Systems",
+          subject: "Computer Science",
+          level: "300",
+          status: "Community",
+          description: "Comprehensive guide to relational databases, SQL, normalization, and database design principles.",
+          fileSize: "4.1",
+          author: "Sophia Johnson",
+          rating: 4.5,
+          downloadLink: "#"
+        },
+        {
+          title: "Human Anatomy & Physiology",
+          subject: "Biology",
+          level: "200",
+          status: "Verified",
+          description: "Detailed notes on human body systems, tissues, organs, and physiological processes with diagrams.",
+          fileSize: "8.3",
+          author: "Dr. Sarah Miller",
+          rating: 4.7,
+          downloadLink: "#"
+        }
+      ];
+      
+      function renderNotes(notes) {
+        notes.forEach(note => {
+          // Create star rating HTML
+          const fullStars = Math.floor(note.rating);
+          const halfStar = note.rating % 1 >= 0.5;
+          const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+          
+          let starsHTML = '';
+          for (let i = 0; i < fullStars; i++) {
+            starsHTML += '<i class="fas fa-star"></i>';
+          }
+          if (halfStar) {
+            starsHTML += '<i class="fas fa-star-half-alt"></i>';
+          }
+          for (let i = 0; i < emptyStars; i++) {
+            starsHTML += '<i class="far fa-star"></i>';
+          }
+          
+          // Determine status badge style
+          let statusBadgeClass = 'bg-green-100 text-green-800';
+          if (note.status === 'Community') {
+            statusBadgeClass = 'bg-blue-100 text-blue-800';
+          } else if (note.status === 'Premium') {
+            statusBadgeClass = 'bg-purple-100 text-purple-800';
+          }
+          
+          notesContainer.innerHTML += `
+            <div class="bg-white border rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+              <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 class="text-xl font-bold">${note.title}</h3>
+                    <p class="text-sm text-gray-500 mt-1">${note.subject} • ${note.level} Level</p>
+                  </div>
+                  <span class="${statusBadgeClass} px-2 py-1 rounded-full text-xs font-medium">${note.status}</span>
+                </div>
+                <p class="text-gray-600 mb-4">${note.description}</p>
+                <div class="flex justify-between items-center">
+                  <div class="flex items-center">
+                    <img src="/api/placeholder/32/32" class="rounded-full mr-2" alt="Author avatar">
+                    <span class="text-sm">${note.author}</span>
+                  </div>
+                  <div class="flex items-center text-amber-400 text-sm">
+                    ${starsHTML}
+                    <span class="text-gray-600 ml-1">(${note.rating})</span>
+                  </div>
+                </div>
+                <div class="border-t mt-4 pt-4 flex justify-between items-center">
+                  <span class="text-gray-500 flex items-center"><i class="fas fa-file-pdf mr-1"></i> ${note.fileSize}MB</span>
+                  <a href="${note.downloadLink}" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors">Download</a>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      }
+      
+      // Initial render
+      renderNotes(notesData);
+      /*
+      // Simulate loading more notes
+      loadMoreBtn.addEventListener('click', function() {
+        loadMoreBtn.disabled = true;
+        loadingIndicator.classList.remove('hidden');
+        
+        // Simulate API delay
+        setTimeout(() => {
+          renderNotes(notesData.slice(0, 3));
+          */
+          </script>
+          </body>
+          </html>

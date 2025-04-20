@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Notes - CollegeNotes</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-white text-black font-sans">
+
+  <!-- Navbar -->
+  <nav class="bg-gray-100 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="text-2xl font-bold">CollegeNotes</div>
+      <div class="space-x-4">
+        <a href="index.html" class="hover:underline">Home</a>
+        <a href="upload.html" class="hover:underline">Upload</a>
+        <a href="my-notes.html" class="font-semibold underline">My Notes</a>
+        <a href="profile.html" class="hover:underline">Profile</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 mt-8">
+
+    <!-- Skeleton Loader -->
+    <section id="loader" class="space-y-4">
+      <div class="animate-pulse border p-4 rounded space-y-2">
+        <div class="h-6 bg-gray-300 rounded w-2/3"></div>
+        <div class="h-4 bg-gray-300 rounded w-1/3"></div>
+        <div class="h-4 bg-gray-300 rounded w-24"></div>
+      </div>
+      <div class="animate-pulse border p-4 rounded space-y-2">
+        <div class="h-6 bg-gray-300 rounded w-2/3"></div>
+        <div class="h-4 bg-gray-300 rounded w-1/3"></div>
+        <div class="h-4 bg-gray-300 rounded w-24"></div>
+      </div>
+    </section>
+
+    <!-- Error Message -->
+    <div id="errorMsg" class="text-red-500 text-center hidden mt-4"></div>
+
+    <!-- Notes Container -->
+    <section id="notesContainer" class="space-y-4 hidden"></section>
+  </main>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { app } from './firebase-config.js'; // Must export initialized Firebase app
+
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const notesContainer = document.getElementById("notesContainer");
+    const loader = document.getElementById("loader");
+    const errorMsg = document.getElementById("errorMsg");
+
+    function showError(message) {
+      errorMsg.innerHTML = message;
+      errorMsg.classList.remove("hidden");
+      loader.classList.add("hidden");
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        showError(`Please <a href="login.html" class="text-blue-500 underline">log in</a> to view your notes.`);
+        return;
+      }
+
+      try {
+        const q = query(collection(db, "notes"), where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+
+        loader.classList.add("hidden");
+        notesContainer.classList.remove("hidden");
+
+        if (querySnapshot.empty) {
+          notesContainer.innerHTML = "<p class='text-gray-600'>You haven’t uploaded any notes yet.</p>";
+        } else {
+          querySnapshot.forEach((doc) => {
+            const note = doc.data();
+            const noteCard = `
+              <div class="border p-4 rounded shadow-sm hover:shadow-md transition">
+                <h2 class="text-xl font-semibold">${note.title}</h2>
+                <p class="text-sm text-gray-600">${note.subject}</p>
+                <a href="${note.fileURL}" target="_blank" class="text-blue-500 underline mt-2 inline-block">View Note</a>
+              </div>
+            `;
+            notesContainer.innerHTML += noteCard;
+          });
+        }
+      } catch (error) {
+        console.error("Firestore error:", error);
+        showError("Something went wrong while loading notes.");
+      }
+    });
+    alert("Hii");
+  </script>
+</body>
+</html>
