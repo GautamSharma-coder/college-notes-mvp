@@ -33,57 +33,94 @@
   </div>
 
   <!-- Navbar -->
-  <nav class="px-6 py-3 border-b bg-white sticky top-0 z-10 shadow-sm">
-    <div class="max-w-7xl mx-auto flex justify-between items-center">
-      <a href="index.html" class="flex items-center gap-2">
-        <svg class="h-8 w-8 text-primary" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
-        </svg>
-        <span class="text-2xl font-bold text-gray-800">CollegeNotes</span>
-      </a>
+ <!-- Navigation Bar -->
+<nav class="bg-white/30 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="text-2xl font-bold tracking-tight">CollegeNotes</a>
 
-      <!-- Desktop Menu -->
-      <div class="hidden md:flex items-center space-x-6">
-        <a href="index.html" class="text-gray-600 hover:text-primary transition-colors">Home</a>
-        <a href="notes.html" class="text-primary font-medium border-b-2 border-primary pb-1">Notes</a>
-        <a href="lectures.html" class="text-gray-600 hover:text-primary transition-colors">Lectures</a>
-        <a href="tutors.html" class="text-gray-600 hover:text-primary transition-colors">Find Tutors</a>
-        <a href="contact.html" class="text-gray-600 hover:text-primary transition-colors">Contact</a>
-        <div class="ml-4 flex items-center space-x-2">
-          <a href="upload.html" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
-            <i class="fas fa-upload mr-1"></i> Upload
-          </a>
-          <a id="authBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors">
-            <i class="fas fa-user mr-1"></i> Login
-          </a>
-        </div>
-      </div>
+    <!-- Hamburger (Mobile) -->
+    <button id="sidebarToggle" class="md:hidden focus:outline-none">
+      <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
 
-      <!-- Mobile Menu Button -->
-      <button class="md:hidden text-gray-600" id="mobileMenuBtn">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-      </button>
+    <!-- Desktop Menu -->
+    <div class="hidden md:flex space-x-8 items-center">
+      <a href="notes.html" class="text-gray-700 hover:text-black transition">Notes</a>
+      <a href="lectures.html" class="text-gray-700 hover:text-black transition">Lectures</a>
+      <a href="contact.html" class="text-gray-700 hover:text-black transition">Contact</a>
+      <a href="./discussion/index.html" class="text-gray-700 hover:text-black transition">Discussion</a>
+      <input type="text" placeholder="Search..." class="pl-3 pr-4 py-1 border rounded-md text-sm border-gray-300 focus:outline-none">
+      <a href="login.html" class="bg-black text-white px-4 py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
     </div>
-    
-    <!-- Mobile Menu -->
-    <div id="mobileMenu" class="hidden md:hidden mt-4 pb-4">
-      <div class="flex flex-col space-y-3">
-        <a href="index.html" class="text-gray-600 hover:text-primary transition-colors py-2">Home</a>
-        <a href="notes.html" class="text-primary font-medium py-2">Notes</a>
-        <a href="lectures.html" class="text-gray-600 hover:text-primary transition-colors py-2">Lectures</a>
-        <a href="tutors.html" class="text-gray-600 hover:text-primary transition-colors py-2">Find Tutors</a>
-        <a href="contact.html" class="text-gray-600 hover:text-primary transition-colors py-2">Contact</a>
-        <a href="upload.html" class="text-gray-600 hover:text-primary transition-colors py-2">
-          <i class="fas fa-upload mr-1"></i> Upload
-        </a>
-        <a id="mobileAuthBtn" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors text-center">
-          <i class="fas fa-user mr-1"></i> Login
-        </a>
-      </div>
-    </div>
-  </nav>
+  </div>
+</nav>
+
+<!-- Overlay -->
+<div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden"></div>
+
+<!-- Sidebar -->
+<div id="mobileSidebar" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 md:hidden z-50 flex flex-col">
+  
+  <!-- Sidebar Header -->
+  <div class="flex justify-between items-center p-4 border-b">
+    <span class="text-xl font-semibold">Menu</span>
+    <button id="closeSidebar" class="text-gray-500 hover:text-black text-3xl leading-none">
+      &times;
+    </button>
+  </div>
+
+  <!-- Sidebar Content -->
+  <div class="flex-1 p-4 space-y-4 overflow-y-auto">
+    <a href="notes.html" class="block text-base text-gray-700 hover:text-black">Notes</a>
+    <a href="lectures.html" class="block text-base text-gray-700 hover:text-black">Lectures</a>
+    <a href="contact.html" class="block text-base text-gray-700 hover:text-black">Contact</a>
+    <a href="./discussion/index.html" class="block text-base text-gray-700 hover:text-black">Discussion</a>
+
+    <input type="text" placeholder="Search..." class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black">
+  </div>
+
+  <!-- Sidebar Footer -->
+  <div class="p-4 border-t">
+    <a href="login.html" class="block text-center bg-black text-white py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
+  </div>
+</div>
+
+<!-- Script -->
+<script>
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const closeSidebar = document.getElementById('closeSidebar');
+  const mobileSidebar = document.getElementById('mobileSidebar');
+  const overlay = document.getElementById('overlay');
+
+  sidebarToggle.addEventListener('click', () => {
+    mobileSidebar.classList.remove('translate-x-full');
+    overlay.classList.remove('hidden');
+  });
+
+  closeSidebar.addEventListener('click', () => {
+    mobileSidebar.classList.add('translate-x-full');
+    overlay.classList.add('hidden');
+  });
+
+  overlay.addEventListener('click', () => {
+    mobileSidebar.classList.add('translate-x-full');
+    overlay.classList.add('hidden');
+  });
+</script>
+
+<script>
+  //auto highlighter
+  const currentPath = window.location.pathname.split("/").pop();
+  const sidebarLinks = document.querySelectorAll('#mobileSidebar a');
+
+  sidebarLinks.forEach(link => {
+    if (link.getAttribute('href').includes(currentPath)) {
+      link.classList.add('text-black', 'font-semibold');
+    }
+  });
+</script>
 
   <main class="max-w-7xl mx-auto px-4 py-8 flex-grow">
     <!-- Hero Section -->

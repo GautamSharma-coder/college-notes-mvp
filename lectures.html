@@ -48,47 +48,98 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-200 min-h-screen flex flex-col">
+<body class=" min-h-screen flex flex-col">
     <!-- Header -->
-    <header class="bg-black shadow-md">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-4">
-                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838l-2.727 1.169 1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"></path>
-                    </svg>
-                    <h1 class="text-xl font-bold text-white">College Notes Hub</h1>
-                </div>
-                <div class="hidden md:flex items-center space-x-4">
-                    <button class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md transition">
-                        <i class="fas fa-sync-alt mr-2"></i>Sync Notes
-                    </button>
-                    <div class="relative">
-                        <img class="h-10 w-10 rounded-full object-cover" src="/api/placeholder/40/40" alt="User profile">
-                        <div class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-400 border-2 border-black"></div>
-                    </div>
-                </div>
-                <button class="md:hidden text-white">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </header>
+     <!-- Navigation Bar -->
+<nav class="bg-white/30 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="text-2xl font-bold tracking-tight">CollegeNotes</a>
+
+    <!-- Hamburger (Mobile) -->
+    <button id="sidebarToggle" class="md:hidden focus:outline-none">
+      <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+
+    <!-- Desktop Menu -->
+    <div class="hidden md:flex space-x-8 items-center">
+      <a href="notes.html" class="text-gray-700 hover:text-black transition">Notes</a>
+      <a href="lectures.html" class="text-gray-700 hover:text-black transition">Lectures</a>
+      <a href="contact.html" class="text-gray-700 hover:text-black transition">Contact</a>
+      <a href="./discussion/index.html" class="text-gray-700 hover:text-black transition">Discussion</a>
+      <input type="text" placeholder="Search..." class="pl-3 pr-4 py-1 border rounded-md text-sm border-gray-300 focus:outline-none">
+      <a href="login.html" class="bg-black text-white px-4 py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Overlay -->
+<div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden"></div>
+
+<!-- Sidebar -->
+<div id="mobileSidebar" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 md:hidden z-50 flex flex-col">
+  
+  <!-- Sidebar Header -->
+  <div class="flex justify-between items-center p-4 border-b">
+    <span class="text-xl font-semibold">Menu</span>
+    <button id="closeSidebar" class="text-gray-500 hover:text-black text-3xl leading-none">
+      &times;
+    </button>
+  </div>
+
+  <!-- Sidebar Content -->
+  <div class="flex-1 p-4 space-y-4 overflow-y-auto">
+    <a href="notes.html" class="block text-base text-gray-700 hover:text-black">Notes</a>
+    <a href="lectures.html" class="block text-base text-gray-700 hover:text-black">Lectures</a>
+    <a href="contact.html" class="block text-base text-gray-700 hover:text-black">Contact</a>
+    <a href="./discussion/index.html" class="block text-base text-gray-700 hover:text-black">Discussion</a>
+
+    <input type="text" placeholder="Search..." class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black">
+  </div>
+
+  <!-- Sidebar Footer -->
+  <div class="p-4 border-t">
+    <a href="login.html" class="block text-center bg-black text-white py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
+  </div>
+</div>
+
+<!-- Script -->
+<script>
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const closeSidebar = document.getElementById('closeSidebar');
+  const mobileSidebar = document.getElementById('mobileSidebar');
+  const overlay = document.getElementById('overlay');
+
+  sidebarToggle.addEventListener('click', () => {
+    mobileSidebar.classList.remove('translate-x-full');
+    overlay.classList.remove('hidden');
+  });
+
+  closeSidebar.addEventListener('click', () => {
+    mobileSidebar.classList.add('translate-x-full');
+    overlay.classList.add('hidden');
+  });
+
+  overlay.addEventListener('click', () => {
+    mobileSidebar.classList.add('translate-x-full');
+    overlay.classList.add('hidden');
+  });
+</script>
+
+<script>
+  //auto highlighter
+  const currentPath = window.location.pathname.split("/").pop();
+  const sidebarLinks = document.querySelectorAll('#mobileSidebar a');
+
+  sidebarLinks.forEach(link => {
+    if (link.getAttribute('href').includes(currentPath)) {
+      link.classList.add('text-black', 'font-semibold');
+    }
+  });
+</script>
+
     
-    <!-- Navigation -->
-    <nav class="bg-gray-800 shadow-md">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center space-x-8">
-                <a href="index.html" class="py-4 text-gray-400 hover:text-white transition">Home</a>
-                <a href="lectures.html" class="py-4 text-white border-b-2 border-white font-medium">Lectures</a>
-                <a href="assignments.html" class="py-4 text-gray-400 hover:text-white transition">Assignments</a>
-                <a href="resources.html" class="py-4 text-gray-400 hover:text-white transition">Resources</a>
-                <a href="calendar.html" class="py-4 text-gray-400 hover:text-white transition">Calendar</a>
-            </div>
-        </div>
-    </nav>
     
     <!-- Main Content -->
     <main class="container mx-auto px-4 py-8 flex-grow">
@@ -442,7 +493,7 @@
     <!-- Footer -->
     <footer class="bg-black text-gray-400 py-6">
         <div class="container mx-auto px-4 text-center">
-            <p>&copy; 2025 College Notes Hub | Made with <span class="text-white">♥</span> by Your Name</p>
+            <p>&copy; 2025 College Notes Hub | Made with <span class="text-white">♥</span> by GautamSharma-coder</p>
         </div>
     </footer>
 </body>

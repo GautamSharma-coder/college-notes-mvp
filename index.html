@@ -17,27 +17,94 @@
 </head>
 <body class="font-sans text-gray-800 bg-white">
   <!-- Navigation - Minimalist Style -->
-  <nav class="py-6 border-b border-gray-100 sticky top-0 z-50 bg-white/30 backdrop-blur-sm ">
-    <div class="max-w-6xl mx-auto px-6 flex justify-between items-center">
-      <a href="index.html"  id="logo" class="text-2xl font-bold tracking-tight">CollegeNotes</a>
+  <!-- Navigation Bar -->
+<nav class="bg-white/30 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="index.html" class="text-2xl font-bold tracking-tight">CollegeNotes</a>
 
-      <div class="hidden md:flex space-x-10">
-        <a href="notes.html" class="text-gray-700 hover:text-black transition-colors">Notes</a>
-        <a href="lectures.html" class="text-gray-700 hover:text-black transition-colors">Lectures</a>
-        <a href="contact.html" class="text-gray-700 hover:text-black transition-colors">Contact</a>
-        <a href="./discussion/index.html" class="text-gray-700 hover:text-black transition-colors">Discussion</a>
-      </div>
+    <!-- Hamburger (Mobile) -->
+    <button id="sidebarToggle" class="md:hidden focus:outline-none">
+      <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
 
-      <div class="flex items-center space-x-4">
-        <div class="hidden md:block relative">
-          <input type="text" placeholder="Search..." class="pl-10 pr-4 py-2 w-36 border-b border-gray-200 focus:border-black focus:outline-none">
-          <i class="fas fa-search absolute left-0 top-3 text-gray-400"></i>
-        </div>
-        <a href="login.html" id="authBtn" class="bg-black text-white px-5 py-2 rounded-full text-sm hover:bg-gray-900 transition-colors">Login</a>
-      </div>
+    <!-- Desktop Menu -->
+    <div class="hidden md:flex space-x-8 items-center">
+      <a href="notes.html" class="text-gray-700 hover:text-black transition">Notes</a>
+      <a href="lectures.html" class="text-gray-700 hover:text-black transition">Lectures</a>
+      <a href="contact.html" class="text-gray-700 hover:text-black transition">Contact</a>
+      <a href="./discussion/index.html" class="text-gray-700 hover:text-black transition">Discussion</a>
+      <input type="text" placeholder="Search..." class="pl-3 pr-4 py-1 border rounded-md text-sm border-gray-300 focus:outline-none">
+      <a href="login.html" id="authBtn" class="bg-black text-white px-4 py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
     </div>
-  </nav>
+  </div>
+</nav>
 
+<!-- Overlay -->
+<div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden"></div>
+
+<!-- Sidebar -->
+<div id="mobileSidebar" class="fixed rounded-l-2xl top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 md:hidden z-50 flex flex-col">
+  
+  <!-- Sidebar Header -->
+  <div class="flex justify-between items-center p-4 border-b">
+    <span class="text-xl font-semibold">Menu</span>
+    <button id="closeSidebar" class="text-gray-500 hover:text-black text-3xl leading-none">
+      &times;
+    </button>
+  </div>
+
+  <!-- Sidebar Content -->
+  <div class="flex-1 p-4 space-y-4 overflow-y-auto">
+    <a href="notes.html" class="block text-base text-gray-700 hover:text-black">Notes</a>
+    <a href="lectures.html" class="block text-base text-gray-700 hover:text-black">Lectures</a>
+    <a href="contact.html" class="block text-base text-gray-700 hover:text-black">Contact</a>
+    <a href="./discussion/index.html" class="block text-base text-gray-700 hover:text-black">Discussion</a>
+
+    <input type="text" placeholder="Search..." class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black">
+  </div>
+
+  <!-- Sidebar Footer -->
+  <div class="p-4 border-t">
+    <a href="login.html" id="authBtn" class="block text-center bg-black text-white py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
+  </div>
+</div>
+
+<!-- Script -->
+<script>
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const closeSidebar = document.getElementById('closeSidebar');
+  const mobileSidebar = document.getElementById('mobileSidebar');
+  const overlay = document.getElementById('overlay');
+
+  sidebarToggle.addEventListener('click', () => {
+    mobileSidebar.classList.remove('translate-x-full');
+    overlay.classList.remove('hidden');
+  });
+
+  closeSidebar.addEventListener('click', () => {
+    mobileSidebar.classList.add('translate-x-full');
+    overlay.classList.add('hidden');
+  });
+
+  overlay.addEventListener('click', () => {
+    mobileSidebar.classList.add('translate-x-full');
+    overlay.classList.add('hidden');
+  });
+</script>
+
+<script>
+  //auto highlighter
+  const currentPath = window.location.pathname.split("/").pop();
+  const sidebarLinks = document.querySelectorAll('#mobileSidebar a');
+
+  sidebarLinks.forEach(link => {
+    if (link.getAttribute('href').includes(currentPath)) {
+      link.classList.add('text-black', 'font-semibold');
+    }
+  });
+</script>
   <!-- Hero Section - Minimalist -->
   <section class="pt-20 pb-32">
     <div class="max-w-5xl mx-auto px-6">

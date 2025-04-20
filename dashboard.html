@@ -70,32 +70,28 @@
       <!-- Left Column -->
       <div class="md:col-span-2 space-y-6">
         <!-- Study Analytics -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-gray-800">Study Analytics</h2>
-            <div class="relative">
-              <select id="analyticsTimeframe" class="bg-gray-100 text-gray-700 rounded-md py-1 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-                <option value="semester">This Semester</option>
-              </select>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="p-4 bg-gray-50 rounded-lg">
-              <h3 class="font-medium mb-3 text-gray-700">Weekly Study Hours</h3>
-              <canvas id="studyHoursChart" height="200"></canvas>
-            </div>
-            <div class="p-4 bg-gray-50 rounded-lg">
-              <h3 class="font-medium mb-3 text-gray-700">Subject Distribution</h3>
-              <canvas id="subjectPieChart" height="200"></canvas>
-            </div>
-          </div>
-          <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h3 class="font-medium mb-3 text-gray-700">Productivity Trend</h3>
-            <canvas id="productivityChart" height="100"></canvas>
-          </div>
-        </div>
+        <!-- Your Learning Stats -->
+<div class="bg-white rounded-lg shadow-md p-6">
+  <h2 class="text-xl font-bold text-gray-800 mb-4">Your Learning Stats</h2>
+  <div id="learningStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+    <div>
+      <p class="text-2xl font-bold text-indigo-600" id="statNotes">--</p>
+      <p class="text-sm text-gray-500">Notes Uploaded</p>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-indigo-600" id="statSubjects">--</p>
+      <p class="text-sm text-gray-500">Subjects</p>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-indigo-600" id="statPlans">--</p>
+      <p class="text-sm text-gray-500">Study Plans</p>
+    </div>
+    <div>
+      <p class="text-2xl font-bold text-indigo-600" id="statDownloads">--</p>
+      <p class="text-sm text-gray-500">Downloads</p>
+    </div>
+  </div>
+</div>
         
         <!-- Recent Activity -->
         <div class="bg-white rounded-lg shadow-md p-6">
@@ -382,95 +378,42 @@
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // Initialize charts
-    const initCharts = () => {
-      // Study Hours Chart
-      new Chart(document.getElementById('studyHoursChart'), {
-        type: 'bar',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [{
-            label: 'Study Hours',
-            data: [3, 5, 4, 6, 4, 5, 2],
-            backgroundColor: '#6366F1'
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
-        }
-      });
-
-      // Subject Distribution Chart
-      new Chart(document.getElementById('subjectPieChart'), {
-        type: 'pie',
-        data: {
-          labels: ['Math', 'Physics', 'CS', 'Chemistry'],
-          datasets: [{
-            data: [40, 25, 25, 10],
-            backgroundColor: ['#6366F1', '#8B5CF6', '#D946EF', '#EC4899']
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'right',
-              labels: {
-                boxWidth: 15,
-                font: {
-                  size: 10
-                }
-              }
-            }
-          }
-        }
-      });
-
-      // Productivity Chart
-      new Chart(document.getElementById('productivityChart'), {
-        type: 'line',
-        data: {
-          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-          datasets: [{
-            label: 'Productivity Score',
-            data: [65, 78, 72, 85],
-            borderColor: '#6366F1',
-            backgroundColor: 'rgba(99, 102, 241, 0.1)',
-            fill: true,
-            tension: 0.3
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              min: 50,
-              max: 100
-            }
-          }
-        }
-      });
-    };
+  
 
     // Initialize dashboard
     auth.onAuthStateChanged(async (user) => {
       if (!user) window.location.href = '/login.html';
       
       // Initialize charts
-      initCharts();
+      //initCharts();
       
       // Load profile data
       const userDoc = await getDoc(doc(db, "users", user.uid));
       const userData = userDoc.data() || {};
+      
+      // Load Learning Stats
+try {
+  // Notes uploaded
+  const notesSnap = await getDocs(query(collection(db, "notes"), where("userId", "==", user.uid)));
+  const notes = notesSnap.docs;
+  const subjectsSet = new Set(notes.map(n => n.data().subject));
+  
+  // Study plans
+  const plansSnap = await getDocs(query(collection(db, "studyPlans"), where("userId", "==", user.uid)));
+
+  // Downloads (optional: implement a tracking collection for downloads)
+  const downloadsSnap = await getDocs(query(collection(db, "downloads"), where("userId", "==", user.uid)));
+
+  // Update UI
+  document.getElementById('statNotes').textContent = notes.length;
+  document.getElementById('statSubjects').textContent = subjectsSet.size;
+  document.getElementById('statPlans').textContent = plansSnap.size || 0;
+  document.getElementById('statDownloads').textContent = downloadsSnap.size || 0;
+} catch (error) {
+  console.error("Error loading stats:", error);
+}
+
+
 
       // Populate profile
       document.getElementById('userName').textContent = userData.name || "Student";
