@@ -14,8 +14,41 @@
     </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <title>CollegeNotes - Study Smarter</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9037658096235022"
+     crossorigin="anonymous"></script>
 </head>
 <body class="font-sans text-gray-800 bg-white">
+  <!-- Top Progress Bar -->
+<div id="topProgressBar"
+     class="fixed top-0 left-0 h-1 z-[9999] transition-all duration-300 ease-out rounded-r shadow-md bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+     style="width: 0%;">
+</div>
+<script>
+  const progressBar = document.getElementById("topProgressBar");
+
+  function startProgress() {
+    let width = 0;
+    const interval = setInterval(() => {
+      if (width >= 90) {
+        clearInterval(interval);
+      } else {
+        width += Math.random() * 8; // feel smoother
+        progressBar.style.width = width + "%";
+      }
+    }, 150);
+  }
+
+  window.addEventListener("load", () => {
+    startProgress();
+
+    setTimeout(() => {
+      progressBar.style.width = "100%";
+      setTimeout(() => {
+        progressBar.style.opacity = "0";
+      }, 300);
+    }, 1000);
+  });
+</script>
   <!-- Navigation - Minimalist Style -->
   <!-- Navigation Bar -->
 <nav class="bg-white/30 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100">
@@ -296,40 +329,47 @@
     import { auth, signOut, db, doc, getDoc, onAuthStateChanged } from './assets/js/firebase-init.js';
 
 document.addEventListener("DOMContentLoaded", () => {
-    const authBtn = document.getElementById("authBtn");
-    const ctaBtn = document.getElementById("ctaBtn");
+    const authBtns = document.querySelectorAll("#authBtn");
+const ctaBtn = document.getElementById("ctaBtn");
 
-    if (!authBtn || !ctaBtn) return;
+if (authBtns.length === 0 || !ctaBtn) return;
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const docRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(docRef);
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    if (userData.role === "admin") {
-                        authBtn.textContent = "Admin Dashboard";
-                        authBtn.href = "admin-dashboard.html";
-                        return;
-                    }
-                }
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    try {
+      const docRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(docRef);
 
-                authBtn.textContent = "Dashboard";
-                authBtn.href = "dashboard.html";
-                ctaBtn.textContent = "Go to Dashboard";
-                ctaBtn.href = "dashboard.html";
-            } catch (e) {
-                console.error("Error fetching user data", e);
-            }
-        } else {
-            console.log("❌ User is logged out.");
-            authBtn.textContent = "Login";
-            authBtn.href = "login.html"; 
-            ctaBtn.textContent = "Start for Free";
-            ctaBtn.href = "signup.html"; 
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.role === "admin") {
+          authBtns.forEach(btn => {
+            btn.textContent = "Admin Dashboard";
+            btn.href = "admin-dashboard.html";
+          });
+          return;
         }
+      }
+
+      authBtns.forEach(btn => {
+        btn.textContent = "Dashboard";
+        btn.href = "dashboard.html";
+      });
+      ctaBtn.textContent = "Go to Dashboard";
+      ctaBtn.href = "dashboard.html";
+    } catch (e) {
+      console.error("Error fetching user data", e);
+    }
+  } else {
+    console.log("❌ User is logged out.");
+    authBtns.forEach(btn => {
+      btn.textContent = "Login";
+      btn.href = "login.html";
     });
+    ctaBtn.textContent = "Start for Free";
+    ctaBtn.href = "signup.html";
+  }
+});
 });
   </script>
   <!--
