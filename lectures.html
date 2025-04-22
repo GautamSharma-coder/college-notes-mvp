@@ -80,7 +80,7 @@
 <div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden"></div>
 
 <!-- Sidebar -->
-<div id="mobileSidebar" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 md:hidden z-50 flex flex-col">
+<div id="mobileSidebar" class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 md:hidden z-50 flex flex-col overflow-y-auto">
   
   <!-- Sidebar Header -->
   <div class="flex justify-between items-center p-4 border-b">
@@ -254,7 +254,7 @@
                     All Lectures
                 </h2>
                 
-                <div class="flex space-x-3">
+                <div class="flex flex-col space-y-3 md:flex-row md:space-y-0 md:space-x-3">
                     <div class="relative">
                         <input type="text" placeholder="Search lectures..." class="bg-gray-800 text-white placeholder-gray-400 px-4 py-2 pr-10 rounded focus:outline-none focus:ring-1 focus:ring-white">
                         <div class="absolute right-3 top-2.5 text-gray-400">
