@@ -18,6 +18,18 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
+  <!-- Notification Modal -->
+<div id="notificationsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+  <div class="bg-white w-full max-w-md mx-4 rounded-lg shadow-lg p-6 relative">
+    <h3 class="text-lg font-semibold mb-4">Notifications</h3>
+    <div id="notificationsList" class="space-y-4 max-h-80 overflow-y-auto">
+      <!-- Notifications will be loaded here dynamically -->
+    </div>
+    <button id="closeNotificationBtn" class="absolute top-2 right-3 text-gray-400 hover:text-black">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
   <!-- Navbar -->
   <nav class="bg-white text-black shadow-lg sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,6 +43,12 @@
         <div class="flex items-center space-x-4">
           <a href="/dashboard.html" class="font-medium px-3 py-2 rounded-md hover:bg-indigo-600">Dashboard</a>
           <a href="/study-plans.html" class="font-medium px-3 py-2 rounded-md hover:bg-indigo-600">Study Plan</a>
+          <!-- Notification Button -->
+<button id="notificationBtn" class="relative text-gray-600 hover:text-black focus:outline-none">
+  <i class="fas fa-bell fa-lg"></i>
+  <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+</button>
+
           <div class="relative" x-data="{ open: false }">
             <button id="userDropdown" class="flex items-center space-x-2" onclick="toggleDropdown()">
               <img id="navProfileImage" src="https://via.placeholder.com/40" alt="Profile" class="w-8 h-8 rounded-full">
@@ -779,6 +797,16 @@ try {
         }
       });
     });
+    function openNotificationsModal() {
+  document.getElementById('notificationsModal').classList.remove('hidden');
+  loadUserNotifications();
+}
+
+function closeNotificationsModal() {
+  document.getElementById('notificationsModal').classList.add('hidden');
+}
+document.getElementById('notificationBtn').addEventListener('click', openNotificationsModal);
+document.getElementById('closeNotificationBtn').addEventListener('click', closeNotificationsModal);
   </script>
 
 </body>

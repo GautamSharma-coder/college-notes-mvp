@@ -21,6 +21,17 @@
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
+<div id="sendNotificationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+  <div class="bg-white w-full max-w-md mx-4 p-6 rounded-lg shadow-lg relative">
+    <h3 class="text-lg font-semibold mb-4">Send Notification</h3>
+    <input type="text" id="notifTitle" placeholder="Title" class="w-full mb-2 p-2 border rounded" />
+    <textarea id="notifMessage" placeholder="Message" class="w-full mb-4 p-2 border rounded"></textarea>
+    <button id="sendNotifBtn" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Send</button>
+    <button onclick="closeNotificationModal()" class="absolute top-2 right-3 text-gray-500 hover:text-black">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
     <div class="flex flex-col md:flex-row min-h-screen">
         <!-- Sidebar (hidden by default on mobile) -->
         <div id="sidebar" class="bg-black text-white w-60 md:flex flex-col fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-30 ">
@@ -80,6 +91,9 @@
                             <i class="fas fa-bell"></i>
                             <span class="ml-1 bg-red-500 text-white text-xs rounded-full px-2 py-1">3</span>
                         </button>
+                        <button onclick="openNotificationModal()" class="bg-black text-white text-sm px-3 py-1 rounded hover:bg-gray-800">
+  Send Notification
+</button>
                         <div class="relative hidden sm:block">
                             <input class="bg-gray-100 rounded-lg px-4 py-2 pr-8 w-64 focus:outline-none focus:ring-2 focus:ring-black" type="text" placeholder="Search..." id="searchInput">
                             <button class="absolute right-2 top-2 text-gray-500">
@@ -361,6 +375,17 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Admin Notifications Section -->
+<div class="bg-white rounded-lg shadow-sm mt-8">
+  <div class="px-4 md:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+    <h3 class="text-lg font-semibold text-gray-800">Sent Notifications</h3>
+    <button onclick="openNotificationModal()" class="bg-black text-white px-3 py-1 md:px-4 md:py-2 rounded-lg text-sm hover:bg-gray-800 transition">Send New</button>
+  </div>
+  <div class="p-4 md:p-6 max-h-96 overflow-y-auto" id="sentNotificationsList">
+    <!-- Notifications will be loaded here -->
+    <p class="text-sm text-gray-500">Loading notifications...</p>
+  </div>
+</div>
 
                     <!-- Popular Notes Section -->
                     <div class="bg-white rounded-lg shadow-sm">
@@ -544,6 +569,57 @@ async function checkAdminRole(userId) {
     console.error("Error checking admin role:", error);
   }
 }
+//notifications
+async function fetchNotifications() {
+  const db = firebase.firestore();
+  const notificationsRef = db.collection("notifications")
+    .where("forRole", "==", "admin")
+    .where("read", "==", false);
+
+  const snap = await notificationsRef.get();
+  const count = snap.size;
+
+  const badge = document.querySelector('.fa-bell + span');
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline' : 'none';
+  }
+}
+//notifications list
+async function loadSentNotifications() {
+  const db = firebase.firestore();
+  const listContainer = document.getElementById("sentNotificationsList");
+
+  try {
+    const snap = await db.collection("notifications")
+      .orderBy("createdAt", "desc")
+      .limit(20)
+      .get();
+
+    listContainer.innerHTML = '';
+
+    if (snap.empty) {
+      listContainer.innerHTML = '<p class="text-sm text-gray-500">No notifications found.</p>';
+      return;
+    }
+
+    snap.forEach(doc => {
+      const notif = doc.data();
+      const time = notif.createdAt?.toDate().toLocaleString() || 'Unknown time';
+
+      listContainer.innerHTML += `
+        <div class="border-b py-3">
+          <h4 class="font-semibold text-sm text-gray-800">${notif.title}</h4>
+          <p class="text-sm text-gray-600">${notif.message}</p>
+          <p class="text-xs text-gray-400 mt-1">${time} • for ${notif.forRole}</p>
+        </div>
+      `;
+    });
+  } catch (err) {
+    console.error("Error loading sent notifications:", err);
+    listContainer.innerHTML = '<p class="text-sm text-red-500">Failed to load notifications.</p>';
+  }
+}
 
 // Display user profile information
 function displayUserProfile(user) {
@@ -584,6 +660,8 @@ async function loadDashboardData() {
   fetchPendingApprovals();
   fetchRecentUsers();
   fetchPopularNotes();
+  fetchNotifications();
+  loadSentNotifications();
 }
 
 // Fetch user statistics
@@ -801,8 +879,43 @@ async function fetchPendingApprovals() {
     console.error("Error fetching pending approvals:", error);
   }
 }
+function openNotificationModal() {
+  document.getElementById("sendNotificationModal").classList.remove("hidden");
+}
 
-// Approve a note
+function closeNotificationModal() {
+  document.getElementById("sendNotificationModal").classList.add("hidden");
+}
+
+window.openNotificationModal = openNotificationModal;
+window.closeNotificationModal = closeNotificationModal;
+
+document.getElementById("sendNotifBtn").addEventListener("click", async () => {
+  const title = document.getElementById("notifTitle").value.trim();
+  const message = document.getElementById("notifMessage").value.trim();
+  const db = firebase.firestore();
+
+  if (!title || !message) {
+    showNotification("Title and message are required", "error");
+    return;
+  }
+
+  try {
+    await db.collection("notifications").add({
+      title,
+      message,
+      forRole: "user",  // or "admin"
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      read: false
+    });
+    showNotification("Notification sent successfully", "success");
+    closeNotificationModal();
+  } catch (err) {
+    console.error("Error sending notification:", err);
+    showNotification("Failed to send notification", "error");
+  }
+});
+//Approve a note
 async function approveNote(noteId) {
   try {
     const db = firebase.firestore();
