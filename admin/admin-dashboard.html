@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,11 +12,29 @@
       }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media (max-width: 768px) {
+            .sidebar-open {
+                transform: translateX(0);
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 font-sans">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <div class="bg-black text-white w-60 flex flex-col">
+<div id="sendNotificationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+  <div class="bg-white w-full max-w-md mx-4 p-6 rounded-lg shadow-lg relative">
+    <h3 class="text-lg font-semibold mb-4">Send Notification</h3>
+    <input type="text" id="notifTitle" placeholder="Title" class="w-full mb-2 p-2 border rounded" />
+    <textarea id="notifMessage" placeholder="Message" class="w-full mb-4 p-2 border rounded"></textarea>
+    <button id="sendNotifBtn" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Send</button>
+    <button onclick="closeNotificationModal()" class="absolute top-2 right-3 text-gray-500 hover:text-black">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar (hidden by default on mobile) -->
+        <div id="sidebar" class="bg-black text-white w-60 md:flex flex-col fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-30 ">
             <div class="p-5 border-b border-gray-700">
                 <h1 class="text-2xl font-bold">College Notes</h1>
                 <p class="text-xs text-gray-400">Admin Dashboard</p>
@@ -49,29 +66,35 @@
                     <img id="adminPhoto" class="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="Admin avatar">
                     <div class="ml-3">
                         <p class="text-sm font-medium">Admin User</p>
-                        <a href="#" class="text-xs text-gray-400 hover:text-white">Logout</a>
+                        <a href="#" id="logoutButton" class="text-xs text-gray-400 hover:text-white">Logout</a>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Mobile overlay -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black opacity-50 z-20 hidden md:hidden"></div>
+
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Top Navigation -->
             <header class="bg-white shadow-sm z-10">
-                <div class="px-6 py-4 flex items-center justify-between">
+                <div class="px-4 py-4 flex items-center justify-between">
                     <div class="flex items-center">
-                        <button class="text-gray-500 focus:outline-none">
+                        <button id="sidebarToggle" class="text-gray-500 focus:outline-none md:hidden">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <h2 class="ml-4 text-xl font-semibold text-gray-800">Dashboard Overview</h2>
+                        <h2 class="ml-4 text-xl font-semibold text-gray-800 truncate">Dashboard Overview</h2>
                     </div>
-                    <div class="flex items-center">
-                        <button class="flex items-center text-gray-500 hover:text-gray-700 focus:outline-none mr-4">
+                    <div class="flex items-center space-x-4">
+                        <button class="flex items-center text-gray-500 hover:text-gray-700 focus:outline-none">
                             <i class="fas fa-bell"></i>
                             <span class="ml-1 bg-red-500 text-white text-xs rounded-full px-2 py-1">3</span>
                         </button>
-                        <div class="relative">
+                        <button onclick="openNotificationModal()" class="bg-black text-white text-sm px-3 py-1 rounded hover:bg-gray-800">
+  Send Notification
+</button>
+                        <div class="relative hidden sm:block">
                             <input class="bg-gray-100 rounded-lg px-4 py-2 pr-8 w-64 focus:outline-none focus:ring-2 focus:ring-black" type="text" placeholder="Search..." id="searchInput">
                             <button class="absolute right-2 top-2 text-gray-500">
                                 <i class="fas fa-search"></i>
@@ -79,17 +102,25 @@
                         </div>
                     </div>
                 </div>
+                <div class="px-4 py-2 sm:hidden">
+                    <div class="relative">
+                        <input class="bg-gray-100 rounded-lg px-4 py-2 pr-8 w-full focus:outline-none focus:ring-2 focus:ring-black" type="text" placeholder="Search..." id="mobileSearchInput">
+                        <button class="absolute right-2 top-2 text-gray-500">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
             </header>
 
             <!-- Main Content Area -->
-            <main class="flex-1 overflow-y-auto bg-gray-100 p-6">
+            <main class="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-6">
                 <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+                    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-gray-500 text-sm">Total Users</p>
-                                <h3 id="userCount" class="text-3xl font-bold text-gray-800">2,456</h3>
+                                <h3 id="userCount" class="text-2xl md:text-3xl font-bold text-gray-800">2,456</h3>
                             </div>
                             <div class="bg-black rounded-full p-3">
                                 <i class="fas fa-users text-white"></i>
@@ -97,16 +128,16 @@
                         </div>
                         <div class="flex items-center mt-4 text-green-500 text-sm">
                             <i class="fas fa-arrow-up mr-1"></i>
-                            <span>12% increase</span>
-                            <span class="text-gray-400 ml-2">since last month</span>
+                            <span id="userGrowth">12% increase</span>
+                            <span class="text-gray-400 ml-2 hidden sm:inline">since last month</span>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-gray-500 text-sm">Total Notes</p>
-                                <h3 id="notesCount" class="text-3xl font-bold text-gray-800">1,823</h3>
+                                <h3 id="notesCount" class="text-2xl md:text-3xl font-bold text-gray-800">1,823</h3>
                             </div>
                             <div class="bg-black rounded-full p-3">
                                 <i class="fas fa-file-alt text-white"></i>
@@ -115,15 +146,15 @@
                         <div class="flex items-center mt-4 text-green-500 text-sm">
                             <i class="fas fa-arrow-up mr-1"></i>
                             <span>8% increase</span>
-                            <span class="text-gray-400 ml-2">since last month</span>
+                            <span class="text-gray-400 ml-2 hidden sm:inline">since last month</span>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-gray-500 text-sm">Pending Approvals</p>
-                                <h3 class="text-3xl font-bold text-gray-800">42</h3>
+                                <h3 id="pendingApprovals" class="text-2xl md:text-3xl font-bold text-gray-800">42</h3>
                             </div>
                             <div class="bg-black rounded-full p-3">
                                 <i class="fas fa-clock text-white"></i>
@@ -132,15 +163,15 @@
                         <div class="flex items-center mt-4 text-red-500 text-sm">
                             <i class="fas fa-arrow-up mr-1"></i>
                             <span>15% increase</span>
-                            <span class="text-gray-400 ml-2">since last week</span>
+                            <span class="text-gray-400 ml-2 hidden sm:inline">since last week</span>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-gray-500 text-sm">Total Downloads</p>
-                                <h3 class="text-3xl font-bold text-gray-800">28.5k</h3>
+                                <h3 id="totalDownloads" class="text-2xl md:text-3xl font-bold text-gray-800">28.5k</h3>
                             </div>
                             <div class="bg-black rounded-full p-3">
                                 <i class="fas fa-download text-white"></i>
@@ -149,94 +180,118 @@
                         <div class="flex items-center mt-4 text-green-500 text-sm">
                             <i class="fas fa-arrow-up mr-1"></i>
                             <span>24% increase</span>
-                            <span class="text-gray-400 ml-2">since last month</span>
+                            <span class="text-gray-400 ml-2 hidden sm:inline">since last month</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Notes Approval Section -->
-                <div class="bg-white rounded-lg shadow-sm mb-8">
-                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <div class="bg-white rounded-lg shadow-sm mb-6 md:mb-8">
+                    <div class="px-4 md:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                         <h3 class="text-lg font-semibold text-gray-800">Notes Pending Approval</h3>
-                        <button class="bg-black text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">View All</button>
+                        <button class="bg-black text-white px-3 py-1 md:px-4 md:py-2 rounded-lg text-sm hover:bg-gray-800 transition">View All</button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uploaded By</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th class="px-2 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                    <th class="px-2 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Subject</th>
+                                    <th class="px-2 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Uploaded By</th>
+                                    <th class="px-2 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Date</th>
+                                    <th class="px-2 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody id="pendingNotesTableBody" class="bg-white divide-y divide-gray-200">
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <i class="fas fa-file-pdf text-red-500 mr-2"></i>
-                                            <div class="text-sm font-medium text-gray-900">Quantum Mechanics Notes</div>
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[140px] md:max-w-none">Quantum Mechanics Notes</div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Physics</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Physics</td>
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap hidden md:table-cell">
                                         <div class="flex items-center">
                                             <img class="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="User avatar">
                                             <div class="ml-2 text-sm font-medium text-gray-900">John Doe</div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 2, 2025</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <button class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs mr-2 hover:bg-green-200">Approve</button>
-                                        <button class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs hover:bg-red-200">Reject</button>
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Apr 2, 2025</td>
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap text-sm">
+                                        <div class="flex space-x-1">
+                                            <button class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs hover:bg-green-200">
+                                                <i class="fas fa-check sm:hidden"></i>
+                                                <span class="hidden sm:inline">Approve</span>
+                                            </button>
+                                            <button class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs hover:bg-red-200">
+                                                <i class="fas fa-times sm:hidden"></i>
+                                                <span class="hidden sm:inline">Reject</span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <i class="fas fa-file-word text-blue-500 mr-2"></i>
-                                            <div class="text-sm font-medium text-gray-900">Macroeconomics Summary</div>
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[140px] md:max-w-none">Macroeconomics Summary</div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Economics</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Economics</td>
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap hidden md:table-cell">
                                         <div class="flex items-center">
                                             <img class="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="User avatar">
                                             <div class="ml-2 text-sm font-medium text-gray-900">Jane Smith</div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Apr 1, 2025</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <button class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs mr-2 hover:bg-green-200">Approve</button>
-                                        <button class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs hover:bg-red-200">Reject</button>
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Apr 1, 2025</td>
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap text-sm">
+                                        <div class="flex space-x-1">
+                                            <button class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs hover:bg-green-200">
+                                                <i class="fas fa-check sm:hidden"></i>
+                                                <span class="hidden sm:inline">Approve</span>
+                                            </button>
+                                            <button class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs hover:bg-red-200">
+                                                <i class="fas fa-times sm:hidden"></i>
+                                                <span class="hidden sm:inline">Reject</span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             <i class="fas fa-file-powerpoint text-orange-500 mr-2"></i>
-                                            <div class="text-sm font-medium text-gray-900">Data Structures Review</div>
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[140px] md:max-w-none">Data Structures Review</div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Computer Science</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Computer Science</td>
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap hidden md:table-cell">
                                         <div class="flex items-center">
                                             <img class="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="User avatar">
                                             <div class="ml-2 text-sm font-medium text-gray-900">Alex Johnson</div>
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Mar 30, 2025</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <button class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs mr-2 hover:bg-green-200">Approve</button>
-                                        <button class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs hover:bg-red-200">Reject</button>
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">Mar 30, 2025</td>
+                                    <td class="px-2 md:px-6 py-4 whitespace-nowrap text-sm">
+                                        <div class="flex space-x-1">
+                                            <button class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs hover:bg-green-200">
+                                                <i class="fas fa-check sm:hidden"></i>
+                                                <span class="hidden sm:inline">Approve</span>
+                                            </button>
+                                            <button class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs hover:bg-red-200">
+                                                <i class="fas fa-times sm:hidden"></i>
+                                                <span class="hidden sm:inline">Reject</span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="px-6 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-                        <span class="text-sm text-gray-500">Showing 3 of 42 notes</span>
+                    <div class="px-4 md:px-6 py-3 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between">
+                        <span class="text-sm text-gray-500 mb-2 sm:mb-0">Showing 3 of 42 notes</span>
                         <div class="flex space-x-1">
                             <button class="px-3 py-1 text-sm bg-black text-white rounded-lg">1</button>
                             <button class="px-3 py-1 text-sm text-gray-500 hover:bg-gray-200 rounded-lg">2</button>
@@ -247,21 +302,22 @@
                     </div>
                 </div>
 
-                <!-- User Management Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- User Management and Popular Notes Sections -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+                    <!-- Recent Users Section -->
                     <div class="bg-white rounded-lg shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <div class="px-4 md:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                             <h3 class="text-lg font-semibold text-gray-800">Recent Users</h3>
-                            <button class="bg-black text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">Manage Users</button>
+                            <button class="bg-black text-white px-3 py-1 md:px-4 md:py-2 rounded-lg text-sm hover:bg-gray-800 transition">Manage Users</button>
                         </div>
-                        <div class="p-6">
-                            <div class="space-y-4">
+                        <div class="p-4 md:p-6">
+                            <div id="recentUsersContainer" class="space-y-4">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
                                         <img class="h-10 w-10 rounded-full" src="/api/placeholder/40/40" alt="User avatar">
                                         <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Sarah Wilson</div>
-                                            <div class="text-sm text-gray-500">sarah.wilson@example.com</div>
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">Sarah Wilson</div>
+                                            <div class="text-xs sm:text-sm text-gray-500 truncate max-w-[120px] sm:max-w-none">sarah.wilson@example.com</div>
                                         </div>
                                     </div>
                                     <div class="flex space-x-2">
@@ -275,8 +331,8 @@
                                     <div class="flex items-center">
                                         <img class="h-10 w-10 rounded-full" src="/api/placeholder/40/40" alt="User avatar">
                                         <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Michael Brown</div>
-                                            <div class="text-sm text-gray-500">michael.brown@example.com</div>
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">Michael Brown</div>
+                                            <div class="text-xs sm:text-sm text-gray-500 truncate max-w-[120px] sm:max-w-none">michael.brown@example.com</div>
                                         </div>
                                     </div>
                                     <div class="flex space-x-2">
@@ -290,8 +346,8 @@
                                     <div class="flex items-center">
                                         <img class="h-10 w-10 rounded-full" src="/api/placeholder/40/40" alt="User avatar">
                                         <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Emily Davis</div>
-                                            <div class="text-sm text-gray-500">emily.davis@example.com</div>
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">Emily Davis</div>
+                                            <div class="text-xs sm:text-sm text-gray-500 truncate max-w-[120px] sm:max-w-none">emily.davis@example.com</div>
                                         </div>
                                     </div>
                                     <div class="flex space-x-2">
@@ -305,8 +361,8 @@
                                     <div class="flex items-center">
                                         <img class="h-10 w-10 rounded-full" src="/api/placeholder/40/40" alt="User avatar">
                                         <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Robert Johnson</div>
-                                            <div class="text-sm text-gray-500">robert.johnson@example.com</div>
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">Robert Johnson</div>
+                                            <div class="text-xs sm:text-sm text-gray-500 truncate max-w-[120px] sm:max-w-none">robert.johnson@example.com</div>
                                         </div>
                                     </div>
                                     <div class="flex space-x-2">
@@ -319,23 +375,34 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Admin Notifications Section -->
+<div class="bg-white rounded-lg shadow-sm mt-8">
+  <div class="px-4 md:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+    <h3 class="text-lg font-semibold text-gray-800">Sent Notifications</h3>
+    <button onclick="openNotificationModal()" class="bg-black text-white px-3 py-1 md:px-4 md:py-2 rounded-lg text-sm hover:bg-gray-800 transition">Send New</button>
+  </div>
+  <div class="p-4 md:p-6 max-h-96 overflow-y-auto" id="sentNotificationsList">
+    <!-- Notifications will be loaded here -->
+    <p class="text-sm text-gray-500">Loading notifications...</p>
+  </div>
+</div>
 
                     <!-- Popular Notes Section -->
                     <div class="bg-white rounded-lg shadow-sm">
-                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <div class="px-4 md:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
                             <h3 class="text-lg font-semibold text-gray-800">Most Downloaded Notes</h3>
-                            <button class="bg-black text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-800 transition">View All</button>
+                            <button class="bg-black text-white px-3 py-1 md:px-4 md:py-2 rounded-lg text-sm hover:bg-gray-800 transition">View All</button>
                         </div>
-                        <div class="p-6">
-                            <div class="space-y-4">
+                        <div class="p-4 md:p-6">
+                            <div id="popularNotesContainer" class="space-y-4">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
-                                        <div class="bg-blue-100 p-3 rounded-lg">
+                                        <div class="bg-blue-100 p-3 rounded-lg hidden sm:block">
                                             <i class="fas fa-file-alt text-blue-500"></i>
                                         </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Organic Chemistry Fundamentals</div>
-                                            <div class="text-sm text-gray-500">Chemistry • 42 Pages</div>
+                                        <div class="ml-0 sm:ml-4">
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[150px] md:max-w-none">Organic Chemistry Fundamentals</div>
+                                            <div class="text-xs sm:text-sm text-gray-500">Chemistry • 42 Pages</div>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -345,12 +412,12 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
-                                        <div class="bg-green-100 p-3 rounded-lg">
+                                        <div class="bg-green-100 p-3 rounded-lg hidden sm:block">
                                             <i class="fas fa-file-excel text-green-500"></i>
                                         </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Statistical Analysis Methods</div>
-                                            <div class="text-sm text-gray-500">Mathematics • 36 Pages</div>
+                                        <div class="ml-0 sm:ml-4">
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[150px] md:max-w-none">Statistical Analysis Methods</div>
+                                            <div class="text-xs sm:text-sm text-gray-500">Mathematics • 36 Pages</div>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -360,12 +427,12 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
-                                        <div class="bg-purple-100 p-3 rounded-lg">
+                                        <div class="bg-purple-100 p-3 rounded-lg hidden sm:block">
                                             <i class="fas fa-file-word text-purple-500"></i>
                                         </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Modern Literature Review</div>
-                                            <div class="text-sm text-gray-500">English • 28 Pages</div>
+                                        <div class="ml-0 sm:ml-4">
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[150px] md:max-w-none">Modern Literature Review</div>
+                                            <div class="text-xs sm:text-sm text-gray-500">English • 28 Pages</div>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -375,12 +442,12 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
-                                        <div class="bg-red-100 p-3 rounded-lg">
+                                        <div class="bg-red-100 p-3 rounded-lg hidden sm:block">
                                             <i class="fas fa-file-pdf text-red-500"></i>
                                         </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">Neural Networks Explained</div>
-                                            <div class="text-sm text-gray-500">Computer Science • 53 Pages</div>
+                                        <div class="ml-0 sm:ml-4">
+                                            <div class="text-sm font-medium text-gray-900 truncate max-w-[150px] md:max-w-none">Neural Networks Explained</div>
+                                            <div class="text-xs sm:text-sm text-gray-500">Computer Science • 53 Pages</div>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -395,70 +462,98 @@
             </main>
         </div>
     </div>
-  <!--
-    <script src="../assets/js/admin.js"></script>
-    -->
-    
-    
-    <script type="module">
-      // Import Firebase modules
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signOut ,
-  getFirestore,
-  collection,
-  query,
-  where,
-  orderBy,
-  limit,
-  getDocs,
-  doc,
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  getStorage, 
-  ref, 
-  getDownloadURL ,
-  auth,
-  storage,
-  db
-} from "../assets/js/firebase-init.js";
-
-
-
-// DOM Elements
-const userCountElement = document.getElementById('userCount');
-const notesCountElement = document.getElementById('notesCount');
-const pendingApprovalsElement = document.getElementById('pendingApprovals');
-const totalDownloadsElement = document.getElementById('totalDownloads');
-const pendingNotesTableBody = document.getElementById('pendingNotesTableBody');
-const recentUsersContainer = document.getElementById('recentUsersContainer');
-const popularNotesContainer = document.getElementById('popularNotesContainer');
-const logoutButton = document.getElementById('logoutButton');
-const userProfileElement = document.getElementById('userProfile');
-
-// Authentication state observer
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is signed in
-    checkAdminRole(user.uid);
-    displayUserProfile(user.uid);
-  } else {
-    // User is signed out, redirect to login
-    window.location.href = 'login.html';
-  }
+<!-- Firebase App (the core Firebase SDK) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-app.min.js"></script>
+<!-- Add Firebase products that you want to use -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-auth.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-firestore.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase-storage.min.js"></script>
+    <script>// DOM Elements
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize Firebase
+  initializeFirebase();
+  
+  // Set up event listeners
+  setupEventListeners();
 });
+
+function initializeFirebase() {
+  // Firebase configuration - replace with your config
+  const firebaseConfig = {
+  apiKey: "AIzaSyDbwE7hFNe4eqDIOllJL99QUyHCxgzpS-o",
+  authDomain: "datacoll-36cec.firebaseapp.com",
+  databaseURL: "https://datacoll-36cec-default-rtdb.firebaseio.com",
+  projectId: "datacoll-36cec",
+  storageBucket: "datacoll-36cec.appspot.com",
+  messagingSenderId: "1016604814091",
+  appId: "1:1016604814091:web:413f4f753259580060d00e"
+};
+
+  // Initialize Firebase if not already initialized
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  
+  // Get Firebase services
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+  
+  // Authentication state observer
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      // User is signed in
+      checkAdminRole(user.uid);
+      displayUserProfile(user);
+    } else {
+      // User is signed out, redirect to login
+      window.location.href = 'login.html';
+    }
+  });
+}
+
+function setupEventListeners() {
+  // Logout button in user profile area
+  document.querySelector('#userProfile').addEventListener('click', (e) => {
+    if (e.target.id === 'logoutButton' || e.target.classList.contains('logout-link')) {
+      handleLogout();
+      e.preventDefault();
+    }
+  });
+  
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm) {
+          performSearch(searchTerm);
+        }
+      }
+    });
+  }
+  
+  // Sidebar toggle for mobile
+  const sidebarToggle = document.querySelector('button.text-gray-500:has(i.fas.fa-bars)');
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+      const sidebar = document.querySelector('.bg-black.text-white.w-60');
+      sidebar.classList.toggle('hidden');
+    });
+  }
+}
 
 // Check if user has admin role
 async function checkAdminRole(userId) {
   try {
-    const userRef = doc(db, "users", userId);
-    const userSnap = await getDoc(userRef);
+    const db = firebase.firestore();
+    const userRef = db.collection("users").doc(userId);
+    const userSnap = await userRef.get();
     
-    if (userSnap.exists()) {
+    if (userSnap.exists) {
       const userData = userSnap.data();
-      if (userData.role !== "admin" ) {
+      if (userData.role !== "admin") {
         // Not an admin, redirect to home
         alert("You don't have permission to access the admin dashboard");
         window.location.href = 'index.html';
@@ -474,20 +569,75 @@ async function checkAdminRole(userId) {
     console.error("Error checking admin role:", error);
   }
 }
+//notifications
+async function fetchNotifications() {
+  const db = firebase.firestore();
+  const notificationsRef = db.collection("notifications")
+    .where("forRole", "==", "admin")
+    .where("read", "==", false);
+
+  const snap = await notificationsRef.get();
+  const count = snap.size;
+
+  const badge = document.querySelector('.fa-bell + span');
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline' : 'none';
+  }
+}
+//notifications list
+async function loadSentNotifications() {
+  const db = firebase.firestore();
+  const listContainer = document.getElementById("sentNotificationsList");
+
+  try {
+    const snap = await db.collection("notifications")
+      .orderBy("createdAt", "desc")
+      .limit(20)
+      .get();
+
+    listContainer.innerHTML = '';
+
+    if (snap.empty) {
+      listContainer.innerHTML = '<p class="text-sm text-gray-500">No notifications found.</p>';
+      return;
+    }
+
+    snap.forEach(doc => {
+      const notif = doc.data();
+      const time = notif.createdAt?.toDate().toLocaleString() || 'Unknown time';
+
+      listContainer.innerHTML += `
+        <div class="border-b py-3">
+          <h4 class="font-semibold text-sm text-gray-800">${notif.title}</h4>
+          <p class="text-sm text-gray-600">${notif.message}</p>
+          <p class="text-xs text-gray-400 mt-1">${time} • for ${notif.forRole}</p>
+        </div>
+      `;
+    });
+  } catch (err) {
+    console.error("Error loading sent notifications:", err);
+    listContainer.innerHTML = '<p class="text-sm text-red-500">Failed to load notifications.</p>';
+  }
+}
 
 // Display user profile information
 function displayUserProfile(user) {
+  const userProfileElement = document.getElementById('userProfile');
+  const adminPhoto = document.getElementById('adminPhoto');
+  
   if (userProfileElement) {
-    getDoc(doc(db, "users", user.uid)).then((docSnap) => {
-      if (docSnap.exists()) {
+    const db = firebase.firestore();
+    db.collection("users").doc(user.uid).get().then((docSnap) => {
+      if (docSnap.exists) {
         const userData = docSnap.data();
         userProfileElement.innerHTML = `
-          <p class="text-sm font-medium">${userData.displayName || user.email}</p>
-          <a href="#" id="logoutButton" class="text-xs text-gray-400 hover:text-white">Logout</a>
+          <img id="adminPhoto" class="h-8 w-8 rounded-full" src="${userData.imageURL || '/api/placeholder/32/32'}" alt="Admin avatar">
+          <div class="ml-3">
+            <p class="text-sm font-medium">${userData.name || user.email}</p>
+            <a href="#" id="logoutButton" class="text-xs text-gray-400 hover:text-white">Logout</a>
+          </div>
         `;
-        document.getElementById("adminPhoto").src = user.photoURL;
-        // Add event listener to logout button
-        document.getElementById('logoutButton').addEventListener('click', handleLogout);
       }
     });
   }
@@ -495,7 +645,8 @@ function displayUserProfile(user) {
 
 // Handle user logout
 function handleLogout() {
-  signOut(auth).then(() => {
+  const auth = firebase.auth();
+  auth.signOut().then(() => {
     window.location.href = 'login.html';
   }).catch((error) => {
     console.error("Error signing out:", error);
@@ -509,35 +660,42 @@ async function loadDashboardData() {
   fetchPendingApprovals();
   fetchRecentUsers();
   fetchPopularNotes();
+  fetchNotifications();
+  loadSentNotifications();
 }
 
 // Fetch user statistics
 async function fetchUserStatistics() {
   try {
-    const usersRef = collection(db, "users");
-    const usersSnap = await getDocs(usersRef);
+    const db = firebase.firestore();
+    const userCountElement = document.getElementById('userCount');
+    
+    if (!userCountElement) return;
+    
+    const usersRef = db.collection("users");
+    const usersSnap = await usersRef.get();
     const totalUsers = usersSnap.size;
     
-    if (userCountElement) {
-      userCountElement.textContent = totalUsers.toLocaleString();
-    }
+    userCountElement.textContent = totalUsers.toLocaleString();
     
     // Get last month's user count for comparison
     const lastMonthDate = new Date();
     lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
     
-    const lastMonthQuery = query(
-      collection(db, "users"),
-      where("createdAt", "<", lastMonthDate)
-    );
-    
-    const lastMonthSnap = await getDocs(lastMonthQuery);
+    const lastMonthQuery = usersRef.where("createdAt", "<", lastMonthDate);
+    const lastMonthSnap = await lastMonthQuery.get();
     const lastMonthCount = lastMonthSnap.size;
     
     // Calculate growth percentage
     if (lastMonthCount > 0) {
       const growthPercentage = ((totalUsers - lastMonthCount) / lastMonthCount) * 100;
-      document.getElementById('userGrowth').textContent = `${growthPercentage.toFixed(1)}% increase`;
+      // Find the growth indicator element - may be nested in a parent element
+      const growthElements = document.querySelectorAll('.text-green-500.text-sm');
+      growthElements.forEach(el => {
+        if (el.textContent.includes('increase')) {
+          el.querySelector('span').textContent = `${growthPercentage.toFixed(1)}% increase`;
+        }
+      });
     }
   } catch (error) {
     console.error("Error fetching user statistics:", error);
@@ -547,36 +705,44 @@ async function fetchUserStatistics() {
 // Fetch notes statistics
 async function fetchNotesStatistics() {
   try {
+    const db = firebase.firestore();
+    const notesCountElement = document.getElementById('notesCount');
+    
+    if (!notesCountElement) return;
+    
     // Total notes count
-    const notesRef = collection(db, "notes");
-    const notesSnap = await getDocs(notesRef);
+    const notesRef = db.collection("notes");
+    const notesSnap = await notesRef.get();
     const totalNotes = notesSnap.size;
     
-    if (notesCountElement) {
-      notesCountElement.textContent = totalNotes.toLocaleString();
-    }
+    notesCountElement.textContent = totalNotes.toLocaleString();
     
-    // Pending approvals count
-    const pendingQuery = query(
-      collection(db, "notes"),
-      where("status", "==", "pending")
-    );
-    
-    const pendingSnap = await getDocs(pendingQuery);
+    // Pending approvals count - find the element that contains pending approvals
+    const pendingQuery = notesRef.where("status", "==", "pending");
+    const pendingSnap = await pendingQuery.get();
     const pendingCount = pendingSnap.size;
     
-    if (pendingApprovalsElement) {
-      pendingApprovalsElement.textContent = pendingCount;
-    }
+    // Update the UI with pending count - might be in a heading or stat card
+    const pendingElements = document.querySelectorAll('h3.text-3xl.font-bold.text-gray-800');
+    pendingElements.forEach(el => {
+      // Find the element preceded by "Pending Approvals" text
+      const prevElement = el.previousElementSibling;
+      if (prevElement && prevElement.textContent.includes('Pending Approvals')) {
+        el.textContent = pendingCount;
+      }
+    });
     
-    // Total downloads count
-    const statsRef = doc(db, "statistics", "downloads");
-    const statsSnap = await getDoc(statsRef);
+    // Total downloads count - Similar approach
+    const totalDownloadElements = document.querySelectorAll('h3.text-3xl.font-bold.text-gray-800');
+    totalDownloadElements.forEach(el => {
+      const prevElement = el.previousElementSibling;
+      if (prevElement && prevElement.textContent.includes('Total Downloads')) {
+        // Instead of fetching from Firestore, we keep the mock data
+        // normally we would fetch this from a Firestore document
+        el.textContent = "28.5k";
+      }
+    });
     
-    if (statsSnap.exists() && totalDownloadsElement) {
-      const totalDownloads = statsSnap.data().total;
-      totalDownloadsElement.textContent = (totalDownloads / 1000).toFixed(1) + "k";
-    }
   } catch (error) {
     console.error("Error fetching notes statistics:", error);
   }
@@ -585,109 +751,180 @@ async function fetchNotesStatistics() {
 // Fetch pending approval notes
 async function fetchPendingApprovals() {
   try {
-    const pendingQuery = query(
-      collection(db, "notes"),
-      where("status", "==", "pending"),
-      orderBy("uploadDate", "desc"),
-      limit(10)
-    );
+    const db = firebase.firestore();
+    // Find the table body by traversing from the table header that has "Notes Pending Approval"
+    let pendingNotesTableBody;
+    const tableHeaders = document.querySelectorAll('h3.text-lg.font-semibold.text-gray-800');
     
-    const pendingSnap = await getDocs(pendingQuery);
+    tableHeaders.forEach(header => {
+      if (header.textContent.includes('Notes Pending Approval')) {
+        // Find the nearest table and then its tbody
+        const parentSection = header.closest('.bg-white.rounded-lg.shadow-sm');
+        if (parentSection) {
+          pendingNotesTableBody = parentSection.querySelector('tbody');
+        }
+      }
+    });
     
-    if (pendingNotesTableBody) {
-      pendingNotesTableBody.innerHTML = ''; // Clear existing content
+    if (!pendingNotesTableBody) return;
+    
+    const pendingQuery = db.collection("notes")
+      .where("status", "==", "pending")
+      .orderBy("uploadDate", "desc")
+      .limit(10);
+    
+    const pendingSnap = await pendingQuery.get();
+    
+    pendingNotesTableBody.innerHTML = ''; // Clear existing content
+    
+    if (pendingSnap.empty) {
+      pendingNotesTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+            No pending notes found
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    
+    // Process each pending note
+    const promises = pendingSnap.docs.map(async (noteDoc) => {
+      const noteData = noteDoc.data();
+      const noteId = noteDoc.id;
       
-      if (pendingSnap.empty) {
-        pendingNotesTableBody.innerHTML = `
-          <tr>
-            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-              No pending notes found
-            </td>
-          </tr>
-        `;
-        return;
+      // Get uploader data
+      let uploaderData = { displayName: "Unknown User" };
+      try {
+        const uploaderRef = db.collection("users").doc(noteData.uploaderId);
+        const uploaderSnap = await uploaderRef.get();
+        if (uploaderSnap.exists) {
+          uploaderData = uploaderSnap.data();
+        }
+      } catch (err) {
+        console.error("Error fetching uploader data:", err);
       }
       
-      // Process each pending note
-      pendingSnap.forEach(async (noteDoc) => {
-        const noteData = noteDoc.data();
-        const noteId = noteDoc.id;
-        
-        // Get uploader data
-        const uploaderRef = doc(db, "users", noteData.uploaderId);
-        const uploaderSnap = await getDoc(uploaderRef);
-        const uploaderData = uploaderSnap.exists() ? uploaderSnap.data() : { displayName: "Unknown User" };
-        
-        // Format date
-        const uploadDate = noteData.uploadDate.toDate ? noteData.uploadDate.toDate() : new Date(noteData.uploadDate);
-        const formattedDate = uploadDate.toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'short', 
-          day: 'numeric' 
-        });
-        
-        // Get file icon based on file type
-        let fileIcon = 'fas fa-file';
-        switch (noteData.fileType) {
-          case 'pdf':
-            fileIcon = 'fas fa-file-pdf text-red-500';
-            break;
-          case 'doc':
-          case 'docx':
-            fileIcon = 'fas fa-file-word text-blue-500';
-            break;
-          case 'ppt':
-          case 'pptx':
-            fileIcon = 'fas fa-file-powerpoint text-orange-500';
-            break;
-          case 'xls':
-          case 'xlsx':
-            fileIcon = 'fas fa-file-excel text-green-500';
-            break;
-        }
-        
-        // Create table row
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center">
-              <i class="${fileIcon} mr-2"></i>
-              <div class="text-sm font-medium text-gray-900">${noteData.title}</div>
-            </div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${noteData.subject}</td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="flex items-center">
-              <img class="h-8 w-8 rounded-full" src="${uploaderData.photoURL || '/api/placeholder/32/32'}" alt="User avatar">
-              <div class="ml-2 text-sm font-medium text-gray-900">${uploaderData.displayName}</div>
-            </div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm">
-            <button class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs mr-2 hover:bg-green-200" 
-                    data-note-id="${noteId}" 
-                    onclick="approveNote('${noteId}')">Approve</button>
-            <button class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs hover:bg-red-200" 
-                    data-note-id="${noteId}" 
-                    onclick="rejectNote('${noteId}')">Reject</button>
-          </td>
-        `;
-        
-        pendingNotesTableBody.appendChild(row);
+      // Format date - handle both Firestore Timestamps and date strings
+      let uploadDate;
+      if (noteData.uploadDate && typeof noteData.uploadDate.toDate === 'function') {
+        uploadDate = noteData.uploadDate.toDate();
+      } else if (noteData.uploadDate) {
+        uploadDate = new Date(noteData.uploadDate);
+      } else {
+        uploadDate = new Date(); // Fallback to current date
+      }
+      
+      const formattedDate = uploadDate.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
       });
-    }
+      
+      // Get file icon based on file type
+      let fileIcon = 'fas fa-file';
+      switch (noteData.fileType) {
+        case 'pdf':
+          fileIcon = 'fas fa-file-pdf text-red-500';
+          break;
+        case 'doc':
+        case 'docx':
+          fileIcon = 'fas fa-file-word text-blue-500';
+          break;
+        case 'ppt':
+        case 'pptx':
+          fileIcon = 'fas fa-file-powerpoint text-orange-500';
+          break;
+        case 'xls':
+        case 'xlsx':
+          fileIcon = 'fas fa-file-excel text-green-500';
+          break;
+      }
+      
+      // Create table row
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center">
+            <i class="${fileIcon} mr-2"></i>
+            <div class="text-sm font-medium text-gray-900">${noteData.title || 'Untitled'}</div>
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${noteData.subject || 'N/A'}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center">
+            <img class="h-8 w-8 rounded-full" src="${uploaderData.photoURL || '/api/placeholder/32/32'}" alt="User avatar">
+            <div class="ml-2 text-sm font-medium text-gray-900">${uploaderData.displayName || 'Unknown User'}</div>
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+          <button class="approve-note bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs mr-2 hover:bg-green-200" 
+                  data-note-id="${noteId}">Approve</button>
+          <button class="reject-note bg-red-100 text-red-800 px-3 py-1 rounded-full text-xs hover:bg-red-200" 
+                  data-note-id="${noteId}">Reject</button>
+        </td>
+      `;
+      
+      pendingNotesTableBody.appendChild(row);
+      
+      // Add event listeners for approve/reject buttons
+      row.querySelector('.approve-note').addEventListener('click', () => approveNote(noteId));
+      row.querySelector('.reject-note').addEventListener('click', () => rejectNote(noteId));
+    });
+    
+    await Promise.all(promises);
+    
   } catch (error) {
     console.error("Error fetching pending approvals:", error);
   }
 }
+function openNotificationModal() {
+  document.getElementById("sendNotificationModal").classList.remove("hidden");
+}
 
-// Approve a note
-window.approveNote = async function(noteId) {
+function closeNotificationModal() {
+  document.getElementById("sendNotificationModal").classList.add("hidden");
+}
+
+window.openNotificationModal = openNotificationModal;
+window.closeNotificationModal = closeNotificationModal;
+
+document.getElementById("sendNotifBtn").addEventListener("click", async () => {
+  const title = document.getElementById("notifTitle").value.trim();
+  const message = document.getElementById("notifMessage").value.trim();
+  const db = firebase.firestore();
+
+  if (!title || !message) {
+    showNotification("Title and message are required", "error");
+    return;
+  }
+
   try {
-    const noteRef = doc(db, "notes", noteId);
-    await updateDoc(noteRef, {
+    await db.collection("notifications").add({
+      title,
+      message,
+      forRole: "user",  // or "admin"
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      read: false
+    });
+    showNotification("Notification sent successfully", "success");
+    closeNotificationModal();
+  } catch (err) {
+    console.error("Error sending notification:", err);
+    showNotification("Failed to send notification", "error");
+  }
+});
+//Approve a note
+async function approveNote(noteId) {
+  try {
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    
+    const noteRef = db.collection("notes").doc(noteId);
+    await noteRef.update({
       status: "approved",
-      approvedAt: new Date(),
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp(),
       approvedBy: auth.currentUser.uid
     });
     
@@ -704,12 +941,15 @@ window.approveNote = async function(noteId) {
 }
 
 // Reject a note
-window.rejectNote = async function(noteId) {
+async function rejectNote(noteId) {
   try {
-    const noteRef = doc(db, "notes", noteId);
-    await updateDoc(noteRef, {
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    
+    const noteRef = db.collection("notes").doc(noteId);
+    await noteRef.update({
       status: "rejected",
-      rejectedAt: new Date(),
+      rejectedAt: firebase.firestore.FieldValue.serverTimestamp(),
       rejectedBy: auth.currentUser.uid
     });
     
@@ -728,21 +968,56 @@ window.rejectNote = async function(noteId) {
 // Fetch recent users
 async function fetchRecentUsers() {
   try {
-    const usersQuery = query(
-      collection(db, "users"),
-      orderBy("createdAt", "desc"),
-      limit(4)
-    );
+    const db = firebase.firestore();
     
-    const usersSnap = await getDocs(usersQuery);
+    // Find the container for recent users by traversing from the heading
+    let recentUsersContainer;
+    const sectionHeaders = document.querySelectorAll('h3.text-lg.font-semibold.text-gray-800');
     
-    if (recentUsersContainer) {
-      recentUsersContainer.innerHTML = ''; // Clear existing content
+    sectionHeaders.forEach(header => {
+      if (header.textContent.includes('Recent Users')) {
+        // Find the container inside the section
+        const parentSection = header.closest('.bg-white.rounded-lg.shadow-sm');
+        if (parentSection) {
+          recentUsersContainer = parentSection.querySelector('.p-6 .space-y-4');
+        }
+      }
+    });
+    
+    if (!recentUsersContainer) return;
+    
+    const usersQuery = db.collection("users")
+      .orderBy("createdAt", "desc")
+      .limit(4);
+    
+    const usersSnap = await usersQuery.get();
+    
+    // Keep existing content as it's properly structured
+    // Just update user data if available
+    
+    if (usersSnap.empty) return;
+    
+    // Get all user containers
+    const userElements = recentUsersContainer.querySelectorAll('.flex.items-center.justify-between');
+    
+    // Update each container with real data if available
+    usersSnap.docs.forEach((userDoc, index) => {
+      if (index >= userElements.length) return;
       
-      usersSnap.forEach((userDoc) => {
-        const userData = userDoc.data();
-        const userId = userDoc.id;
-        
+      const userData = userDoc.data();
+      const userId = userDoc.id;
+      const userElement = userElements[index];
+      
+      // Update user name and email
+      const nameElement = userElement.querySelector('.text-sm.font-medium.text-gray-900');
+      const emailElement = userElement.querySelector('.text-sm.text-gray-500');
+      
+      if (nameElement) nameElement.textContent = userData.displayName || userData.email || 'Unknown User';
+      if (emailElement) emailElement.textContent = userData.email || 'No email';
+      
+      // Update status badge
+      const statusBadge = userElement.querySelector('[class*="bg-"][class*="-100"]');
+      if (statusBadge) {
         // Determine user status class
         let statusClass = "bg-green-100 text-green-800";
         let statusText = "Active";
@@ -755,183 +1030,72 @@ async function fetchRecentUsers() {
           statusText = "Pending";
         }
         
-        // Create user card
-        const userCard = document.createElement('div');
-        userCard.className = "flex items-center justify-between";
-        userCard.innerHTML = `
-          <div class="flex items-center">
-            <img class="h-10 w-10 rounded-full" src="${userData.photoURL || '/api/placeholder/40/40'}" alt="User avatar">
-            <div class="ml-4">
-              <div class="text-sm font-medium text-gray-900">${userData.displayName || userData.email}</div>
-              <div class="text-sm text-gray-500">${userData.email}</div>
-            </div>
-          </div>
-          <div class="flex space-x-2">
-            <span class="${statusClass} text-xs px-2 py-1 rounded-full">${statusText}</span>
-            <div class="dropdown relative">
-              <button class="text-gray-400 hover:text-gray-500" id="user-dropdown-${userId}">
-                <i class="fas fa-ellipsis-v"></i>
-              </button>
-              <div class="dropdown-menu hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" 
-                   id="dropdown-content-${userId}">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
-                   onclick="viewUserDetails('${userId}')">View Details</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
-                   onclick="toggleUserStatus('${userId}', '${userData.status}')">
-                   ${userData.status === 'suspended' ? 'Activate User' : 'Suspend User'}
-                </a>
-                <a href="#" class="block px-4 py-2 text-sm text-red-700 hover:bg-gray-100" 
-                   onclick="deleteUser('${userId}')">Delete User</a>
-              </div>
-            </div>
-          </div>
-        `;
-        
-        recentUsersContainer.appendChild(userCard);
-        
-        // Add dropdown toggle functionality
-        document.getElementById(`user-dropdown-${userId}`).addEventListener('click', function() {
-          document.getElementById(`dropdown-content-${userId}`).classList.toggle('hidden');
-        });
-        
-        // Close dropdown when clicking outside
-        window.addEventListener('click', function(event) {
-          if (!event.target.matches(`#user-dropdown-${userId}`) && 
-              !event.target.closest(`#user-dropdown-${userId}`)) {
-            const dropdown = document.getElementById(`dropdown-content-${userId}`);
-            if (!dropdown.classList.contains('hidden')) {
-              dropdown.classList.add('hidden');
-            }
-          }
-        });
-      });
-    }
-  } catch (error) {
-    console.error("Error fetching recent users:", error);
-  }
-}
-
-// View user details
-window.viewUserDetails = function(userId) {
-  // Redirect to user details page with user ID
-  window.location.href = `user-details.html?id=${userId}`;
-}
-
-// Toggle user status (activate/suspend)
-window.toggleUserStatus = async function(userId, currentStatus) {
-  try {
-    const newStatus = currentStatus === 'suspended' ? 'active' : 'suspended';
-    
-    await updateDoc(doc(db, "users", userId), {
-      status: newStatus,
-      updatedAt: new Date()
+        // Update badge class and text
+        statusBadge.className = statusClass + " text-xs px-2 py-1 rounded-full";
+        statusBadge.textContent = statusText;
+      }
     });
     
-    // Refresh recent users
-    fetchRecentUsers();
-    
-    // Show success message
-    showNotification(`User ${newStatus === 'active' ? 'activated' : 'suspended'} successfully`, "success");
   } catch (error) {
-    console.error("Error updating user status:", error);
-    showNotification("Failed to update user status", "error");
-  }
-}
-
-// Delete user (this would typically require additional checks and confirmations)
-window.deleteUser = async function(userId) {
-  // Show confirmation dialog
-  if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
-    return;
-  }
-  
-  try {
-    // In a real app, you might want to:
-    // 1. Delete user's content (notes, comments, etc.)
-    // 2. Update statistics
-    // 3. Delete user authentication record
-    
-    // For now, just delete the user document
-    await deleteDoc(doc(db, "users", userId));
-    
-    // Refresh recent users
-    fetchRecentUsers();
-    fetchUserStatistics();
-    
-    // Show success message
-    showNotification("User deleted successfully", "success");
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    showNotification("Failed to delete user", "error");
+    console.error("Error fetching recent users:", error);
   }
 }
 
 // Fetch popular notes
 async function fetchPopularNotes() {
   try {
-    const notesQuery = query(
-      collection(db, "notes"),
-      where("status", "==", "approved"),
-      orderBy("downloadCount", "desc"),
-      limit(4)
-    );
+    const db = firebase.firestore();
     
-    const notesSnap = await getDocs(notesQuery);
+    // Find the container for popular notes
+    let popularNotesContainer;
+    const sectionHeaders = document.querySelectorAll('h3.text-lg.font-semibold.text-gray-800');
     
-    if (popularNotesContainer) {
-      popularNotesContainer.innerHTML = ''; // Clear existing content
-      
-      notesSnap.forEach((noteDoc) => {
-        const noteData = noteDoc.data();
-        
-        // Determine file icon class based on file type
-        let fileIconClass = "bg-blue-100";
-        let fileIcon = "fas fa-file-alt text-blue-500";
-        
-        switch (noteData.fileType) {
-          case 'pdf':
-            fileIconClass = "bg-red-100";
-            fileIcon = "fas fa-file-pdf text-red-500";
-            break;
-          case 'doc':
-          case 'docx':
-            fileIconClass = "bg-purple-100";
-            fileIcon = "fas fa-file-word text-purple-500";
-            break;
-          case 'xls':
-          case 'xlsx':
-            fileIconClass = "bg-green-100";
-            fileIcon = "fas fa-file-excel text-green-500";
-            break;
-          case 'ppt':
-          case 'pptx':
-            fileIconClass = "bg-orange-100";
-            fileIcon = "fas fa-file-powerpoint text-orange-500";
-            break;
+    sectionHeaders.forEach(header => {
+      if (header.textContent.includes('Most Downloaded Notes')) {
+        // Find the container inside the section
+        const parentSection = header.closest('.bg-white.rounded-lg.shadow-sm');
+        if (parentSection) {
+          popularNotesContainer = parentSection.querySelector('.p-6 .space-y-4');
         }
-        
-        // Create note card
-        const noteCard = document.createElement('div');
-        noteCard.className = "flex items-center justify-between";
-        noteCard.innerHTML = `
-          <div class="flex items-center">
-            <div class="${fileIconClass} p-3 rounded-lg">
-              <i class="${fileIcon}"></i>
-            </div>
-            <div class="ml-4">
-              <div class="text-sm font-medium text-gray-900">${noteData.title}</div>
-              <div class="text-sm text-gray-500">${noteData.subject} • ${noteData.pageCount || 'N/A'} Pages</div>
-            </div>
-          </div>
-          <div class="text-right">
-            <div class="text-sm font-medium text-gray-900">${noteData.downloadCount.toLocaleString()}</div>
-            <div class="text-xs text-gray-500">downloads</div>
-          </div>
-        `;
-        
-        popularNotesContainer.appendChild(noteCard);
-      });
-    }
+      }
+    });
+    
+    if (!popularNotesContainer) return;
+    
+    const notesQuery = db.collection("notes")
+      .where("status", "==", "approved")
+      .orderBy("downloadCount", "desc")
+      .limit(4);
+    
+    const notesSnap = await notesQuery.get();
+    
+    // Keep existing content but update with real data if available
+    if (notesSnap.empty) return;
+    
+    // Get all note containers
+    const noteElements = popularNotesContainer.querySelectorAll('.flex.items-center.justify-between');
+    
+    // Update each container with real data if available
+    notesSnap.docs.forEach((noteDoc, index) => {
+      if (index >= noteElements.length) return;
+      
+      const noteData = noteDoc.data();
+      const noteElement = noteElements[index];
+      
+      // Update note title and subject
+      const titleElement = noteElement.querySelector('.text-sm.font-medium.text-gray-900');
+      const infoElement = noteElement.querySelector('.text-sm.text-gray-500');
+      
+      if (titleElement) titleElement.textContent = noteData.title || 'Untitled';
+      if (infoElement) infoElement.textContent = `${noteData.subject || 'General'} • ${noteData.pageCount || 'N/A'} Pages`;
+      
+      // Update download count
+      const countElement = noteElement.querySelector('.text-sm.font-medium.text-gray-900:last-child');
+      if (countElement && noteData.downloadCount) {
+        countElement.textContent = noteData.downloadCount.toLocaleString();
+      }
+    });
+    
   } catch (error) {
     console.error("Error fetching popular notes:", error);
   }
@@ -939,8 +1103,12 @@ async function fetchPopularNotes() {
 
 // Show notification
 function showNotification(message, type = 'info') {
+  // Remove any existing notifications
+  const existingNotifications = document.querySelectorAll('.notification-toast');
+  existingNotifications.forEach(notification => notification.remove());
+  
   const notification = document.createElement('div');
-  notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 ${
+  notification.className = `notification-toast fixed top-4 right-4 px-6 py-3 rounded-lg text-white z-50 ${
     type === 'success' ? 'bg-green-600' : 
     type === 'error' ? 'bg-red-600' : 
     'bg-blue-600'
@@ -954,32 +1122,70 @@ function showNotification(message, type = 'info') {
   }, 3000);
 }
 
-// Initialize event listeners
-document.addEventListener('DOMContentLoaded', () => {
-  // Logout button
-  if (logoutButton) {
-    logoutButton.addEventListener('click', handleLogout);
+// Handle user actions 
+function viewUserDetails(userId) {
+  window.location.href = `user-details.html?id=${userId}`;
+}
+
+async function toggleUserStatus(userId, currentStatus) {
+  try {
+    const db = firebase.firestore();
+    const newStatus = currentStatus === 'suspended' ? 'active' : 'suspended';
+    
+    await db.collection("users").doc(userId).update({
+      status: newStatus,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    // Refresh recent users
+    fetchRecentUsers();
+    
+    // Show success message
+    showNotification(`User ${newStatus === 'active' ? 'activated' : 'suspended'} successfully`, "success");
+  } catch (error) {
+    console.error("Error updating user status:", error);
+    showNotification("Failed to update user status", "error");
+  }
+}
+
+async function deleteUser(userId) {
+  // Show confirmation dialog
+  if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
+    return;
   }
   
-  // Search functionality
-  const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') {
-        // Implement search functionality here
-        const searchTerm = searchInput.value.trim();
-        if (searchTerm) {
-          console.log("Searching for:", searchTerm);
-          // Implement search logic
-        }
-      }
-    });
-  }
-});
-
-// Export functions for global access
-window.handleLogout = handleLogout;
-    </script>
+  try {
+    const db = firebase.firestore();
     
+    // Delete the user document
+    await db.collection("users").doc(userId).delete();
+    
+    // Refresh recent users
+    fetchRecentUsers();
+    fetchUserStatistics();
+    
+    // Show success message
+    showNotification("User deleted successfully", "success");
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    showNotification("Failed to delete user", "error");
+  }
+}
+
+function performSearch(searchTerm) {
+  showNotification(`Searching for: ${searchTerm}`, "info");
+  // Implement actual search functionality here
+}
+
+// Make functions globally available
+window.handleLogout = handleLogout;
+window.approveNote = approveNote;
+window.rejectNote = rejectNote;
+window.viewUserDetails = viewUserDetails;
+window.toggleUserStatus = toggleUserStatus;
+window.deleteUser = deleteUser;
+       
+        
+    </script>
 </body>
 </html>

@@ -1,398 +1,227 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Dashboard - CollegeNotes</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="../assets/js/session-manager.js"></script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9037658096235022"
-     crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style type="text/tailwindcss">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Dashboard - CollegeNotes</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="../assets/js/session-manager.js"></script>
+<script async="" crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9037658096235022"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
       @theme {
         --color-clifford: #da373d;
       }
     </style>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"/>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    [x-cloak] { display: none !important; }
+        .font-display {
+      font-family: 'Syne', sans-serif;
+    }
+  .nav-item {
+    position: relative;
+  }
+  .nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s ease;
+  }
+  .nav-item:hover::after {
+    width: 100%;
+  }
+  .text-gradient {
+    background: linear-gradient(90deg, #4F46E5, #EC4899);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bg-gradient {
+    background: linear-gradient(135deg, #4F46E5, #EC4899);
+  }
+</style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-  <!-- Notification Modal -->
-<div id="notificationsModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-  <div class="bg-white w-full max-w-md mx-4 rounded-lg shadow-lg p-6 relative">
-    <h3 class="text-lg font-semibold mb-4">Notifications</h3>
-    <div id="notificationsList" class="space-y-4 max-h-80 overflow-y-auto">
-      <!-- Notifications will be loaded here dynamically -->
-    </div>
-    <button id="closeNotificationBtn" class="absolute top-2 right-3 text-gray-400 hover:text-black">
-      <i class="fas fa-times"></i>
-    </button>
-  </div>
+<body class="bg-gray-100 min-h-screen flex flex-col" x-data="{ mobileMenu: false}">
+<!-- Notification Modal -->
+<!-- Navbar -->
+<div id="navbar-container"></div>
+   
+   <script>
+     fetch('./components/navbar.html')
+   .then(res => {
+     if (!res.ok) throw new Error('Navbar file not found');
+     return res.text();
+   })
+   .then(html => {
+     document.getElementById('navbar-container').innerHTML = html;
+   })
+   .then(() => {
+     const user = {
+       isLoggedIn: true,
+       role: "admin" // or "user"
+     };
+     document.querySelectorAll('#authBtn').forEach(btn => {
+       if (user.isLoggedIn) {
+         btn.textContent = user.role === "admin" ? "Admin Dashboard" : "Dashboard";
+         btn.href = user.role === "admin" ? "/admin-dashboard.html" : "/dashboard.html";
+       } else {
+         btn.textContent = "Login";
+         btn.href = "/login.html";
+       }
+     });
+   })
+   .catch(err => {
+     console.error("Failed to load navbar:", err);
+     document.getElementById('navbar-container').innerHTML = "<div style='padding:1em;background:#fee;border:1px solid #f00;'>Navbar not found</div>";
+   });
+   </script> 
+
+<main class="max-w-7xl mx-auto px-6 pt-25 pb-20 sm:px-6 lg:px-8 py-4" >
+<!-- Welcome Banner -->
+<div class="bg-indigo-600 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg shadow-md p-6 mb-8 text-white">
+<div class="flex flex-col md:flex-row items-center justify-between">
+<div class="mb-4 md:mb-0">
+<h1 class="text-2xl font-bold">Welcome back, <span id="welcomeUserName">Student</span>!</h1>
+<p class="text-indigo-100">Track your progress, manage your notes, and improve your learning journey.</p>
 </div>
-  <!-- Navbar -->
-  <nav class="bg-white text-black shadow-lg sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex items-center">
-          <a href="/" class="flex items-center">
-            
-            <span class="text-xl font-bold">CollegeNotes</span>
+<div class="flex space-x-3">
+<a class="bg-white text-indigo-700 px-4 py-2 rounded-md hover:bg-indigo-50 transition flex items-center" href="/upload.html">
+<i class="fas fa-plus mr-2"></i> Upload Note
           </a>
-        </div>
-        <div class="flex items-center space-x-4">
-          <a href="/dashboard.html" class="font-medium px-3 py-2 rounded-md hover:bg-indigo-600">Dashboard</a>
-          <a href="/study-plans.html" class="font-medium px-3 py-2 rounded-md hover:bg-indigo-600">Study Plan</a>
-          <!-- Notification Button -->
-<button id="notificationBtn" class="relative text-gray-600 hover:text-black focus:outline-none">
-  <i class="fas fa-bell fa-lg"></i>
-  <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
-</button>
-
-          <div class="relative" x-data="{ open: false }">
-            <button id="userDropdown" class="flex items-center space-x-2" onclick="toggleDropdown()">
-              <img id="navProfileImage" src="https://via.placeholder.com/40" alt="Profile" class="w-8 h-8 rounded-full">
-              <span id="navUserName" class="hidden md:inline-block">User</span>
-              <i class="fas fa-chevron-down text-xs"></i>
-            </button>
-            <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-              <a href="/profile.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</a>
-              <a href="/settings.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Settings</a>
-              <button id="logoutBtn" class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">Logout</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <!-- Welcome Banner -->
-    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg shadow-md p-6 mb-8 text-white">
-      <div class="flex flex-col md:flex-row items-center justify-between">
-        <div class="mb-4 md:mb-0">
-          <h1 class="text-2xl font-bold">Welcome back, <span id="welcomeUserName">Student</span>!</h1>
-          <p class="text-indigo-100">Track your progress, manage your notes, and improve your learning journey.</p>
-        </div>
-        <div class="flex space-x-3">
-          <a href="/upload.html" class="bg-white text-indigo-700 px-4 py-2 rounded-md hover:bg-indigo-50 transition flex items-center">
-            <i class="fas fa-plus mr-2"></i> Upload Note
-          </a>
-          <button onclick="showModal('studyPlanModal')" class="bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-400 transition flex items-center">
-            <i class="fas fa-calendar-alt mr-2"></i> Create Study Plan
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Dashboard Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Left Column -->
-      <div class="md:col-span-2 space-y-6">
-        <!-- Study Analytics -->
-        <!-- Your Learning Stats -->
+</div>
+</div>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Left Column -->
+<div class="md:col-span-2 space-y-6">
+<!-- Study Analytics -->
+<!-- Your Learning Stats -->
 <div class="bg-white rounded-lg shadow-md p-6">
-  <h2 class="text-xl font-bold text-gray-800 mb-4">Your Learning Stats</h2>
-  <div id="learningStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-    <div>
-      <p class="text-2xl font-bold text-indigo-600" id="statNotes">--</p>
-      <p class="text-sm text-gray-500">Notes Uploaded</p>
-    </div>
-    <div>
-      <p class="text-2xl font-bold text-indigo-600" id="statSubjects">--</p>
-      <p class="text-sm text-gray-500">Subjects</p>
-    </div>
-    <div>
-      <p class="text-2xl font-bold text-indigo-600" id="statPlans">--</p>
-      <p class="text-sm text-gray-500">Study Plans</p>
-    </div>
-    <div>
-      <p class="text-2xl font-bold text-indigo-600" id="statDownloads">--</p>
-      <p class="text-sm text-gray-500">Downloads</p>
-    </div>
-  </div>
+<h2 class="text-xl font-bold text-gray-800 mb-4">Your Learning Stats</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center" id="learningStats">
+<div>
+<p class="text-2xl font-bold text-indigo-600" id="statNotes">--</p>
+<p class="text-sm text-gray-500">Notes Uploaded</p>
 </div>
-        
-        <!-- Recent Activity -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-gray-800">Recent Activity</h2>
-            <a href="/activity.html" class="text-indigo-600 hover:text-indigo-800 text-sm">View All</a>
-          </div>
-          <div id="userActivity" class="space-y-3">
-            <div class="flex items-start p-3 border-l-4 border-indigo-500 bg-gray-50">
-              <div class="bg-indigo-100 p-2 rounded-lg mr-3">
-                <i class="fas fa-upload text-indigo-600"></i>
-              </div>
-              <div>
-                <p class="font-medium">Uploaded Physics Notes - Chapter 5</p>
-                <p class="text-xs text-gray-500">Today, 10:45 AM</p>
-              </div>
-            </div>
-            <div class="flex items-start p-3 border-l-4 border-green-500 bg-gray-50">
-              <div class="bg-green-100 p-2 rounded-lg mr-3">
-                <i class="fas fa-download text-green-600"></i>
-              </div>
-              <div>
-                <p class="font-medium">Downloaded Calculus Study Guide</p>
-                <p class="text-xs text-gray-500">Yesterday, 3:20 PM</p>
-              </div>
-            </div>
-            <div class="flex items-start p-3 border-l-4 border-blue-500 bg-gray-50">
-              <div class="bg-blue-100 p-2 rounded-lg mr-3">
-                <i class="fas fa-file-alt text-blue-600"></i>
-              </div>
-              <div>
-                <p class="font-medium">Created new Study Plan</p>
-                <p class="text-xs text-gray-500">March 29, 2025</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Right Column -->
-      <div class="space-y-6">
-        <!-- Profile Card -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex flex-col items-center text-center mb-4">
-            <div class="relative mb-4">
-              <img id="profileImage" src="https://via.placeholder.com/150" class="w-24 h-24 rounded-full border-4 border-indigo-100">
-              <input type="file" id="profileUpload" class="hidden" accept="image/*">
-              <button onclick="document.getElementById('profileUpload').click()"
-                      class="absolute bottom-0 right-0 bg-indigo-600 text-white p-1 rounded-full hover:bg-indigo-700">
-                <i class="fas fa-camera"></i>
+<div>
+<p class="text-2xl font-bold text-indigo-600" id="statSubjects">--</p>
+<p class="text-sm text-gray-500">Subjects</p>
+</div>
+<div>
+<p class="text-2xl font-bold text-indigo-600" id="statPlans">--</p>
+<p class="text-sm text-gray-500">Study Plans</p>
+</div>
+<div>
+<p class="text-2xl font-bold text-indigo-600" id="statDownloads">--</p>
+<p class="text-sm text-gray-500">Downloads</p>
+</div>
+</div>
+</div>
+<!-- Recent Activity -->
+</div>
+<!-- Right Column -->
+<div class="space-y-6">
+<!-- Profile Card -->
+<div class="bg-white rounded-lg shadow-md p-6">
+<div class="flex flex-col items-center text-center mb-4">
+<div class="relative mb-4">
+<img class="w-24 h-24 rounded-full border-4 border-indigo-100" id="profileImage" src="https://via.placeholder.com/150"/>
+<input accept="image/*" class="hidden" id="profileUpload" type="file"/>
+<button class="absolute bottom-0 right-0 bg-indigo-600 text-white p-1 rounded-full hover:bg-indigo-700" onclick="document.getElementById('profileUpload').click()">
+<i class="fas fa-camera"></i>
+</button>
+</div>
+<h3 class="text-xl font-bold" id="userName">Student Name</h3>
+<p class="text-gray-600 text-sm" id="userEmail">student@example.com</p>
+<p class="text-xs text-gray-500 mt-1">Member since: <span id="joinDate">Jan 2025</span></p>
+<div class="mt-3 pt-3 border-t border-gray-200 w-full">
+<button class="text-indigo-600 hover:text-indigo-800 text-sm" onclick="showModal('profileModal')">
+<i class="fas fa-pen mr-1"></i> Edit Profile
               </button>
-            </div>
-            <h3 id="userName" class="text-xl font-bold">Student Name</h3>
-            <p id="userEmail" class="text-gray-600 text-sm">student@example.com</p>
-            <p class="text-xs text-gray-500 mt-1">Member since: <span id="joinDate">Jan 2025</span></p>
-            <div class="mt-3 pt-3 border-t border-gray-200 w-full">
-              <button onclick="showModal('profileModal')" class="text-indigo-600 hover:text-indigo-800 text-sm">
-                <i class="fas fa-pen mr-1"></i> Edit Profile
-              </button>
-            </div>
-          </div>
-          <div class="border-t border-gray-200 pt-4">
-            <h4 class="font-medium text-gray-800 mb-2">Stats</h4>
-            <div class="grid grid-cols-3 gap-2 text-center">
-              <div class="p-2 bg-gray-50 rounded">
-                <p class="text-lg font-bold text-indigo-600">12</p>
-                <p class="text-xs text-gray-500">Notes</p>
-              </div>
-              <div class="p-2 bg-gray-50 rounded">
-                <p class="text-lg font-bold text-indigo-600">8</p>
-                <p class="text-xs text-gray-500">Downloads</p>
-              </div>
-              <div class="p-2 bg-gray-50 rounded">
-                <p class="text-lg font-bold text-indigo-600">4</p>
-                <p class="text-xs text-gray-500">Subjects</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Your Notes -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="text-xl font-bold text-gray-800">Your Notes</h2>
-            <a href="/my-notes.html" class="text-indigo-600 hover:text-indigo-800 text-sm">View All</a>
-          </div>
-          <div id="userUploads" class="space-y-3">
-            <div class="p-3 bg-gray-50 rounded-lg hover:shadow-md transition">
-              <div class="flex justify-between items-start">
-                <h3 class="font-medium">Calculus - Integration Methods</h3>
-                <span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">Math</span>
-              </div>
-              <p class="text-xs text-gray-500 mt-1">Uploaded on March 25, 2025</p>
-              <div class="flex mt-2">
-                <a href="#" class="text-indigo-600 text-sm mr-3 hover:text-indigo-800">
-                  <i class="fas fa-download mr-1"></i> Download
+</div>
+</div>
+<div class="border-t border-gray-200 pt-4">
+<h4 class="font-medium text-gray-800 mb-2">Stats</h4>
+<div class="grid grid-cols-3 gap-2 text-center">
+<div class="p-2 bg-gray-50 rounded">
+<p class="text-lg font-bold text-indigo-600">12</p>
+<p class="text-xs text-gray-500">Notes</p>
+</div>
+<div class="p-2 bg-gray-50 rounded">
+<p class="text-lg font-bold text-indigo-600">8</p>
+<p class="text-xs text-gray-500">Downloads</p>
+</div>
+<div class="p-2 bg-gray-50 rounded">
+<p class="text-lg font-bold text-indigo-600">4</p>
+<p class="text-xs text-gray-500">Subjects</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Your Notes -->
+<div class="bg-white rounded-lg shadow-md p-6">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-xl font-bold text-gray-800">Your Notes</h2>
+<a class="text-indigo-600 hover:text-indigo-800 text-sm" href="/my-notes.html">View All</a>
+</div>
+<div class="space-y-3" id="userUploads">
+<div class="p-3 bg-gray-50 rounded-lg hover:shadow-md transition">
+<div class="flex justify-between items-start">
+<h3 class="font-medium">Calculus - Integration Methods</h3>
+<span class="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">Math</span>
+</div>
+<p class="text-xs text-gray-500 mt-1">Uploaded on March 25, 2025</p>
+<div class="flex mt-2">
+<a class="text-indigo-600 text-sm mr-3 hover:text-indigo-800" href="#">
+<i class="fas fa-download mr-1"></i> Download
                 </a>
-                <a href="#" class="text-gray-600 text-sm hover:text-gray-800">
-                  <i class="fas fa-share-alt mr-1"></i> Share
+<a class="text-gray-600 text-sm hover:text-gray-800" href="#">
+<i class="fas fa-share-alt mr-1"></i> Share
                 </a>
-              </div>
-            </div>
-            <div class="p-3 bg-gray-50 rounded-lg hover:shadow-md transition">
-              <div class="flex justify-between items-start">
-                <h3 class="font-medium">Computer Networks - TCP/IP</h3>
-                <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">CS</span>
-              </div>
-              <p class="text-xs text-gray-500 mt-1">Uploaded on March 18, 2025</p>
-              <div class="flex mt-2">
-                <a href="#" class="text-indigo-600 text-sm mr-3 hover:text-indigo-800">
-                  <i class="fas fa-download mr-1"></i> Download
+</div>
+</div>
+<div class="p-3 bg-gray-50 rounded-lg hover:shadow-md transition">
+<div class="flex justify-between items-start">
+<h3 class="font-medium">Computer Networks - TCP/IP</h3>
+<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">CS</span>
+</div>
+<p class="text-xs text-gray-500 mt-1">Uploaded on March 18, 2025</p>
+<div class="flex mt-2">
+<a class="text-indigo-600 text-sm mr-3 hover:text-indigo-800" href="#">
+<i class="fas fa-download mr-1"></i> Download
                 </a>
-                <a href="#" class="text-gray-600 text-sm hover:text-gray-800">
-                  <i class="fas fa-share-alt mr-1"></i> Share
+<a class="text-gray-600 text-sm hover:text-gray-800" href="#">
+<i class="fas fa-share-alt mr-1"></i> Share
                 </a>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Recommended -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-bold text-gray-800 mb-4">Recommended For You</h2>
-          <div id="recommendations" class="space-y-3">
-            <div class="p-3 bg-gray-50 rounded-lg border-l-4 border-yellow-400 hover:shadow-md transition">
-              <h3 class="font-medium">Advanced Calculus Guide</h3>
-              <p class="text-sm text-gray-600 mt-1">Complete guide for understanding advanced calculus concepts</p>
-              <a href="#" class="text-indigo-600 text-sm mt-2 inline-block hover:text-indigo-800">
-                <i class="fas fa-external-link-alt mr-1"></i> View Resource
-              </a>
-            </div>
-            <div class="p-3 bg-gray-50 rounded-lg border-l-4 border-indigo-400 hover:shadow-md transition">
-              <h3 class="font-medium">Physics Study Group</h3>
-              <p class="text-sm text-gray-600 mt-1">Join other students preparing for Physics 201 final</p>
-              <a href="#" class="text-indigo-600 text-sm mt-2 inline-block hover:text-indigo-800">
-                <i class="fas fa-users mr-1"></i> Join Group
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-lg shadow-md p-6 mt-6">
-      <h2 class="text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="/upload.html" class="p-4 bg-gray-50 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 transition flex flex-col items-center text-center">
-          <i class="fas fa-upload text-2xl mb-2"></i>
-          <span>Upload Note</span>
-        </a>
-        <a href="/request.html" class="p-4 bg-gray-50 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 transition flex flex-col items-center text-center">
-          <i class="fas fa-search text-2xl mb-2"></i>
-          <span>Request Notes</span>
-        </a>
-        <button onclick="showModal('studyPlanModal')" class="p-4 bg-gray-50 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 transition flex flex-col items-center text-center">
-          <i class="fas fa-calendar-alt text-2xl mb-2"></i>
-          <span>Create Study Plan</span>
-        </button>
-        <a href="/downloads.html" class="p-4 bg-gray-50 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 transition flex flex-col items-center text-center">
-          <i class="fas fa-download text-2xl mb-2"></i>
-          <span>Recent Downloads</span>
-        </a>
-      </div>
-    </div>
-  </main>
-
-  <!-- Profile Edit Modal -->
-  <div id="profileModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg w-full max-w-md">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Edit Profile</h3>
-        <button onclick="hideModal('profileModal')" class="text-gray-500 hover:text-gray-700">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <form id="profileForm" class="space-y-4">
-        <div>
-          <label class="block mb-2 text-gray-700">Full Name</label>
-          <input type="text" id="nameInput" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-        <div>
-          <label class="block mb-2 text-gray-700">Major</label>
-          <input type="text" id="majorInput" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-        <div>
-          <label class="block mb-2 text-gray-700">Year</label>
-          <select id="yearInput" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-            <option value="1">Freshman</option>
-            <option value="2">Sophomore</option>
-            <option value="3">Junior</option>
-            <option value="4">Senior</option>
-            <option value="5">Graduate</option>
-          </select>
-        </div>
-        <div class="flex gap-4 pt-2">
-          <button type="submit" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
-            Save Changes
-          </button>
-          <button type="button" onclick="hideModal('profileModal')" class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Study Plan Modal -->
-  <div id="studyPlanModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg w-full max-w-md">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Create Study Plan</h3>
-        <button onclick="hideModal('studyPlanModal')" class="text-gray-500 hover:text-gray-700">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <form id="studyPlanForm" class="space-y-4">
-        <div>
-          <label class="block mb-2 text-gray-700">Subjects</label>
-          <select id="subjectsInput" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" multiple>
-            <option value="math">Mathematics</option>
-            <option value="physics">Physics</option>
-            <option value="computer science">Computer Science</option>
-            <option value="cyber security">Cyber Security</option>
-            <option value="chemistry">Chemistry</option>
-            <option value="biology">Biology</option>
-          </select>
-          <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple subjects</p>
-        </div>
-        <div>
-          <label class="block mb-2 text-gray-700">Time Period</label>
-          <select id="timePeriodInput" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-            <option value="week">1 Week</option>
-            <option value="2week">2 Weeks</option>
-            <option value="month">1 Month</option>
-          </select>
-        </div>
-        <div>
-          <label class="block mb-2 text-gray-700">Study Goals</label>
-          <textarea id="goalsInput" class="w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" rows="3" placeholder="What do you want to achieve?"></textarea>
-        </div>
-        <div class="flex gap-4 pt-2">
-          <button type="submit" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
-            Generate Plan
-          </button>
-          <button type="button" onclick="hideModal('studyPlanModal')" class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-  
-  <!-- Study Plan Result -->
-  <div id="studyPlanContainer" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Your Study Plan</h3>
-        <button onclick="hideModal('studyPlanContainer')" class="text-gray-500 hover:text-gray-700">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div id="studyPlanResult" class="p-4 bg-gray-50 rounded-lg mb-4"></div>
-      <div class="flex space-x-4">
-        <button id="editPlan" class="flex items-center text-indigo-600 hover:text-indigo-800">
-          <i class="fas fa-edit mr-1"></i> Edit
-        </button>
-        <button id="deletePlan" class="flex items-center text-red-600 hover:text-red-800">
-          <i class="fas fa-trash-alt mr-1"></i> Delete
-        </button>
-        <button id="downloadPDF" class="flex items-center text-green-600 hover:text-green-800">
-          <i class="fas fa-file-download mr-1"></i> Download PDF
-        </button>
-        <button id="sharePlan" class="flex items-center text-blue-600 hover:text-blue-800">
-          <i class="fas fa-share-alt mr-1"></i> Share
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script type="module">
+</div>
+</div>
+</div>
+</div>
+<!-- Recommended -->
+</div>
+</div>
+<!-- Quick Actions -->
+</main>
+<!-- Profile Edit Modal -->
+<!-- Study Plan Modal -->
+<!-- Study Plan Result -->
+<script type="module">
     import { auth, db, storage, ref, uploadBytes, getDownloadURL } from '../assets/js/firebase-init.js';
     import { doc, getDoc, updateDoc, collection, query, where, getDocs, setDoc, deleteDoc } 
     from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -808,6 +637,42 @@ function closeNotificationsModal() {
 document.getElementById('notificationBtn').addEventListener('click', openNotificationsModal);
 document.getElementById('closeNotificationBtn').addEventListener('click', closeNotificationsModal);
   </script>
-
-</body>
+<div class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" id="profileModal">
+<div class="bg-white p-6 rounded-lg w-full max-w-md">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-xl font-bold">Edit Profile</h3>
+<button class="text-gray-500 hover:text-gray-700" onclick="hideModal('profileModal')">
+<i class="fas fa-times"></i>
+</button>
+</div>
+<form class="space-y-4" id="profileForm">
+<div>
+<label class="block mb-2 text-gray-700">Full Name</label>
+<input class="w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" id="nameInput" type="text"/>
+</div>
+<div>
+<label class="block mb-2 text-gray-700">Major</label>
+<input class="w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" id="majorInput" type="text"/>
+</div>
+<div>
+<label class="block mb-2 text-gray-700">Year</label>
+<select class="w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" id="yearInput">
+<option value="1">Freshman</option>
+<option value="2">Sophomore</option>
+<option value="3">Junior</option>
+<option value="4">Senior</option>
+<option value="5">Graduate</option>
+</select>
+</div>
+<div class="flex gap-4 pt-2">
+<button class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition" type="submit">
+            Save Changes
+          </button>
+<button class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition" onclick="hideModal('profileModal')" type="button">
+            Cancel
+          </button>
+</div>
+</form>
+</div>
+</div></body>
 </html>

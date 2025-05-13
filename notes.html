@@ -14,19 +14,6 @@
       }
     </style>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#3b82f6',
-            secondary: '#1e40af',
-            accent: '#eff6ff',
-          }
-        }
-      }
-    }
-  </script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
   <!-- Announcement Banner -->
@@ -306,6 +293,9 @@
 
       <!-- Notes Grid -->
       <div id="notesContainer" class="grid gap-6 md:grid-cols-3">
+        <!-- User Feedback -->
+<div id="notesFeedback" class="text-center text-gray-600 col-span-full hidden"></div>
+
         <!-- Notes will be loaded dynamically -->
       </div>
       
@@ -409,12 +399,22 @@
     </div>
   </footer>
 
-  <script>
-    // Mobile menu toggle
+  <script type="module" >
+    import {db,getDocs,collection} from './assets/js/firebase-init.js';
+
+    // Simulate loading notes
+    document.addEventListener("DOMContentLoaded", () => {
+      const notesContainer = document.getElementById("notesContainer");
+      const searchInput = document.getElementById("searchNotes");
+      const filterSubjects = document.getElementById("filterSubjects");
+      const loadMoreBtn = document.getElementById("loadMoreBtn");
+      const loadingIndicator = document.getElementById("loadingIndicator");
+          // Mobile menu toggle
+          /*
     document.getElementById('mobileMenuBtn').addEventListener('click', function() {
       const mobileMenu = document.getElementById('mobileMenu');
       mobileMenu.classList.toggle('hidden');
-    });
+    });*/
     
     // Filter tag selection
     const filterTags = document.querySelectorAll('.filter-tag');
@@ -427,15 +427,8 @@
       });
     });
     
-    // Simulate loading notes
-    document.addEventListener("DOMContentLoaded", async () => {
-      const notesContainer = document.getElementById("notesContainer");
-      const searchInput = document.getElementById("searchNotes");
-      const filterSubjects = document.getElementById("filterSubjects");
-      const loadMoreBtn = document.getElementById("loadMoreBtn");
-      const loadingIndicator = document.getElementById("loadingIndicator");
-      
       // Sample notes data
+      /*
       const notesData = [
         {
           title: "Introduction to Psychology",
@@ -504,8 +497,11 @@
           downloadLink: "#"
         }
       ];
-      
+      */
       function renderNotes(notes) {
+       const notesContainer = document.getElementById("notesContainer");
+    notesContainer.innerHTML = "";
+   // alert("working");
         notes.forEach(note => {
           // Create star rating HTML
           const fullStars = Math.floor(note.rating);
@@ -561,9 +557,54 @@
           `;
         });
       }
+
       
-      // Initial render
-      renderNotes(notesData);
+      console.log("Firebase :", db);
+      //import { db, getDocs, collection } from './assets/js/firebase-init.js';
+
+async function fetchNotes() {
+  const notesContainer = document.getElementById("notesContainer");
+  const loadingIndicator = document.getElementById("loadingIndicator");
+  const notesFeedback = document.getElementById("notesFeedback");
+
+  // Clear previous feedback
+  notesFeedback.classList.add("hidden");
+  notesFeedback.textContent = "";
+  notesContainer.innerHTML = "";
+  loadingIndicator.classList.remove("hidden");
+
+  try {
+    const querySnapshot = await getDocs(collection(db, "notes"));
+    const notes = [];
+    querySnapshot.forEach((doc) => {
+      const note = doc.data();
+      note.id = doc.id;
+      notes.push(note);
+    });
+
+    if (notes.length === 0) {
+      notesFeedback.textContent = "No notes found. Try uploading some!";
+      notesFeedback.classList.remove("hidden");
+    } else {
+      renderNotes(notes);
+    }
+
+  } catch (error) {
+    console.error("Error fetching notes:", error);
+    notesFeedback.innerHTML = `
+      <div class="bg-red-100 text-red-700 p-4 rounded-lg text-center">
+        Failed to load notes. Please check your connection or try again later.
+      </div>
+    `;
+    notesFeedback.classList.remove("hidden");
+  } finally {
+    loadingIndicator.classList.add("hidden");
+  }
+}
+
+
+});
+      
       /*
       // Simulate loading more notes
       loadMoreBtn.addEventListener('click', function() {

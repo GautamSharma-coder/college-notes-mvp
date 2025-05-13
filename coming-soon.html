@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coming Soon - CollegeNotes</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-clifford: #da373d;
+      }
+    </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-20px);
+      }
+      100% {
+        transform: translateY(0px);
+      }
+    }
+    .countdown-item {
+      position: relative;
+    }
+    .countdown-item::after {
+      content: '';
+      position: absolute;
+      right: -15px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #000;
+    }
+    .countdown-item:last-child::after {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
+  <!-- Navigation Bar (From Your Code) -->
+  <nav class="bg-white/30 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="text-2xl font-bold tracking-tight">CollegeNotes</a>
+
+      <!-- Hamburger (Mobile) -->
+      <button id="sidebarToggle" class="md:hidden focus:outline-none">
+        <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Desktop Menu -->
+      <div class="hidden md:flex space-x-8 items-center">
+        <a href="notes.html" class="text-gray-700 hover:text-black transition">Notes</a>
+        <a href="coming-soon.html" class="text-gray-700 hover:text-black transition">Lectures</a>
+        <a href="contact.html" class="text-gray-700 hover:text-black transition">Contact</a>
+        <a href="./discussion/index.html" class="text-gray-700 hover:text-black transition">Discussion</a>
+        <input type="text" placeholder="Search..." class="pl-3 pr-4 py-1 border rounded-md text-sm border-gray-300 focus:outline-none">
+        <a href="login.html" id="authBtn" class="bg-black text-white px-4 py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Overlay -->
+  <div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden"></div>
+
+  <!-- Sidebar -->
+  <div id="mobileSidebar" class="fixed rounded-l-2xl top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 md:hidden z-50 flex flex-col">
+    
+    <!-- Sidebar Header -->
+    <div class="flex justify-between items-center p-4 border-b">
+      <span class="text-xl font-semibold">Menu</span>
+      <button id="closeSidebar" class="text-gray-500 hover:text-black text-3xl leading-none">
+        &times;
+      </button>
+    </div>
+
+    <!-- Sidebar Content -->
+    <div class="flex-1 p-4 space-y-4 overflow-y-auto">
+      <a href="notes.html" class="block text-base text-gray-700 hover:text-black">Notes</a>
+      <a href="coming-soon.html" class="block text-base text-gray-700 hover:text-black">Lectures</a>
+      <a href="contact.html" class="block text-base text-gray-700 hover:text-black">Contact</a>
+      <a href="./discussion/index.html" class="block text-base text-gray-700 hover:text-black">Discussion</a>
+
+      <input type="text" placeholder="Search..." class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black">
+    </div>
+
+    <!-- Sidebar Footer -->
+    <div class="p-4 border-t">
+      <a href="login.html" id="authBtn" class="block text-center bg-black text-white py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
+    </div>
+  </div>
+
+  <!-- Coming Soon Content -->
+  <main class="max-w-6xl mx-auto px-6 py-16 md:py-24">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      
+      <!-- Left Column - Text Content -->
+      <div class="space-y-8">
+        <div>
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">Something amazing is coming soon</h1>
+          <p class="text-lg text-gray-600">We're working hard to bring you the ultimate college note-taking experience. Stay tuned!</p>
+        </div>
+        
+        <!-- Countdown -->
+        <div class="py-6">
+          <p class="text-sm uppercase font-semibold tracking-wider mb-4">Launching in</p>
+          <div class="flex space-x-8">
+            <div class="countdown-item">
+              <span id="days" class="text-4xl font-bold">14</span>
+              <p class="text-sm text-gray-500">Days</p>
+            </div>
+            <div class="countdown-item">
+              <span id="hours" class="text-4xl font-bold">22</span>
+              <p class="text-sm text-gray-500">Hours</p>
+            </div>
+            <div class="countdown-item">
+              <span id="minutes" class="text-4xl font-bold">07</span>
+              <p class="text-sm text-gray-500">Minutes</p>
+            </div>
+            <div class="countdown-item">
+              <span id="seconds" class="text-4xl font-bold">19</span>
+              <p class="text-sm text-gray-500">Seconds</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notification Form -->
+        <div class="bg-white/50 backdrop-blur-sm p-6 rounded-xl border border-gray-100 shadow-sm">
+          <h3 class="text-xl font-semibold mb-4">Get notified when we launch</h3>
+          <form class="space-y-4">
+            <div>
+              <input type="email" placeholder="Enter your email address" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition duration-300">Notify Me</button>
+          </form>
+        </div>
+        
+        <!-- Social Links -->
+        <div class="flex space-x-6">
+          <a href="#" class="text-gray-600 hover:text-blue-600 transition">
+            <i class="fab fa-twitter text-xl"></i>
+          </a>
+          <a href="#" class="text-gray-600 hover:text-blue-600 transition">
+            <i class="fab fa-instagram text-xl"></i>
+          </a>
+          <a href="#" class="text-gray-600 hover:text-blue-600 transition">
+            <i class="fab fa-facebook text-xl"></i>
+          </a>
+          <a href="#" class="text-gray-600 hover:text-blue-600 transition">
+            <i class="fab fa-discord text-xl"></i>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Right Column - Illustration -->
+      <div class="flex justify-center">
+        <div class="relative">
+          <!-- Main illustration -->
+          <div class="animate-float">
+            <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500 w-full h-auto">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+          </div>
+          
+          <!-- Decorative elements -->
+          <div class="absolute -top-6 -right-6 bg-yellow-300 w-16 h-16 rounded-full opacity-70"></div>
+          <div class="absolute -bottom-4 -left-4 bg-purple-300 w-12 h-12 rounded-full opacity-70"></div>
+          <div class="absolute top-1/2 -left-8 bg-blue-300 w-8 h-8 rounded-full opacity-70"></div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Features Preview -->
+    <div class="mt-24 text-center">
+      <h2 class="text-2xl md:text-3xl font-bold mb-12">What's Coming?</h2>
+      
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-gray-100 shadow-sm">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 text-blue-600 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Smart Notes</h3>
+          <p class="text-gray-600">AI-powered organization that automatically sorts your notes by subject, topic, and importance.</p>
+        </div>
+        
+        <div class="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-gray-100 shadow-sm">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Interactive Lectures</h3>
+          <p class="text-gray-600">Record, transcribe, and highlight key points from your lectures automatically.</p>
+        </div>
+        
+        <div class="bg-white/60 backdrop-blur-sm p-6 rounded-xl border border-gray-100 shadow-sm">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 text-purple-600 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Collaborative Study</h3>
+          <p class="text-gray-600">Create and join study groups with real-time collaboration features and discussions.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Footer -->
+  <footer class="bg-white/30 backdrop-blur-sm border-t border-gray-100 mt-16">
+    <div class="max-w-6xl mx-auto px-6 py-8">
+      <div class="md:flex md:justify-between md:items-center">
+        <div class="text-center md:text-left">
+          <a href="index.html" class="text-xl font-bold tracking-tight">CollegeNotes</a>
+          <p class="mt-2 text-sm text-gray-600">Transforming how students take and organize notes.</p>
+        </div>
+        
+        <div class="mt-6 md:mt-0">
+          <p class="text-sm text-gray-600">&copy; 2025 CollegeNotes. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script for Sidebar Toggle (From Your Code) -->
+  <script>
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const closeSidebar = document.getElementById('closeSidebar');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const overlay = document.getElementById('overlay');
+
+    sidebarToggle.addEventListener('click', () => {
+      mobileSidebar.classList.remove('translate-x-full');
+      overlay.classList.remove('hidden');
+    });
+
+    closeSidebar.addEventListener('click', () => {
+      mobileSidebar.classList.add('translate-x-full');
+      overlay.classList.add('hidden');
+    });
+
+    overlay.addEventListener('click', () => {
+      mobileSidebar.classList.add('translate-x-full');
+      overlay.classList.add('hidden');
+    });
+  </script>
+
+  <script>
+    //auto highlighter
+    const currentPath = window.location.pathname.split("/").pop();
+    const sidebarLinks = document.querySelectorAll('#mobileSidebar a');
+
+    sidebarLinks.forEach(link => {
+      if (link.getAttribute('href').includes(currentPath)) {
+        link.classList.add('text-black', 'font-semibold');
+      }
+    });
+  </script>
+
+  <!-- Countdown Script -->
+  <script>
+    // Set the countdown date (14 days from now)
+    const countDownDate = new Date();
+    countDownDate.setDate(countDownDate.getDate() + 14);
+    
+    // Update the countdown every 1 second
+    const countdownTimer = setInterval(function() {
+      // Get current date and time
+      const now = new Date().getTime();
+      
+      // Find the distance between now and the countdown date
+      const distance = countDownDate - now;
+      
+      // Time calculations for days, hours, minutes and seconds
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      
+      // Display the results
+      document.getElementById("days").innerHTML = days.toString().padStart(2, '0');
+      document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
+      document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
+      document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, '0');
+      
+      // If the countdown is finished, display a message
+      if (distance < 0) {
+        clearInterval(countdownTimer);
+        document.getElementById("days").innerHTML = "00";
+        document.getElementById("hours").innerHTML = "00";
+        document.getElementById("minutes").innerHTML = "00";
+        document.getElementById("seconds").innerHTML = "00";
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

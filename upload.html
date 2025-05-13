@@ -10,119 +10,747 @@
         --color-clifford: #da373d;
       }
     </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .file-preview {
+            max-height: 200px;
+            overflow: hidden;
+        }
+        .preview-container {
+            transition: all 0.3s ease;
+        }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        .auth-loading {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-  <!--
-    <div class="max-w-3xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-3xl font-bold mb-6 text-center">Upload Notes</h2>
-        
-        <label class="block font-semibold">Title:</label>
-        <input id="noteTitle" type="text" class="w-full border p-2 rounded" placeholder="Enter title">
+<body class="bg-gray-50 text-gray-900 min-h-screen">
+    <!-- Header with Navigation -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-book-open text-blue-600 text-2xl mr-2"></i>
+                        <span class="font-bold text-xl text-blue-800">CollegeNotes</span>
+                    </a>
+                    <nav class="hidden md:ml-10 md:flex space-x-8">
+                        <a href="dashboard.html" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                        <a href="browse.html" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Browse Notes</a>
+                        <a href="upload.html" class="text-blue-600 border-b-2 border-blue-600 px-3 py-2 text-sm font-medium">Upload Notes</a>
+                        <a href="community.html" class="text-gray-500 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Community</a>
+                    </nav>
+                </div>
+                <div class="hidden md:flex items-center">
+                    <div id="userProfileNav" class="hidden ml-3 relative">
+                        <div>
+                            <button id="userMenuButton" type="button" class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" aria-expanded="false">
+                                <img id="userAvatarNav" class="h-8 w-8 rounded-full" src="/api/placeholder/32/32" alt="User avatar">
+                                <span id="userNameNav" class="ml-2 text-gray-700 self-center"></span>
+                                <svg class="ml-1 h-5 w-5 text-gray-400 self-center" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div id="userDropdown" class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+                            <div class="py-1">
+                                <a href="profile.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                                <a href="settings.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                                <a href="my-notes.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Notes</a>
+                            </div>
+                            <div class="py-1">
+                                <button id="signOutBtn" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="authButtons" class="hidden">
+                        <a href="login.html" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">Log in</a>
+                        <a href="signup.html" class="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">Sign up</a>
+                    </div>
+                    <div id="authLoading" class="flex items-center">
+                        <div class="auth-loading h-8 w-32 bg-gray-200 rounded"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
 
-        <label class="block font-semibold mt-4">Category:</label>
-        <select id="noteCategory" class="w-full border p-2 rounded">
-            <option value="Mathematics">Mathematics</option>
-            <option value="Computer Science">Computer Science</option>
-            <option value="Physics">Physics</option>
-            <option value="Chemistry">Chemistry</option>
-        </select>
-
-        <label class="block font-semibold mt-4">Upload File:</label>
-        <input type="file" id="noteFile" class="w-full border p-2 rounded">
-
-        <button id="uploadBtn" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded w-full">Upload Note</button>
+    <!-- Auth Check Message -->
+    <div id="authCheckMessage" class="hidden max-w-4xl mx-auto mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm">Please sign in to upload notes. Your academic contributions are valuable to our community!</p>
+                <div class="mt-3 flex">
+                    <a href="login.html" class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm py-1 px-3 rounded mr-2">
+                        Log in
+                    </a>
+                    <a href="signup.html" class="bg-blue-600 hover:bg-blue-700 text-white text-sm py-1 px-3 rounded">
+                        Sign up
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <!-- Main Content -->
+    <div id="mainContent" class="hidden max-w-4xl mx-auto mt-8 p-6">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="md:flex">
+                <!-- Left side - Form -->
+                <div class="md:w-1/2 p-8">
+                    <h2 class="text-3xl font-bold mb-2 text-blue-800">Upload Notes</h2>
+                    <p class="text-gray-600 mb-6">Share your knowledge with the college community</p>
+                    
+                    <form id="uploadForm" class="space-y-5">
+                        <div>
+                            <label for="noteTitle" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                            <input type="text" id="noteTitle" placeholder="e.g. Database Systems" class="p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                            <div id="titleError" class="text-red-500 text-xs mt-1 hidden">Please enter a valid title</div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="noteSubject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                                <select id="noteSubject" class="p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                                    <option value="" disabled selected>Select subject</option>
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Physics">Physics</option>
+                                    <option value="Chemistry">Chemistry</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="noteLevel" class="block text-sm font-medium text-gray-700 mb-1">Level</label>
+                                <select id="noteLevel" class="p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+                                    <option value="" disabled selected>Select level</option>
+                                    <option value="100">100</option>
+                                    <option value="200">200</option>
+                                    <option value="300">300</option>
+                                    <option value="400">400</option>
+                                    <option value="500">500</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="noteDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea id="noteDescription" rows="3" placeholder="Brief description of the note content..." class="p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required></textarea>
+                            <div id="descError" class="text-red-500 text-xs mt-1 hidden">Description should be at least 20 characters</div>
+                        </div>
+                        
+                        <div>
+                            <label for="noteFile" class="block text-sm font-medium text-gray-700 mb-1">Upload File</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 transition cursor-pointer" id="dropZone">
+                                <input type="file" id="noteFile" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt" required>
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p id="filePrompt" class="text-gray-500">Drag and drop or <span class="text-blue-500">browse</span></p>
+                                <p class="text-xs text-gray-400 mt-1">Supported formats: PDF, DOC, DOCX, PPT, PPTX, TXT</p>
+                            </div>
+                            <div id="fileError" class="text-red-500 text-xs mt-1 hidden">Please upload a valid file</div>
+                        </div>
+                        
+                        <div class="preview-container hidden" id="previewContainer">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">File Preview</label>
+                            <div class="border rounded-lg p-4 bg-gray-50">
+                                <div class="flex items-center">
+                                    <i id="fileIcon" class="fas fa-file-pdf text-red-500 text-2xl mr-3"></i>
+                                    <div class="flex-1">
+                                        <p id="fileName" class="font-medium text-gray-800 truncate">document.pdf</p>
+                                        <p id="fileSize" class="text-sm text-gray-500">2.4 MB</p>
+                                    </div>
+                                    <button id="removeFile" type="button" class="text-gray-400 hover:text-red-500">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="progressContainer" class="hidden">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div id="progressBar" class="bg-blue-600 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+                            </div>
+                            <p id="progressText" class="text-xs text-center text-gray-600 mt-1">Uploading: 0%</p>
+                        </div>
+                        
+                        <button type="submit" id="uploadButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition focus:outline-none focus:ring-4 focus:ring-blue-300">
+                            <i class="fas fa-upload mr-2"></i>Upload Note
+                        </button>
+                    </form>
+                    
+                    <div id="uploadStatus" class="mt-4 text-sm font-medium hidden"></div>
+                </div>
+                
+                <!-- Right side - Note Preview -->
+                <div class="md:w-1/2 bg-blue-50 p-8">
+                    <h3 class="text-xl font-semibold mb-4 text-blue-800">Note Preview</h3>
+                    
+                    <div id="notePreview" class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-700 mr-3">
+                                <i class="fas fa-book text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 id="previewTitle" class="font-bold text-lg">Database Systems</h4>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <span id="previewSubject" class="mr-2">Computer Science</span>
+                                    <span class="text-gray-400">|</span>
+                                    <span id="previewLevel" class="mx-2">Level 300</span>
+                                    <span class="text-gray-400">|</span>
+                                    <span id="previewStatus" class="ml-2">Community</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p id="previewDescription" class="text-gray-700 mb-4">Comprehensive guide to relational databases, SQL, normalization, and database design principles.</p>
+                        
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <img id="previewUserAvatar" src="/api/placeholder/32/32" alt="User" class="w-8 h-8 rounded-full mr-2">
+                                <span id="previewAuthor" class="text-sm text-gray-700">Sophia Johnson</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                                <span id="previewRating" class="text-sm font-medium">4.5</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-100 p-3 rounded flex items-center justify-between">
+                            <div>
+                                <span id="previewFileSize" class="text-sm text-gray-600">4.1 MB</span>
+                                <span id="previewFileType" class="ml-2 text-xs bg-blue-100 text-blue-800 py-1 px-2 rounded">PDF</span>
+                            </div>
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                <i class="fas fa-download mr-1"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 text-sm text-gray-600">
+                        <p class="font-medium mb-2">Note:</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li>All uploads are reviewed by our community moderators</li>
+                            <li>Ensure your content complies with academic standards</li>
+                            <li>You'll receive points for each download of your note</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
     <script type="module">
-        import { auth, db, storage } from './assets/js/firebase-init.js';
-        import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // Complete JavaScript for the Upload Notes page
+import { auth, storage, db } from './assets/js/firebase-init.js';
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        document.getElementById("uploadBtn").addEventListener("click", async () => {
-            const noteTitle = document.getElementById("noteTitle").value;
-            const noteCategory = document.getElementById("noteCategory").value;
-            const noteFile = document.getElementById("noteFile").files[0];
+// File type icons mapping
+const fileIcons = {
+    'pdf': 'fas fa-file-pdf text-red-500',
+    'doc': 'fas fa-file-word text-blue-500',
+    'docx': 'fas fa-file-word text-blue-500',
+    'ppt': 'fas fa-file-powerpoint text-orange-500',
+    'pptx': 'fas fa-file-powerpoint text-orange-500',
+    'txt': 'fas fa-file-alt text-gray-500'
+};
 
-            if (!noteTitle || !noteFile) {
-                alert("Please enter title and select a file.");
-                return;
-            }
+// Elements
+const form = document.getElementById('uploadForm');
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('noteFile');
+const titleInput = document.getElementById('noteTitle');
+const subjectSelect = document.getElementById('noteSubject');
+const levelSelect = document.getElementById('noteLevel');
+const descriptionInput = document.getElementById('noteDescription');
+const previewContainer = document.getElementById('previewContainer');
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const uploadStatus = document.getElementById('uploadStatus');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const fileIcon = document.getElementById('fileIcon');
+const removeFileBtn = document.getElementById('removeFile');
 
-            const fileRef = ref(storage, `notes/${auth.currentUser.uid}/${noteFile.name}`);
-            await uploadBytes(fileRef, noteFile);
-            const fileURL = await getDownloadURL(fileRef);
+// Preview elements
+const previewTitle = document.getElementById('previewTitle');
+const previewSubject = document.getElementById('previewSubject');
+const previewLevel = document.getElementById('previewLevel');
+const previewDescription = document.getElementById('previewDescription');
+const previewFileSize = document.getElementById('previewFileSize');
+const previewFileType = document.getElementById('previewFileType');
+const previewAuthor = document.getElementById('previewAuthor');
+const previewUserAvatar = document.getElementById('previewUserAvatar');
 
-            await addDoc(collection(db, "notes"), {
-                title: noteTitle,
-                category: noteCategory,
-                fileURL: fileURL,
-                userId: auth.currentUser.uid,
-                uploadedAt: new Date()
-            });
+// Auth elements
+const authCheckMessage = document.getElementById('authCheckMessage');
+const mainContent = document.getElementById('mainContent');
+const userProfileNav = document.getElementById('userProfileNav');
+const authButtons = document.getElementById('authButtons');
+const authLoading = document.getElementById('authLoading');
+const userMenuButton = document.getElementById('userMenuButton');
+const userDropdown = document.getElementById('userDropdown');
+const userNameNav = document.getElementById('userNameNav');
+const userAvatarNav = document.getElementById('userAvatarNav');
+const signOutBtn = document.getElementById('signOutBtn');
 
-            alert("Note uploaded successfully!");
-            window.location.href = "dashboard.html";
-        });
-    </script>
-    -->
-    <form id="uploadForm" class="space-y-4">
-  <input type="text" id="noteTitle" placeholder="Note Title2" class="p-2 border rounded w-full" required>
-  <select id="noteSubject" class="p-2 border rounded w-full" required>
-    <option value="Mathematics">Mathematics</option>
-    <option value="Computer Science">Computer Science</option>
-    <option value="Physics">Physics</option>
-  </select>
-  <input type="file" id="noteFile" class="p-2 border rounded w-full" required>
-  <button type="submit" class="bg-black text-white px-4 py-2 rounded">Upload</button>
-</form>
+// Validation error elements
+const titleError = document.getElementById('titleError');
+const descError = document.getElementById('descError');
+const fileError = document.getElementById('fileError');
 
-<div id="uploadStatus" class="mt-4 text-sm text-gray-600"></div>
+// Sample data
+const sampleData = {
+    title: "Database Systems",
+    subject: "Computer Science",
+    level: "300",
+    status: "Community",
+    description: "Comprehensive guide to relational databases, SQL, normalization, and database design principles.",
+    fileSize: "4.1",
+    author: "Sophia Johnson",
+    rating: 4.5
+};
 
-<script type="module">
-  import { auth, storage, db } from './assets/js/firebase-init.js';
-  import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-  import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// Initialize with sample data
+previewTitle.textContent = sampleData.title;
+previewSubject.textContent = sampleData.subject;
+previewLevel.textContent = `Level ${sampleData.level}`;
+previewDescription.textContent = sampleData.description;
+previewFileSize.textContent = `${sampleData.fileSize} MB`;
+previewAuthor.textContent = sampleData.author;
 
-  document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+// Authentication state observer
+onAuthStateChanged(auth, (user) => {
+    // Hide loading state
+    authLoading.classList.add('hidden');
+    
+    if (user) {
+        // User is signed in
+        console.log('User is signed in:', user.displayName);
+        
+        // Show main content
+        mainContent.classList.remove('hidden');
+        authCheckMessage.classList.add('hidden');
+        
+        // Update user profile in navigation
+        userProfileNav.classList.remove('hidden');
+        authButtons.classList.add('hidden');
+        userNameNav.textContent = user.displayName || user.email.split('@')[0];
+        
+        // Update user in preview
+        previewAuthor.textContent = user.displayName || user.email.split('@')[0];
+        
+        // If user has a profile photo, use it
+        if (user.photoURL) {
+            userAvatarNav.src = user.photoURL;
+            previewUserAvatar.src = user.photoURL;
+        }
+    } else {
+        // User is signed out
+        console.log('User is signed out');
+        
+        // Show auth check message
+        authCheckMessage.classList.remove('hidden');
+        mainContent.classList.add('hidden');
+        
+        // Update navigation
+        userProfileNav.classList.add('hidden');
+        authButtons.classList.remove('hidden');
+    }
+});
+
+// Sign out functionality
+signOutBtn.addEventListener('click', () => {
+    signOut(auth).then(() => {
+        // Sign-out successful
+        console.log('User signed out');
+        
+        // Redirect to home page
+        window.location.href = 'index.html';
+    }).catch((error) => {
+        // An error happened
+        console.error('Sign out error:', error);
+    });
+});
+
+// User dropdown toggle
+userMenuButton.addEventListener('click', () => {
+    userDropdown.classList.toggle('hidden');
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (event) => {
+    if (!userMenuButton.contains(event.target) && !userDropdown.contains(event.target)) {
+        userDropdown.classList.add('hidden');
+    }
+});
+
+// Update preview as user enters information
+titleInput.addEventListener('input', () => {
+    previewTitle.textContent = titleInput.value || 'Untitled Note';
+    validateField(titleInput, titleError, (val) => val.length >= 3);
+});
+
+subjectSelect.addEventListener('change', () => {
+    previewSubject.textContent = subjectSelect.value || 'Subject';
+});
+
+levelSelect.addEventListener('change', () => {
+    previewLevel.textContent = `Level ${levelSelect.value}` || 'Level';
+});
+
+descriptionInput.addEventListener('input', () => {
+    previewDescription.textContent = descriptionInput.value || 'No description provided';
+    validateField(descriptionInput, descError, (val) => val.length >= 20);
+});
+
+// File upload handling
+dropZone.addEventListener('click', () => {
+    fileInput.click();
+});
+
+// Drag and drop functionality
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
     e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight() {
+    dropZone.classList.add('border-blue-500', 'bg-blue-50');
+}
+
+function unhighlight() {
+    dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+}
+
+dropZone.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    if (files.length) {
+        fileInput.files = files;
+        handleFiles(files[0]);
+    }
+}
+
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) {
+        handleFiles(fileInput.files[0]);
+    }
+});
+
+function handleFiles(file) {
+    validateFile(file);
+    displayFilePreview(file);
+    updateNotePreview(file);
+}
+
+function validateFile(file) {
+    const validTypes = ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.txt'];
+    const extension = '.' + file.name.split('.').pop().toLowerCase();
+    
+    if (!validTypes.includes(extension)) {
+        fileError.textContent = 'Invalid file type. Please upload PDF, DOC, DOCX, PPT, PPTX, or TXT.';
+        fileError.classList.remove('hidden');
+        return false;
+    } else {
+        fileError.classList.add('hidden');
+        return true;
+    }
+}
+
+function displayFilePreview(file) {
+    const extension = file.name.split('.').pop().toLowerCase();
+    const iconClass = fileIcons[extension] || 'fas fa-file text-gray-500';
+    
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    fileIcon.className = iconClass;
+    previewContainer.classList.remove('hidden');
+    document.getElementById('filePrompt').classList.add('hidden');
+}
+
+function updateNotePreview(file) {
+    const extension = file.name.split('.').pop().toLowerCase();
+    previewFileSize.textContent = formatFileSize(file.size);
+    previewFileType.textContent = extension.toUpperCase();
+}
+
+removeFileBtn.addEventListener('click', () => {
+    fileInput.value = '';
+    previewContainer.classList.add('hidden');
+    document.getElementById('filePrompt').classList.remove('hidden');
+    fileError.classList.add('hidden');
+});
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function validateField(field, errorElement, validationFn) {
+    if (!validationFn(field.value)) {
+        errorElement.classList.remove('hidden');
+        return false;
+    } else {
+        errorElement.classList.add('hidden');
+        return true;
+    }
+}
+
+function validateForm() {
+    let isValid = true;
+    
+    // Validate title
+    if (!validateField(titleInput, titleError, (val) => val.length >= 3)) {
+        isValid = false;
+    }
+    
+    // Validate description
+    if (!validateField(descriptionInput, descError, (val) => val.length >= 20)) {
+        isValid = false;
+    }
+    
+    // Validate file
+    if (!fileInput.files.length) {
+        fileError.textContent = 'Please select a file to upload';
+        fileError.classList.remove('hidden');
+        isValid = false;
+    } else if (!validateFile(fileInput.files[0])) {
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+// Function to simulate upload progress
+function simulateProgress() {
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress > 90) {
+            clearInterval(interval);
+            progress = 90; // Cap at 90% until actual completion
+        }
+        progressBar.style.width = `${progress}%`;
+        progressText.textContent = `Uploading: ${Math.round(progress)}%`;
+    }, 300);
+    
+    // Store interval ID to clear it if needed
+    window.progressInterval = interval;
+    return interval;
+}
+
+// Function to show upload status message
+function showUploadStatus(type, message) {
+    uploadStatus.textContent = message;
+    uploadStatus.classList.remove('hidden', 'text-red-500', 'text-green-500');
+    
+    if (type === 'error') {
+        uploadStatus.classList.add('text-red-500');
+    } else {
+        uploadStatus.classList.add('text-green-500');
+    }
+    
+    // Hide message after 5 seconds
+    setTimeout(() => {
+        uploadStatus.classList.add('hidden');
+    }, 5000);
+}
+
+// Form submission handler
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Check if user is logged in
     const user = auth.currentUser;
     if (!user) {
-      alert("You must be logged in to upload notes.");
-      return;
+        // Scroll to auth message
+        authCheckMessage.classList.remove('hidden');
+        authCheckMessage.scrollIntoView({ behavior: 'smooth' });
+        return;
+    }
+    
+    // Validate form
+    if (!validateForm()) {
+        return;
     }
 
-    const title = document.getElementById("noteTitle").value;
-    const subject = document.getElementById("noteSubject").value;
-    const file = document.getElementById("noteFile").files[0];
+    // Get form values
+    const title = titleInput.value;
+    const subject = subjectSelect.value;
+    const level = levelSelect.value;
+    const description = descriptionInput.value;
+    const file = fileInput.files[0];
 
-    if (!file) {
-      alert("Please select a file.");
-      return;
+    // Check file size (max 50MB)
+    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+    if (file.size > maxSize) {
+        showUploadStatus('error', 'File is too large. Maximum size is 50MB.');
+        return;
     }
 
-    const storageRef = ref(storage, `notes/${user.uid}/${file.name}`);
-    document.getElementById("uploadStatus").textContent = "Uploading...";
-
+    const storageRef = ref(storage, `notes/${user.uid}/${Date.now()}_${file.name}`);
+    
+    // Show progress and disable form
+    progressContainer.classList.remove('hidden');
+    const submitBtn = document.getElementById('uploadButton');
+    submitBtn.disabled = true;
+    submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    
     try {
-      const snapshot = await uploadBytes(storageRef, file);
-      const fileURL = await getDownloadURL(snapshot.ref);
-      
-      await addDoc(collection(db, "notes"), {
-        title,
-        subject,
-        fileURL,
-        userId: user.uid,
-        uploadedAt: new Date()
-      });
+        // Simulate upload progress
+        const progressInterval = simulateProgress();
+        
+        // Upload file
+        const snapshot = await uploadBytes(storageRef, file);
+        
+        // Get download URL
+        const fileURL = await getDownloadURL(snapshot.ref);
+        
+        // Clear progress interval
+        clearInterval(progressInterval);
+        
+        // Add to database
+        await addDoc(collection(db, "notes"), {
+            title,
+            subject,
+            level,
+            description,
+            fileURL,
+            fileName: file.name,
+            fileType: file.name.split('.').pop().toLowerCase(),
+            userId: user.uid,
+            author: user.displayName || user.email.split('@')[0],
+            fileSize: file.size,
+            fileSizeFormatted: formatFileSize(file.size),
+            uploadedAt: new Date(),
+            status: 'Pending Review',
+            downloads: 0,
+            ratings: {
+                average: 0,
+                count: 0
+            }
+        });
 
-      document.getElementById("uploadStatus").textContent = "Upload successful!";
-      document.getElementById("uploadForm").reset();
+        // Complete the progress
+        progressBar.style.width = '100%';
+        progressText.textContent = 'Upload complete!';
+        
+        // Show success message
+        showUploadStatus('success', 'Note uploaded successfully! It will be available after review.');
+        
+        // Reset form after 3 seconds
+        setTimeout(() => {
+            form.reset();
+            previewContainer.classList.add('hidden');
+            progressContainer.classList.add('hidden');
+            document.getElementById('filePrompt').classList.remove('hidden');
+            
+            // Reset preview to default values
+            previewTitle.textContent = sampleData.title;
+            previewSubject.textContent = sampleData.subject;
+            previewLevel.textContent = `Level ${sampleData.level}`;
+            previewDescription.textContent = sampleData.description;
+            previewFileSize.textContent = `${sampleData.fileSize} MB`;
+            previewFileType.textContent = 'PDF';
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }, 3000);
+        
     } catch (error) {
-      document.getElementById("uploadStatus").textContent = "Upload failed.";
-      console.error(error);
+        // Clear progress interval if exists
+        if (window.progressInterval) {
+            clearInterval(window.progressInterval);
+        }
+        
+        // Show error message
+        showUploadStatus('error', `Upload failed: ${error.message}`);
+        console.error('Error uploading file:', error);
+        
+        // Reset progress
+        progressBar.style.width = '0%';
+        progressText.textContent = 'Upload failed';
+        
+        // Hide progress after 3 seconds
+        setTimeout(() => {
+            progressContainer.classList.add('hidden');
+            
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }, 3000);
     }
-  });
+});
+
+// Add additional subjects dynamically (can be moved to a separate config file)
+function populateSubjectOptions() {
+    const additionalSubjects = [
+        "Biology", 
+        "Business", 
+        "Economics", 
+        "Education", 
+        "Engineering", 
+        "Environmental Science",
+        "Health Sciences", 
+        "History", 
+        "Law", 
+        "Literature", 
+        "Medical Sciences",
+        "Philosophy", 
+        "Political Science", 
+        "Psychology", 
+        "Sociology", 
+        "Statistics",
+        "Other"
+    ];
+    
+    // Add them to the subject select dropdown
+    additionalSubjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        subjectSelect.appendChild(option);
+    });
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', () => {
+    // Populate subject options
+    populateSubjectOptions();
+});
 </script>
 </body>
 </html>

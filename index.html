@@ -10,373 +10,856 @@
       @theme {
         --color-clifford: #da373d;
       }
-
     </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <title>CollegeNotes - Study Smarter</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9037658096235022"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9037658096235022" crossorigin="anonymous"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+    @keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    .font-display {
+      font-family: 'Syne', sans-serif;
+    }
+    
+    [x-cloak] { display: none !important; }
+    
+    .morph-bg {
+      border-radius: 30px;
+      background: #ffffff;
+      box-shadow: 20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff;
+    }
+    
+    .image-reveal {
+      clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+      transition: clip-path 1s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+    
+    .image-reveal.revealed {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    }
+    
+    .text-gradient {
+      background: linear-gradient(90deg, #4F46E5, #EC4899);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .bg-gradient {
+      background: linear-gradient(135deg, #4F46E5, #EC4899);
+    }
+    
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .nav-item {
+      position: relative;
+    }
+    
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: currentColor;
+      transition: width 0.3s ease;
+    }
+    
+    .nav-item:hover::after {
+      width: 100%;
+    }
+    
+    .cursor-dot {
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: rgba(79, 70, 229, 0.2);
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      mix-blend-mode: difference;
+    }
+    
+    .svg-blob {
+      animation: blob-animation 25s linear infinite alternate;
+    }
+    
+    @keyframes blob-animation {
+      0% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      }
+      50% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+      }
+      100% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      }
+    }
+    
+    .marquee {
+      position: relative;
+      overflow: hidden;
+      --gap: 1rem;
+    }
+    
+    .marquee-content {
+      display: flex;
+      animation: scroll 20s linear infinite;
+      padding-right: var(--gap);
+    }
+    
+    .marquee-item {
+      flex: 0 0 auto;
+      margin-right: var(--gap);
+    }
+    
+    @keyframes scroll {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(calc(-100% - var(--gap)));
+      }
+    }
+    
+    .card-hover {
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-10px);
+    }
+    
+    .input-wrapper {
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    
+    .input-wrapper:focus-within {
+      transform: scale(1.02);
+    }
+  </style>
 </head>
-<body class="font-sans text-gray-800 bg-white">
-  <!-- Top Progress Bar -->
-<div id="topProgressBar"
-     class="fixed top-0 left-0 h-1 z-[9999] transition-all duration-300 ease-out rounded-r shadow-md bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
-     style="width: 0%;">
-</div>
-<script>
-  const progressBar = document.getElementById("topProgressBar");
+<body class="bg-gray-50 text-gray-900" x-data="{ mobileMenu: false, darkMode: false, mouseX: 0, mouseY: 0 }" @mousemove="mouseX = $event.clientX; mouseY = $event.clientY;">
+  <!-- Custom Cursor (shows on desktop only) -->
+  <div 
+    class="cursor-dot hidden lg:block" 
+    :style="`left: ${mouseX}px; top: ${mouseY}px`">
+  </div>
 
-  function startProgress() {
-    let width = 0;
-    const interval = setInterval(() => {
-      if (width >= 90) {
-        clearInterval(interval);
-      } else {
-        width += Math.random() * 8; // feel smoother
-        progressBar.style.width = width + "%";
-      }
-    }, 150);
-  }
 
-  window.addEventListener("load", () => {
-    startProgress();
-
-    setTimeout(() => {
-      progressBar.style.width = "100%";
-      setTimeout(() => {
-        progressBar.style.opacity = "0";
-      }, 300);
-    }, 1000);
-  });
-</script>
-  <!-- Navigation - Minimalist Style -->
-  <!-- Navigation Bar -->
-<nav class="bg-white/30 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100">
-  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-    <a href="index.html" class="text-2xl font-bold tracking-tight">CollegeNotes</a>
-
-    <!-- Hamburger (Mobile) -->
-    <button id="sidebarToggle" class="md:hidden focus:outline-none">
-      <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
-
-    <!-- Desktop Menu -->
-    <div class="hidden md:flex space-x-8 items-center">
-      <a href="notes.html" class="text-gray-700 hover:text-black transition">Notes</a>
-      <a href="lectures.html" class="text-gray-700 hover:text-black transition">Lectures</a>
-      <a href="contact.html" class="text-gray-700 hover:text-black transition">Contact</a>
-      <a href="./discussion/index.html" class="text-gray-700 hover:text-black transition">Discussion</a>
-      <input type="text" placeholder="Search..." class="pl-3 pr-4 py-1 border rounded-md text-sm border-gray-300 focus:outline-none">
-      <a href="login.html" id="authBtn" class="bg-black text-white px-4 py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
+  <!-- Navigation -->
+  <header x-data="{ isScrolled: false }" @scroll.window="isScrolled = window.pageYOffset > 60" :class="{'bg-white/80 backdrop-blur-lg shadow-md': isScrolled, 'bg-transparent': !isScrolled}" class="fixed w-full top-2 z-50 rounded-2xl transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <a href="index.html" class="font-display font-bold text-2xl tracking-tighter">
+          College<span class="text-gradient">Notes</span>
+        </a>
+        
+        <!-- Desktop Menu -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="notes.html" class="nav-item font-medium">Notes</a>
+          <a href="coming-soon.html" class="nav-item font-medium">Lectures</a>
+          <a href="contact.html" class="nav-item font-medium">Contact</a>
+          <a href="./discussion/index.html" class="nav-item font-medium">Discussion</a>
+<div x-data="{ open: false }" class="relative" @click.away="open = false">
+  <button @click="open = !open" class="hover:text-indigo-700 transition">
+    <span class="sr-only">Search</span>
+    <i class="fas fa-search"></i>
+  </button>
+  <div x-show="open" x-cloak x-transition class="absolute right-0 mt-2 w-72 p-2 bg-white rounded-xl shadow-lg">
+    <div class="input-wrapper">
+      <input type="text" placeholder="Search..." class="w-full p-3 rounded-lg border-0 bg-gray-100 focus:bg-gray-200 focus:outline-none transition-all">
     </div>
   </div>
-</nav>
+</div>
 
-<!-- Overlay -->
-<div id="overlay" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden"></div>
 
-<!-- Sidebar -->
-<div id="mobileSidebar" class="fixed rounded-l-2xl top-0 right-0 h-full w-64 bg-white shadow-lg transform translate-x-full transition-transform duration-300 md:hidden z-50 flex flex-col">
+          <div class="quickBtn">
+          <a href="login.html" id="authBtn" class="px-6 py-2.5 rounded-full bg-gradient text-white font-medium transition-all shadow-md hover:shadow-lg hover:scale-105">
+            Login
+          </a>
+          </div>
+        </nav>
+        
+        <!-- Mobile Menu Button -->
+        <button @click="mobileMenu = !mobileMenu" class="md:hidden focus:outline-none">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
   
-  <!-- Sidebar Header -->
-  <div class="flex justify-between items-center p-4 border-b">
-    <span class="text-xl font-semibold">Menu</span>
-    <button id="closeSidebar" class="text-gray-500 hover:text-black text-3xl leading-none">
-      &times;
-    </button>
+  <!-- Mobile Side Menu -->
+  <div 
+    x-show="mobileMenu" 
+    x-cloak 
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 -translate-x-full"
+    x-transition:enter-end="opacity-100 translate-x-0"
+    x-transition:leave="transition ease-in duration-300"
+    x-transition:leave-start="opacity-100 translate-x-0"
+    x-transition:leave-end="opacity-0 -translate-x-full"
+    class="fixed inset-0 z-50 flex">
+    
+    <!-- Overlay -->
+    <div @click="mobileMenu = false" class="fixed inset-0 bg-black/30 backdrop-blur-sm"></div>
+    
+    <!-- Menu Content -->
+    <div class="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-xl">
+      <div class="px-6 pt-8 pb-4 flex items-center justify-between">
+        <span class="font-display font-bold text-xl">Menu</span>
+        <button @click="mobileMenu = false" class="text-gray-500 hover:text-gray-900">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="flex-1 px-6 py-6 overflow-y-auto">
+        <nav class="space-y-8">
+          <a href="notes.html" class="block text-lg font-medium hover:text-indigo-600">Notes</a>
+          <a href="coming-soon.html" class="block text-lg font-medium hover:text-indigo-600">Lectures</a>
+          <a href="contact.html" class="block text-lg font-medium hover:text-indigo-600">Contact</a>
+          <a href="./discussion/index.html" class="block text-lg font-medium hover:text-indigo-600">Discussion</a>
+          <div class="pt-4">
+            <input type="text" placeholder="Search..." class="w-full p-3 rounded-lg border-0 bg-gray-100 focus:outline-none">
+          </div>
+        </nav>
+      </div>
+      
+      <div class="px-6 py-6 border-t">
+        <a href="login.html" id="mobileAuth" class="block w-full text-center py-3 rounded-full bg-gradient text-white font-medium">
+          Login
+        </a>
+      </div>
+    </div>
   </div>
 
-  <!-- Sidebar Content -->
-  <div class="flex-1 p-4 space-y-4 overflow-y-auto">
-    <a href="notes.html" class="block text-base text-gray-700 hover:text-black">Notes</a>
-    <a href="lectures.html" class="block text-base text-gray-700 hover:text-black">Lectures</a>
-    <a href="contact.html" class="block text-base text-gray-700 hover:text-black">Contact</a>
-    <a href="./discussion/index.html" class="block text-base text-gray-700 hover:text-black">Discussion</a>
+  <!-- Hero Section -->
+  <section class="relative pt-32 pb-20 overflow-hidden">
+    <!-- Decorative Shapes -->
+    <div class="absolute -right-64 -top-64 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
+    <div class="absolute -left-20 top-1/2 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30" style="animation: float 7s ease-in-out infinite"></div>
+    
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="space-y-8" x-data="{ shown: false }" x-init="setTimeout(() => shown = true, 300)">
+          <h1 
+            class="font-display text-5xl lg:text-7xl font-bold leading-tight"
+            x-show="shown"
+            x-transition:enter="transition ease-out duration-500"
+            x-transition:enter-start="opacity-0 -translate-y-8"
+            x-transition:enter-end="opacity-100 translate-y-0"
+          >
+            Study <span class="text-gradient">smarter</span>,<br>not harder.
+          </h1>
+          
+          <p 
+            class="text-lg text-gray-600 max-w-xl"
+            x-show="shown"
+            x-transition:enter="transition ease-out duration-500 delay-300"
+            x-transition:enter-start="opacity-0 -translate-y-8"
+            x-transition:enter-end="opacity-100 translate-y-0"
+          >
+            Access premium study materials from top universities and ace your exams with CollegeNotes' curated resources.
+          </p>
+          
+          <div 
+            class="flex flex-wrap gap-4"
+            x-show="shown"
+            x-transition:enter="transition ease-out duration-500 delay-500"
+            x-transition:enter-start="opacity-0 -translate-y-8"
+            x-transition:enter-end="opacity-100 translate-y-0"
+          >
+            <a href="notes.html" class="px-8 py-4 bg-black text-white font-medium rounded-full shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105">
+              Explore Notes
+            </a>
+            <a href="coming-soon.html" class="px-8 py-4 bg-white text-black font-medium rounded-full border border-black shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105">
+              Watch Lectures
+            </a>
+          </div>
+        </div>
+        
+        <div class="relative" x-data="{ shown: false }" x-intersect="shown = true">
+          <div class="relative z-10 rounded-3xl overflow-hidden">
+            <div class="image-reveal" :class="{'revealed': shown}">
+              <img src="./assets/image/student.jpg" alt="Student studying" class="w-full h-auto rounded-3xl object-cover shadow-xl">
+            </div>
+          </div>
+          
+          <!-- Decorative elements -->
+          <div class="absolute -bottom-10 -right-10 w-64 h-64 bg-gradient opacity-20 rounded-full filter blur-3xl"></div>
+          <div class="absolute -left-6 -bottom-6 w-32 h-32 bg-yellow-400 rounded-2xl rotate-12 -z-10"></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <input type="text" placeholder="Search..." class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-black">
+  <!-- Animated Marquee -->
+  <div class="py-8 bg-black text-white overflow-hidden">
+    <div class="marquee">
+      <div class="marquee-content">
+        <div class="marquee-item text-xl font-semibold tracking-wide py-2 px-4">✨ 5,000+ STUDY NOTES</div>
+        <div class="marquee-item text-xl font-semibold tracking-wide py-2 px-4">📚 350+ VIDEO LECTURES</div>
+        <div class="marquee-item text-xl font-semibold tracking-wide py-2 px-4">👩‍🎓 50,000+ ACTIVE STUDENTS</div>
+        <div class="marquee-item text-xl font-semibold tracking-wide py-2 px-4">🏛️ 100+ UNIVERSITIES</div>
+        <div class="marquee-item text-xl font-semibold tracking-wide py-2 px-4">✨ 5,000+ STUDY NOTES</div>
+        <div class="marquee-item text-xl font-semibold tracking-wide py-2 px-4">📚 350+ VIDEO LECTURES</div>
+        <div class="marquee-item text-xl font-semibold tracking-wide py-2 px-4">👩‍🎓 50,000+ ACTIVE STUDENTS</div>
+        <div class="marquee-item text-xl font-semibold tracking-wide py-2 px-4">🏛️ 100+ UNIVERSITIES</div>
+      </div>
+    </div>
   </div>
 
-  <!-- Sidebar Footer -->
-  <div class="p-4 border-t">
-    <a href="login.html" id="authBtn" class="block text-center bg-black text-white py-2 rounded-full text-sm hover:bg-gray-900 transition">Login</a>
+  <!-- Features Section -->
+  <section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-display font-bold mb-6">Why Students Love CollegeNotes</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">Our platform provides everything you need to succeed in your academic journey.</p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div class="card-hover p-8 rounded-3xl morph-bg" x-data="{hover: false}" @mouseenter="hover = true" @mouseleave="hover = false">
+          <div class="h-14 w-14 bg-indigo-100 rounded-2xl flex items-center justify-center mb-6">
+            <i class="fas fa-check-circle text-2xl text-indigo-600"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Verified Content</h3>
+          <p class="text-gray-600">All notes and resources are verified by professors or top students.</p>
+          <div class="mt-6 transition-all duration-300" :class="{'opacity-100': hover, 'opacity-0': !hover}">
+            <a href="#" class="text-indigo-600 font-medium inline-flex items-center">
+              Learn more
+              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div class="card-hover p-8 rounded-3xl morph-bg" x-data="{hover: false}" @mouseenter="hover = true" @mouseleave="hover = false">
+          <div class="h-14 w-14 bg-pink-100 rounded-2xl flex items-center justify-center mb-6">
+            <i class="fas fa-mobile-alt text-2xl text-pink-600"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Study Anywhere</h3>
+          <p class="text-gray-600">Access your notes on any device, online or offline, anytime you need them.</p>
+          <div class="mt-6 transition-all duration-300" :class="{'opacity-100': hover, 'opacity-0': !hover}">
+            <a href="#" class="text-pink-600 font-medium inline-flex items-center">
+              Learn more
+              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <div class="card-hover p-8 rounded-3xl morph-bg" x-data="{hover: false}" @mouseenter="hover = true" @mouseleave="hover = false">
+          <div class="h-14 w-14 bg-amber-100 rounded-2xl flex items-center justify-center mb-6">
+            <i class="fas fa-users text-2xl text-amber-600"></i>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Community Support</h3>
+          <p class="text-gray-600">Connect with other students to discuss concepts and solve problems together.</p>
+          <div class="mt-6 transition-all duration-300" :class="{'opacity-100': hover, 'opacity-0': !hover}">
+            <a href="#" class="text-amber-600 font-medium inline-flex items-center">
+              Learn more
+              <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Contributor section-->
+<section class="py-24 bg-gray-50 text-center">
+  <div class="max-w-4xl mx-auto px-6">
+    <h2 class="text-4xl font-display font-bold mb-4">Share Your Notes, Help Thousands</h2>
+    <p class="text-lg text-gray-600 mb-8">Join our mission to make learning easier. Upload your class notes and study material to support students nationwide.</p>
+    <a href="upload.html" class="px-8 py-4 bg-indigo-600 text-white font-medium rounded-full shadow-md hover:bg-indigo-700 transition-all">
+      Upload Now
+    </a>
   </div>
-</div>
+</section>
+  <!-- Categories Section -->
+  <section class="py-24 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-4xl font-display font-bold mb-16 text-center">Browse by Category</h2>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" x-data="categories()">
+        <template x-for="(category, index) in categories" :key="index">
+          <a href="#" 
+             class="group relative overflow-hidden rounded-3xl transition-all duration-500 hover:shadow-2xl card-hover"
+             :style="`--delay: ${index * 100}ms`"
+             x-intersect:enter="$el.classList.add('animate-fade-in')"
+          >
+            <div class="aspect-square bg-white p-8 flex flex-col">
+              <!-- Icon -->
+              <div 
+                class="w-16 h-16 rounded-xl flex items-center justify-center mb-auto transition-all duration-300 group-hover:scale-110" 
+                :class="category.bgColor"
+              >
+                <i :class="`fas ${category.icon} text-2xl ${category.textColor}`"></i>
+              </div>
+              
+              <!-- Text -->
+              <div>
+                <h3 class="text-xl font-bold mt-4" x-text="category.name"></h3>
+                <p class="text-gray-600 mt-1" x-text="`${category.resources} resources`"></p>
+              </div>
+              
+              <!-- Hover effect -->
+              <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/70 flex items-end opacity-0 transition-opacity duration-300 group-hover:opacity-100 p-8">
+                <span class="text-white font-medium">View all resources</span>
+              </div>
+            </div>
+          </a>
+        </template>
+      </div>
+    </div>
+  </section>
 
-<!-- Script -->
+<!-- trending -->
+<section class="py-24 bg-white">
+  <div class="max-w-7xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-display font-bold mb-12">Top Subjects This Semester</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="p-6 bg-gray-50 rounded-2xl shadow hover:shadow-lg">
+        <i class="fas fa-code text-indigo-600 text-3xl mb-2"></i>
+        <h3 class="text-lg font-semibold">Data Structures</h3>
+      </div>
+      <div class="p-6 bg-gray-50 rounded-2xl shadow hover:shadow-lg">
+        <i class="fas fa-network-wired text-pink-600 text-3xl mb-2"></i>
+        <h3 class="text-lg font-semibold">Networking</h3>
+      </div>
+      <div class="p-6 bg-gray-50 rounded-2xl shadow hover:shadow-lg">
+        <i class="fas fa-microscope text-yellow-600 text-3xl mb-2"></i>
+        <h3 class="text-lg font-semibold">Physics</h3>
+      </div>
+      <div class="p-6 bg-gray-50 rounded-2xl shadow hover:shadow-lg">
+        <i class="fas fa-dna text-green-600 text-3xl mb-2"></i>
+        <h3 class="text-lg font-semibold">Biology</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- CTA Section -->
+  <section class="py-24 relative overflow-hidden">
+    <!-- Decorative background -->
+    <div class="absolute inset-0 bg-gradient z-0 opacity-90"></div>
+    <div class="absolute inset-0 bg-[url('noise.png')] mix-blend-overlay z-0 opacity-20"></div>
+    
+    <div class="max-w-5xl mx-auto px-6 relative z-10">
+      <div class="bg-white rounded-3xl p-12 shadow-xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 class="text-3xl md:text-4xl font-display font-bold mb-6">Ready to boost your academic performance?</h2>
+            <p class="text-gray-600 mb-8">Join thousands of students who have transformed their grades with CollegeNotes.</p>
+            <a href="login.html" id="ctaBtn" class="inline-block px-8 py-4 bg-black text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              Start for Free
+            </a>
+          </div>
+          
+          <div class="relative">
+            <div class="absolute -left-8 -bottom-8 w-full h-full bg-gradient rounded-3xl -z-10"></div>
+            <img src="./assets/image/student.jpg" alt="Student with laptop" class="w-full h-auto rounded-3xl shadow-lg">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-4xl font-display font-bold mb-16 text-center">How CollegeNotes Works</h2>
+      
+      <div class="relative">
+        <!-- Connection line -->
+        <div class="hidden md:block absolute top-20 left-[10%] w-[80%] h-0.5 bg-gray-200"></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+          <div class="relative text-center" x-data="{ isVisible: false }"
+     x-intersect:enter="isVisible = true"
+     x-intersect:leave="isVisible = false">
+
+            <!-- Step number -->
+            <div 
+              class="w-16 h-16 rounded-full bg-white border-2 border-indigo-600 flex items-center justify-center mx-auto mb-8 z-10 relative transition-all duration-500"
+              :class="{ 'bg-indigo-600 text-white': isVisible }"
+            >
+              <span class="text-xl font-bold">1</span>
+            </div>
+            
+            <h3 class="text-xl font-bold mb-4">Create an Account</h3>
+            <p class="text-gray-600">Sign up for free and get immediate access to thousands of study materials.</p>
+          </div>
+          
+          <div class="relative text-center" x-data="{ isVisible: false }"
+     x-intersect:enter="isVisible = true"
+     x-intersect:leave="isVisible = false">
+
+            <!-- Step number -->
+            <div 
+              class="w-16 h-16 rounded-full bg-white border-2 border-indigo-600 flex items-center justify-center mx-auto mb-8 z-10 relative transition-all duration-700 delay-300"
+              :class="{ 'bg-indigo-600 text-white': isVisible }"
+            >
+              <span class="text-xl font-bold">2</span>
+            </div>
+            
+            <h3 class="text-xl font-bold mb-4">Browse Resources</h3>
+            <p class="text-gray-600">Search for notes, lectures, and study guides by subject, course, or university.</p>
+          </div>
+          
+          <div class="relative text-center" x-data="{ isVisible: false }"
+     x-intersect:enter="isVisible = true"
+     x-intersect:leave="isVisible = false">
+
+            <!-- Step number -->
+            <div 
+              class="w-16 h-16 rounded-full bg-white border-2 border-indigo-600 flex items-center justify-center mx-auto mb-8 z-10 relative transition-all duration-700 delay-500"
+              :class="{ 'bg-indigo-600 text-white': isVisible }"
+            >
+              <span class="text-xl font-bold">3</span>
+            </div>
+            
+            <h3 class="text-xl font-bold mb-4">Ace Your Exams</h3>
+            <p class="text-gray-600">Study efficiently with our organized materials and watch your grades improve.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Campus Ambassador Section -->
+<!-- Campus Ambassador Section -->
+<section class="py-24 bg-white" x-data>
+  <div class="max-w-7xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-display font-bold mb-6" x-intersect:enter="$el.classList.add('animate-fade-in-up')">
+      Become a Campus Ambassador
+    </h2>
+    <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-12" x-intersect:enter="$el.classList.add('animate-fade-in-up')">
+      CollegeNotes is a growing student-led platform — not a company yet — but you can be part of our journey. Join us to promote smarter learning in your college, gain experience, and get recognized.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div class="p-6 bg-gray-50 rounded-2xl shadow hover:shadow-lg transition-all duration-300"
+           x-intersect:enter="$el.classList.add('animate-fade-in-up')">
+        <i class="fas fa-bullhorn text-indigo-600 text-4xl mb-4"></i>
+        <h3 class="text-xl font-semibold mb-2">Be the Voice</h3>
+        <p class="text-gray-600">Promote CollegeNotes in your class and campus WhatsApp groups and help peers discover curated study resources.</p>
+      </div>
+
+      <div class="p-6 bg-gray-50 rounded-2xl shadow hover:shadow-lg transition-all duration-300"
+           x-intersect:enter="$el.classList.add('animate-fade-in-up')">
+        <i class="fas fa-award text-pink-600 text-4xl mb-4"></i>
+        <h3 class="text-xl font-semibold mb-2">Get Recognized</h3>
+        <p class="text-gray-600">Receive certificates, public credits on our site, and early access to features for your contributions.</p>
+      </div>
+
+      <div class="p-6 bg-gray-50 rounded-2xl shadow hover:shadow-lg transition-all duration-300"
+           x-intersect:enter="$el.classList.add('animate-fade-in-up')">
+        <i class="fas fa-user-graduate text-amber-600 text-4xl mb-4"></i>
+        <h3 class="text-xl font-semibold mb-2">Grow Your Resume</h3>
+        <p class="text-gray-600">Develop outreach, marketing, or leadership skills — real experience to stand out in interviews.</p>
+      </div>
+    </div>
+
+    <div class="mt-12">
+      <a href="https://forms.gle/YOUR_FORM_LINK" target="_blank"
+         class="inline-block px-8 py-4 bg-black text-white font-medium rounded-full shadow-lg hover:scale-105 transition-all duration-300">
+        Apply Now
+      </a>
+    </div>
+  </div>
+</section><!-- Testimonials Carousel -->
+<section class="py-24 bg-gray-50" x-data="testimonialCarousel()" x-init="startAutoScroll">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-display font-bold mb-4">What Students Say</h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">Hear it from students who’ve seen real results with CollegeNotes.</p>
+    </div>
+
+    <!-- Carousel -->
+    <div class="relative">
+      <!-- Scrollable Container -->
+      <div class="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 px-2 py-4"
+           x-ref="carousel"
+           @mouseenter="pauseAutoScroll"
+           @mouseleave="startAutoScroll">
+        <template x-for="(testimonial, index) in testimonials" :key="index">
+          <div class="snap-center shrink-0 w-full sm:w-1/2 lg:w-1/3 p-6 bg-white rounded-3xl shadow-md transition duration-300">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 rounded-full bg-gray-200 mr-4"></div>
+              <div>
+                <h4 class="font-bold" x-text="testimonial.name"></h4>
+                <p class="text-sm text-gray-500" x-text="testimonial.college"></p>
+              </div>
+            </div>
+            <p class="text-gray-600" x-text="testimonial.quote"></p>
+            <div class="mt-4 flex text-yellow-400">
+              <template x-for="i in 5">
+                <i :class="i <= testimonial.rating ? 'fas fa-star' : 'far fa-star'"></i>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Left Arrow -->
+      <button @click="scrollLeft"
+              class="absolute left-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-full shadow hover:scale-110 transition hidden sm:flex">
+        <i class="fas fa-chevron-left text-gray-700"></i>
+      </button>
+
+      <!-- Right Arrow -->
+      <button @click="scrollRight"
+              class="absolute right-0 top-1/2 -translate-y-1/2 bg-white p-3 rounded-full shadow hover:scale-110 transition hidden sm:flex">
+        <i class="fas fa-chevron-right text-gray-700"></i>
+      </button>
+    </div>
+  </div>
+</section>
+
 <script>
-  const sidebarToggle = document.getElementById('sidebarToggle');
-  const closeSidebar = document.getElementById('closeSidebar');
-  const mobileSidebar = document.getElementById('mobileSidebar');
-  const overlay = document.getElementById('overlay');
-
-  sidebarToggle.addEventListener('click', () => {
-    mobileSidebar.classList.remove('translate-x-full');
-    overlay.classList.remove('hidden');
-  });
-
-  closeSidebar.addEventListener('click', () => {
-    mobileSidebar.classList.add('translate-x-full');
-    overlay.classList.add('hidden');
-  });
-
-  overlay.addEventListener('click', () => {
-    mobileSidebar.classList.add('translate-x-full');
-    overlay.classList.add('hidden');
-  });
-</script>
-
-<script>
-  //auto highlighter
-  const currentPath = window.location.pathname.split("/").pop();
-  const sidebarLinks = document.querySelectorAll('#mobileSidebar a');
-
-  sidebarLinks.forEach(link => {
-    if (link.getAttribute('href').includes(currentPath)) {
-      link.classList.add('text-black', 'font-semibold');
-    }
-  });
-</script>
-  <!-- Hero Section - Minimalist -->
-  <section class="pt-20 pb-32">
-    <div class="max-w-5xl mx-auto px-6">
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-12 items-center">
-        <div class="md:col-span-3 space-y-8">
-          <h1 class="text-5xl md:text-6xl font-bold leading-tight">Study smarter, not harder.</h1>
-          <p class="text-xl text-gray-600 max-w-xl">Access premium study materials from top universities and ace your exams with CollegeNotes.</p>
-          <div class="flex flex-wrap gap-4">
-            <a href="notes.html" class="bg-black text-white px-8 py-3 rounded-md hover:bg-gray-900 transition-colors">Explore Notes</a>
-            <a href="lectures.html" class="bg-white text-black px-8 py-3 rounded-md border border-black hover:bg-gray-50 transition-colors">Watch Lectures</a>
-          </div>
-        </div>
-        <div class="md:col-span-2">
-          <img src="../assets/image/student.jpg" alt="Student studying" class="w-full h-auto rounded-xl shadow-lg">
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats Section -->
-  <section class="py-16 bg-gray-50">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-        <div>
-          <div class="text-4xl font-bold mb-2">5,000+</div>
-          <p class="text-gray-600">Study Notes</p>
-        </div>
-        <div>
-          <div class="text-4xl font-bold mb-2">350+</div>
-          <p class="text-gray-600">Video Lectures</p>
-        </div>
-        <div>
-          <div class="text-4xl font-bold mb-2">50,000+</div>
-          <p class="text-gray-600">Active Students</p>
-        </div>
-        <div>
-          <div class="text-4xl font-bold mb-2">100+</div>
-          <p class="text-gray-600">Universities</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Featured Categories -->
-  <section class="py-20">
-    <div class="max-w-6xl mx-auto px-6">
-      <h2 class="text-3xl font-bold mb-12 text-center">Browse by Category</h2>
-      
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <a href="#" class="group">
-          <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center transition-all group-hover:bg-gray-200">
-            <i class="fas fa-laptop-code text-4xl text-gray-800"></i>
-          </div>
-          <h3 class="mt-4 text-xl font-semibold">Computer Science</h3>
-          <p class="text-gray-600 mt-1">142 resources</p>
-        </a>
-        
-        <a href="#" class="group">
-          <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center transition-all group-hover:bg-gray-200">
-            <i class="fas fa-flask text-4xl text-gray-800"></i>
-          </div>
-          <h3 class="mt-4 text-xl font-semibold">Chemistry</h3>
-          <p class="text-gray-600 mt-1">98 resources</p>
-        </a>
-        
-        <a href="#" class="group">
-          <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center transition-all group-hover:bg-gray-200">
-            <i class="fas fa-calculator text-4xl text-gray-800"></i>
-          </div>
-          <h3 class="mt-4 text-xl font-semibold">Mathematics</h3>
-          <p class="text-gray-600 mt-1">215 resources</p>
-        </a>
-        
-        <a href="#" class="group">
-          <div class="aspect-square bg-gray-100 rounded-xl flex items-center justify-center transition-all group-hover:bg-gray-200">
-            <i class="fas fa-book-open text-4xl text-gray-800"></i>
-          </div>
-          <h3 class="mt-4 text-xl font-semibold">Literature</h3>
-          <p class="text-gray-600 mt-1">76 resources</p>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Banner -->
-  <section class="py-16 bg-black text-white">
-    <div class="max-w-4xl mx-auto px-6 text-center">
-      <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to boost your academic performance?</h2>
-      <p class="text-gray-300 text-lg mb-8 max-w-2xl mx-auto">Join thousands of students who have transformed their grades with CollegeNotes.</p>
-      <a href="login.html" id="ctaBtn" class="inline-block bg-white text-black font-bold px-8 py-4 rounded-md hover:bg-gray-100 transition-colors">Start for Free</a>
-    </div>
-  </section>
-
-  <!-- How It Works -->
-  <section class="py-20">
-    <div class="max-w-6xl mx-auto px-6">
-      <h2 class="text-3xl font-bold mb-16 text-center">How CollegeNotes Works</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-        <div class="text-center">
-          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span class="text-2xl font-bold">1</span>
-          </div>
-          <h3 class="text-xl font-bold mb-3">Create an Account</h3>
-          <p class="text-gray-600">Sign up for free and get immediate access to thousands of study materials.</p>
-        </div>
-        
-        <div class="text-center">
-          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span class="text-2xl font-bold">2</span>
-          </div>
-          <h3 class="text-xl font-bold mb-3">Browse Resources</h3>
-          <p class="text-gray-600">Search for notes, lectures, and study guides by subject, course, or university.</p>
-        </div>
-        
-        <div class="text-center">
-          <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <span class="text-2xl font-bold">3</span>
-          </div>
-          <h3 class="text-xl font-bold mb-3">Ace Your Exams</h3>
-          <p class="text-gray-600">Study efficiently with our organized materials and watch your grades improve.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer - Minimalist -->
-  <footer class="py-12 border-t border-gray-100">
-    <div class="max-w-6xl mx-auto px-6">
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-8">
-        <div class="col-span-2">
-          <a href="index.html" class="text-2xl font-bold tracking-tight">CollegeNotes</a>
-          <p class="mt-4 text-gray-600 max-w-xs">Your trusted academic resource platform. Access quality notes, lectures, and study materials.</p>
-          <div class="flex space-x-4 mt-6">
-            <a href="#" class="text-gray-600 hover:text-black transition-colors">
-              <i class="fab fa-twitter"></i>
-            </a>
-            <a href="#" class="text-gray-600 hover:text-black transition-colors">
-              <i class="fab fa-instagram"></i>
-            </a>
-            <a href="#" class="text-gray-600 hover:text-black transition-colors">
-              <i class="fab fa-facebook"></i>
-            </a>
-            <a href="#" class="text-gray-600 hover:text-black transition-colors">
-              <i class="fab fa-linkedin"></i>
-            </a>
-          </div>
-        </div>
-        
-        <div>
-          <h4 class="font-bold text-sm uppercase tracking-wider text-gray-500 mb-4">Resources</h4>
-          <ul class="space-y-2">
-            <li><a href="notes.html" class="text-gray-600 hover:text-black transition-colors">Notes</a></li>
-            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Lectures</a></li>
-            <li><a href="download.html" class="text-gray-600 hover:text-black transition-colors">Downloads</a></li>
-            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Premium</a></li>
-            <li><a href="question-bank.html" class="text-gray-600 hover:text-black transition-colors">Question Bank</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 class="font-bold text-sm uppercase tracking-wider text-gray-500 mb-4">Company</h4>
-          <ul class="space-y-2">
-            <li><a href="about.html" class="text-gray-600 hover:text-black transition-colors">About</a></li>
-            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Contact</a></li>
-            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Careers</a></li>
-            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Blog</a></li>
-            <li><a href="review.html" class="text-gray-600 hover:text-black transition-colors">Review</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 class="font-bold text-sm uppercase tracking-wider text-gray-500 mb-4">Legal</h4>
-          <ul class="space-y-2">
-            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Privacy</a></li>
-            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Terms</a></li>
-            <li><a href="#" class="text-gray-600 hover:text-black transition-colors">Copyright</a></li>
-          </ul>
-        </div>
-      </div>
-      
-      <div class="border-t border-gray-100 mt-12 pt-8 text-sm text-gray-500 flex flex-col md:flex-row justify-between">
-        <p>© 2025 CollegeNotes. All rights reserved.</p>
-        <p class="mt-2 md:mt-0">Made with ♥ for students worldwide</p>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Firebase Authentication Script -->
-  <script type="module">
-    import { auth, signOut, db, doc, getDoc, onAuthStateChanged } from './assets/js/firebase-init.js';
-
-document.addEventListener("DOMContentLoaded", () => {
-    const authBtns = document.querySelectorAll("#authBtn");
-const ctaBtn = document.getElementById("ctaBtn");
-
-if (authBtns.length === 0 || !ctaBtn) return;
-
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    try {
-      const docRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(docRef);
-
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        if (userData.role === "admin") {
-          authBtns.forEach(btn => {
-            btn.textContent = "Admin Dashboard";
-            btn.href = "admin-dashboard.html";
-          });
-          return;
+  function testimonialCarousel() {
+    return {
+      testimonials: [
+        {
+          name: 'Ankur Raj',
+          college: 'GEC Samastipur',
+          quote: 'CollegeNotes made complex subjects so easy. It’s my go-to site before every exam!',
+          rating: 4.5
+        },
+        {
+          name: 'Uttam Raj',
+          college: 'GEC Samastipur',
+          quote: 'The organized notes and dashboard are a lifesaver. I use it daily for revision!',
+          rating: 5
+        },
+        {
+          name: 'Priya Verma',
+          college: 'BCA, DU',
+          quote: 'From handwritten notes to YouTube lectures – everything is just one click away!',
+          rating: 4.5
+        },
+        {
+          name: 'Vikash',
+          college: 'GEC Munger',
+          quote: 'CollegeNotes helped me stay consistent. My grades improved significantly.',
+          rating: 5
         }
+      ],
+      interval: null,
+      scrollRight() {
+        this.$refs.carousel.scrollBy({ left: this.$refs.carousel.offsetWidth, behavior: 'smooth' });
+      },
+      scrollLeft() {
+        this.$refs.carousel.scrollBy({ left: -this.$refs.carousel.offsetWidth, behavior: 'smooth' });
+      },
+      startAutoScroll() {
+        this.interval = setInterval(() => this.scrollRight(), 5000);
+      },
+      pauseAutoScroll() {
+        clearInterval(this.interval);
       }
-
-      authBtns.forEach(btn => {
-        btn.textContent = "Dashboard";
-        btn.href = "dashboard.html";
-      });
-      ctaBtn.textContent = "Go to Dashboard";
-      ctaBtn.href = "dashboard.html";
-    } catch (e) {
-      console.error("Error fetching user data", e);
     }
-  } else {
-    console.log("❌ User is logged out.");
-    authBtns.forEach(btn => {
-      btn.textContent = "Login";
-      btn.href = "login.html";
-    });
-    ctaBtn.textContent = "Start for Free";
-    ctaBtn.href = "signup.html";
   }
-});
-});
-  </script>
-  <!--
-  <script type="module" src="./assets/js/auth-check.js"></script>
-  <script type="module" src="../assets/js/protected-route.js"></script>
-  -->
+</script>
+  
+
+<!-- Meet the Creator -->
+<section class="py-24 bg-gray-100">
+  <div class="max-w-3xl mx-auto px-6 text-center">
+    <h2 class="text-4xl font-display font-bold mb-6">Meet the Creator</h2>
+    <p class="text-lg text-gray-600 mb-12">CollegeNotes is built and maintained by a passionate solo developer dedicated to making studying smarter and more accessible.</p>
+    <div class="bg-white p-8 rounded-3xl shadow-md inline-block">
+      <img src="./assets/image/gautam.jpg" alt="Your Photo" class="w-28 h-32 mx-auto rounded-lg object-cover mb-4">
+      <h4 class="text-xl font-bold">Gautam Kumar Sharma</h4>
+      <p class="text-gray-500 mb-4">Founder & Full-Stack Developer</p>
+      <div class="flex justify-center space-x-4">
+        <a href="https://github.com/GautamSharma-coder" target="_blank" class="text-gray-600 hover:text-black"><i class="fab fa-github text-2xl"></i></a>
+        <a href="https://linkedin.com/in/your-link" target="_blank" class="text-gray-600 hover:text-indigo-600"><i class="fab fa-linkedin text-2xl"></i></a>
+        <a href="https://linkedin.com/in/your-link" target="_blank" class="text-gray-600 hover:text-indigo-600"><i class="fab fa-twitter text-2xl"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- FAQ Section -->
+  <section class="py-24 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-4xl font-display font-bold mb-12">Frequently Asked Questions</h2>
+      <div class="space-y-6 text-left">
+        <details class="p-4 bg-white rounded-xl shadow">
+          <summary class="cursor-pointer font-semibold text-lg">Is CollegeNotes free to use?</summary>
+          <p class="mt-2 text-gray-600">Yes! You can access a wide range of notes and lectures for free. Premium content may be added in future.</p>
+        </details>
+        <details class="p-4 bg-white rounded-xl shadow">
+          <summary class="cursor-pointer font-semibold text-lg">Can I upload my own notes?</summary>
+          <p class="mt-2 text-gray-600">Absolutely! Simply sign in and use the "Upload Notes" feature to contribute your study material.</p>
+        </details>
+        <details class="p-4 bg-white rounded-xl shadow">
+          <summary class="cursor-pointer font-semibold text-lg">How can I contact support?</summary>
+          <p class="mt-2 text-gray-600">Visit the Contact page and fill out the form. We'll get back to you as soon as possible.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard Preview Section -->
+  <section class="py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div>
+          <h2 class="text-4xl font-display font-bold mb-6">Take Control with Your Dashboard</h2>
+          <p class="text-gray-600 mb-6">Track your recent uploads, manage your profile, and explore personalized resources all in one place.</p>
+          <a href="profile.html" class="inline-block px-6 py-3 bg-indigo-600 text-white font-medium rounded-full hover:bg-indigo-700 transition">Go to Dashboard</a>
+        </div>
+        <div class="relative">
+          <div class="aspect-video overflow-hidden rounded-3xl shadow-lg border border-gray-200">
+            <img src="./assets/image/dashboard-preview.png" alt="Dashboard Preview" class="w-full h-full object-cover">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-white py-16">
+  <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
+    <div>
+      <h3 class="text-2xl font-bold mb-4">CollegeNotes</h3>
+      <p class="text-gray-400">Your ultimate academic companion for notes, lectures, and resources. Learn smarter, not harder.</p>
+    </div>
+    <div>
+      <h4 class="text-lg font-semibold mb-3">Explore</h4>
+      <ul class="space-y-2 text-gray-400">
+        <li><a href="notes.html" class="hover:text-white">Notes</a></li>
+        <li><a href="coming-soon.html" class="hover:text-white">Lectures</a></li>
+        <li><a href="./discussion/index.html" class="hover:text-white">Discussion</a></li>
+        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="text-lg font-semibold mb-3">Legal</h4>
+      <ul class="space-y-2 text-gray-400">
+        <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+        <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+        <li><a href="#" class="hover:text-white">Cookie Policy</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="text-lg font-semibold mb-3">Newsletter</h4>
+      <p class="text-gray-400 mb-4">Stay updated with new features and resources.</p>
+      <form class="flex flex-col gap-3">
+        <input type="email" placeholder="Your email" class="px-4 py-2 rounded bg-gray-800 border border-gray-700 text-white focus:outline-none" />
+        <button type="submit" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-pink-500 text-white font-medium rounded hover:opacity-90">Subscribe</button>
+      </form>
+    </div>
+  </div>
+  <div class="mt-12 text-center text-sm text-gray-500 border-t border-gray-700 pt-6">
+    &copy; 2025 CollegeNotes. All rights reserved.
+  </div>
+</footer>
+<script>
+  function categories() {
+    return {
+      categories: [
+        {
+          name: 'Computer Science',
+          icon: 'fa-laptop-code',
+          resources: 120,
+          bgColor: 'bg-indigo-100',
+          textColor: 'text-indigo-600'
+        },
+        {
+          name: 'Mathematics',
+          icon: 'fa-square-root-alt',
+          resources: 98,
+          bgColor: 'bg-pink-100',
+          textColor: 'text-pink-600'
+        },
+        {
+          name: 'Physics',
+          icon: 'fa-atom',
+          resources: 87,
+          bgColor: 'bg-yellow-100',
+          textColor: 'text-yellow-600'
+        },
+        {
+          name: 'Engineering',
+          icon: 'fa-cogs',
+          resources: 76,
+          bgColor: 'bg-green-100',
+          textColor: 'text-green-600'
+        }
+      ]
+    }
+  }
+  
+  
+</script>
+<script type="module">
+  import{auth,onAuthStateChanged,getDoc,doc,db} from'../assets/js/firebase-init.js'
+  const authBtn = document.querySelector("#authBtn");
+  const mobileAuth = document.querySelector("#mobileAuth");
+  auth.onAuthStateChanged(async(user)=>{
+   try{
+     
+   
+   if(user){
+     const docRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(docRef);
+        if(userDoc.exists()){
+          const userData = userDoc.data();
+          if(userData.role == "admin"){
+            authBtn.textContent = 'Admin Dashboard';
+     authBtn.href = '/admin-dashboard.html'
+      mobileAuth.textContent = 'Admin Dashboard';
+     mobileAuth.href = '/admin-dashboard.html';
+     
+          }else{
+     authBtn.textContent = 'Dashboard';
+     authBtn.href = '/dashboard.html';
+     mobileAuth.textContent = 'Dashboard';
+     mobileAuth.href = '/dashboard.html';
+     //alert("working");
+     //console.log(user);
+          }
+        }
+   }
+   }catch(err){
+     alert(err);
+   }
+  });
+</script>
 </body>
 </html>

@@ -284,10 +284,11 @@
         
         <div class="input-group">
           <label class="input-label">I am a</label>
-          <select id="userRole" class="input-field">
-            <option value="student">Student</option>
+          <select id="user" class="input-field">
+            <option value="student" selected>Student</option>
+            <!--
             <option value="teacher">Teacher</option>
-            <option value="teaching_assistant">Teaching Assistant</option>
+            <option value="teaching_assistant">Teaching Assistant</option>-->
           </select>
         </div>
         
@@ -324,7 +325,7 @@
   </div>
   
   <script type="module">
-    import {signInWithEmailAndPassword,createUserWithEmailAndPassword,auth,doc,db,getDoc,setDoc} from './assets/js/firebase-init.js';
+    import {signInWithEmailAndPassword,createUserWithEmailAndPassword,auth,doc,db,getDoc,setDoc,onAuthStateChanged} from './assets/js/firebase-init.js';
     // Tab switching
     const loginTabBtn = document.getElementById('loginTabBtn');
     const signupTabBtn = document.getElementById('signupTabBtn');
@@ -451,24 +452,32 @@
         if (userDoc.exists()) {
           const userData = userDoc.data();
           showSuccess(`Welcome back, ${userData.firstName || 'User'}!`);
-          
+          if (userData.role === "teacher") {
+              window.location.href = "teacher-dashboard.html";
+            } else if(userData.role === "admin"){
+              window.location.href = 'admin-dashboard.html'
+            }
+            else {
+              window.location.href = "dashboard.html";
+            }
+          /*
           setTimeout(() => {
             if (userData.role === "teacher") {
               window.location.href = "teacher-dashboard.html";
             } else {
               window.location.href = "student-dashboard.html";
             }
-          }, 1500);
+          }, 1500);*/
         } else {
           showError("User profile not found. Please contact support.");
         }
         
         
         // For demo purposes
-        showSuccess("Login successful! Redirecting to your dashboard...");
-        setTimeout(() => {
+       // showSuccess("Login successful! Redirecting to your dashboard...");
+       /* setTimeout(() => {
           window.location.href = "dashboard.html";
-        }, 1500);
+        }, 1500);*/
       } catch (error) {
         console.error("Login error:", error);
         alert(`error message: ${error}`);
@@ -489,6 +498,19 @@
           default: 
             showError('Login failed. Please try again.');
         }
+      }
+    });
+    
+    // on auth redirected to dashboard
+    auth.onAuthStateChanged(async(user)=>{
+      if(user){
+        const docRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(docRef);
+        if(userDoc.exists()){
+          const userData = userDoc.data();
+          userData.role == 'admin'? window.location.href='/admin-dashboard.html':window.location.href='/dashboard.html';
+        }
+        //window.location.href='/dashboard.html';
       }
     });
     
@@ -545,6 +567,7 @@
         await setDoc(doc(db, 'users', user.uid), {
           firstName: firstName,
           lastName: lastName,
+          name: firstName +' '+lastName,
           email: email,
           role: role,
           createdAt: new Date()
