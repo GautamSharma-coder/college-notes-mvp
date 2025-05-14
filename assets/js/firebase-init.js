@@ -36,7 +36,8 @@ import {
   updateDoc,
   getDoc,
   setDoc,
-  serverTimestamp
+  serverTimestamp,
+  increment
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { 
   getStorage, 
@@ -82,5 +83,6 @@ export {
   where,
   GoogleAuthProvider,
   signInWithPopup,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  increment
 };
