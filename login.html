@@ -473,7 +473,9 @@
         setTimeout(() => {
           if (userData.role === "teacher") {
             window.location.href = "teacher-dashboard.html";
-          } else {
+          } else if(userData.role === "admin") {
+            window.location.href = 'admin-dashboard.html';
+          }else{
             window.location.href = "dashboard.html";
           }
         }, 1500);
