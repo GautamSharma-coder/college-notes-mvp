@@ -323,8 +323,19 @@
     </div>
   </div>
   
-  <script type="module">
-    import {signInWithEmailAndPassword,createUserWithEmailAndPassword,auth,doc,db,getDoc,setDoc} from './assets/js/firebase-init.js';
+<script type="module">
+  import {
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    auth,
+    doc,
+    db,
+    getDoc,
+    setDoc
+  } from './assets/js/firebase-init.js';
+
+  // ... (Tab switching, visibility toggles, and utility functions remain unchanged)
     // Tab switching
     const loginTabBtn = document.getElementById('loginTabBtn');
     const signupTabBtn = document.getElementById('signupTabBtn');
@@ -415,166 +426,158 @@
       const re = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
       return re.test(password);
     }
-    
-    // Login form submission
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      
-      if (!email) {
-        showError('Email is required');
-        return;
-      }
-      
-      if (!validateEmail(email)) {
-        showError('Please enter a valid email address');
-        return;
-      }
-      
-      if (!password) {
-        showError('Password is required');
-        return;
-      }
-      
-      // Simulate login process
-      try {
-        // Uncomment these lines when Firebase is properly set up
-        
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        // Get user profile data
-        const docRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(docRef);
-        
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          showSuccess(`Welcome back, ${userData.firstName || 'User'}!`);
+
+
+  // Login form submission
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !validateEmail(email)) {
+      showError('Please enter a valid email address');
+      return;
+    }
+
+    if (!password) {
+      showError('Password is required');
+      return;
+    }
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Check email verification
+      if (!user.emailVerified) {
+        showError('Please verify your email before logging in.');
+        try{
           
-          setTimeout(() => {
-            if (userData.role === "teacher") {
-              window.location.href = "teacher-dashboard.html";
-            } else {
-              window.location.href = "student-dashboard.html";
-            }
-          }, 1500);
-        } else {
-          showError("User profile not found. Please contact support.");
+        
+        await sendEmailVerification(user);
+        alert('successful send a verification email verify it and login');
         }
-        
-        
-        // For demo purposes
-        showSuccess("Login successful! Redirecting to your dashboard...");
+        catch(err){
+          showError(err);
+        }
+        return;
+      }
+
+      const docRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(docRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        showSuccess(`Welcome back, ${userData.firstName || 'User'}!`);
+
         setTimeout(() => {
-          window.location.href = "dashboard.html";
+          if (userData.role === "teacher") {
+            window.location.href = "teacher-dashboard.html";
+          } else {
+            window.location.href = "dashboard.html";
+          }
         }, 1500);
-      } catch (error) {
-        console.error("Login error:", error);
-        alert(`error message: ${error}`);
-        switch (error.code) {
-          case 'auth/invalid-email': 
-            showError('Invalid email address');
-            break;
-          case 'auth/user-not-found':
-          case 'auth/wrong-password': 
-            showError('Invalid email or password');
-            break;
-          case 'auth/too-many-requests': 
-            showError('Too many failed login attempts. Please try again later.');
-            break;
-          case 'auth/invalid-credential':
-            showError('invalid credentials check it ');
-            break;
-          default: 
-            showError('Login failed. Please try again.');
-        }
+      } else {
+        showError("User profile not found. Please contact support.");
       }
-    });
-    
-    // Signup form submission
-    signupForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const firstName = document.getElementById('firstName').value;
-      const lastName = document.getElementById('lastName').value;
-      const email = document.getElementById('signupEmail').value;
-      const password = document.getElementById('signupPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const role = document.getElementById('userRole').value;
-      const agreeTerms = document.getElementById('agreeTerms').checked;
-      
-      // Perform validations
-      if (!firstName || !lastName) {
-        showError('First name and last name are required');
-        return;
+    } catch (error) {
+      console.error("Login error:", error);
+      switch (error.code) {
+        case 'auth/invalid-email':
+          showError('Invalid email address');
+          break;
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+          showError('Invalid email or password');
+          break;
+        case 'auth/too-many-requests':
+          showError('Too many failed login attempts. Please try again later.');
+          break;
+        case 'auth/invalid-credential':
+          showError('Invalid credentials. Please check again.');
+          break;
+        default:
+          showError('Login failed. Please try again.');
       }
-      
-      if (!email || !validateEmail(email)) {
-        showError('Please enter a valid email address');
-        return;
+    }
+  });
+
+  // Signup form submission
+  signupForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const role = document.getElementById('userRole').value;
+    const agreeTerms = document.getElementById('agreeTerms').checked;
+
+    if (!firstName || !lastName) {
+      showError('First name and last name are required');
+      return;
+    }
+
+    if (!email || !validateEmail(email)) {
+      showError('Please enter a valid email address');
+      return;
+    }
+
+    if (!password || !validatePassword(password)) {
+      showError('Password must be at least 8 characters with 1 uppercase letter, 1 number, and 1 special character');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showError('Passwords do not match');
+      return;
+    }
+
+    if (!agreeTerms) {
+      showError('You must agree to the Terms of Service and Privacy Policy');
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Send verification email
+      await sendEmailVerification(user);
+
+      await setDoc(doc(db, 'users', user.uid), {
+        firstName,
+        lastName,
+        email,
+        role,
+        createdAt: new Date(),
+        emailVerified: false
+      });
+
+      showSuccess('Account created! Please check your email to verify your address.');
+      signupForm.reset();
+
+      // Switch to login tab after short delay
+      setTimeout(() => {
+        loginTabBtn.click();
+      }, 2000);
+    } catch (error) {
+      console.error("Signup error:", error);
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          showError('This email is already in use');
+          break;
+        case 'auth/invalid-email':
+          showError('Invalid email address');
+          break;
+        case 'auth/weak-password':
+          showError('Password is too weak');
+          break;
+        default:
+          showError('Account creation failed. Please try again.');
       }
-      
-      if (!password) {
-        showError('Password is required');
-        return;
-      }
-      
-      if (!validatePassword(password)) {
-        showError('Password must be at least 8 characters with 1 uppercase letter, 1 number, and 1 special character');
-        return;
-      }
-      
-      if (password !== confirmPassword) {
-        showError('Passwords do not match');
-        return;
-      }
-      
-      if (!agreeTerms) {
-        showError('You must agree to the Terms of Service and Privacy Policy');
-        return;
-      }
-      
-      // Simulate account creation
-      try {
-        // Uncomment these lines when Firebase is properly set up
-     
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        
-        // Store additional user data
-        await setDoc(doc(db, 'users', user.uid), {
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          role: role,
-          createdAt: new Date()
-        });
-        
-        
-        showSuccess('Account created successfully! Please sign in with your new account.');
-        signupForm.reset();
-        
-        // Switch to login tab after successful signup
-        setTimeout(() => {
-          loginTabBtn.click();
-        }, 1500);
-      } catch (error) {
-        console.error("Signup error:", error);
-        switch (error.code) {
-          case 'auth/email-already-in-use': 
-            showError('This email is already in use');
-            break;
-          case 'auth/invalid-email': 
-            showError('Invalid email address');
-            break;
-          case 'auth/weak-password': 
-            showError('Password is too weak');
-            break;
-          default: 
-            showError('Account creation failed. Please try again.');
-        }
-      }
-    });
-  </script>
+    }
+  });
+</script>
 </body>
 </html>
