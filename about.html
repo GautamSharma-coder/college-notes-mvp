@@ -10,9 +10,51 @@
         --color-clifford: #da373d;
       }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    [x-cloak] { display: none !important; }
+        .font-display {
+      font-family: 'Syne', sans-serif;
+    }
+  .nav-item {
+    position: relative;
+  }
+  .nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s ease;
+  }
+  .nav-item:hover::after {
+    width: 100%;
+  }
+  .text-gradient {
+    background: linear-gradient(90deg, #4F46E5, #EC4899);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bg-gradient {
+    background: linear-gradient(135deg, #4F46E5, #EC4899);
+  }
+</style>
 </head>
-<body class="bg-white text-gray-900 font-sans">
+<body class="bg-white text-gray-900 font-sans" x-data="{mobileMenu: false}">
+  <!--
     <header class="bg-black text-white py-6">
         <div class="container mx-auto px-6 flex justify-between items-center">
             <div>
@@ -28,9 +70,60 @@
                 </ul>
             </nav>
         </div>
-    </header>
+    </header>-->
+     <div id="navbar-container"></div>
+   
+   <script type='module'>
+     import{auth,onAuthStateChanged,getDoc,doc,db} from'../assets/js/firebase-init.js'
+     
+     fetch('../components/navbar.html')
+   .then(res => {
+     if (!res.ok) throw new Error('Navbar file not found');
+     return res.text();
+   })
+   .then(html => {
+     document.getElementById('navbar-container').innerHTML = html;
+   })
+   .then(() => {
+     const authBtn = document.querySelector("#authBtn");
+  const mobileAuth = document.querySelector("#mobileAuth");
+       auth.onAuthStateChanged(async(user)=>{
+   try{
+     
+   
+   if(user){
+     const docRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(docRef);
+        if(userDoc.exists()){
+          const userData = userDoc.data();
+          if(userData.role == "admin"){
+            authBtn.textContent = 'Admin Dashboard';
+     authBtn.href = '/admin-dashboard.html'
+      mobileAuth.textContent = 'Admin Dashboard';
+     mobileAuth.href = '/admin-dashboard.html';
+     
+          }else{
+     authBtn.textContent = 'Dashboard';
+     authBtn.href = '/dashboard.html';
+     mobileAuth.textContent = 'Dashboard';
+     mobileAuth.href = '/dashboard.html';
+     //alert("working");
+     //console.log(user);
+          }
+        }
+   }
+   }catch(err){
+     alert(err);
+   }
+  });
+   })
+   .catch(err => {
+     console.error("Failed to load navbar:", err);
+     document.getElementById('navbar-container').innerHTML = "<div style='padding:1em;background:#fee;border:1px solid #f00;'>Navbar not found</div>";
+   });
+   </script> 
 
-    <main class="container mx-auto px-6 py-12">
+    <main class="container mx-auto px-6 pt-[90px] py-12">
         <section class="max-w-4xl mx-auto mb-16">
             <h2 class="text-4xl font-bold mb-8 text-center">About CollegeNotes</h2>
             <div class="flex flex-col md:flex-row items-center gap-12">
@@ -52,33 +145,47 @@
                 <p class="text-lg">Today, CollegeNotes serves thousands of students across hundreds of institutions, continually evolving based on user feedback and educational research.</p>
             </div>
         </section>
+        <section class="max-w-4xl mx-auto mb-16 px-4">
+  <h2 class="text-3xl font-bold mb-8 text-center">Our Team</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    
+    <!-- Gautam -->
+    <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 text-center p-6 transform hover:-translate-y-1">
+      <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden bg-gray-200">
+        <img src="/images/gautam.jpg" alt="Gautam Kumar Sharma" class="w-full h-full object-cover">
+      </div>
+      <h3 class="text-xl font-bold">Gautam Kumar Sharma</h3>
+      <p class="text-gray-600 mb-3">Founder, CEO & Developer</p>
+      <div class="flex justify-center gap-4 text-xl">
+        <a href="https://github.com/gautamsharma-coder" target="_blank" aria-label="GitHub" class="text-gray-700 hover:text-black transition">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="https://linkedin.com/in/yourlinkedin" target="_blank" aria-label="LinkedIn" class="text-blue-600 hover:text-blue-800 transition">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </div>
+    </div>
 
-        <section class="max-w-4xl mx-auto mb-16">
-            <h2 class="text-3xl font-bold mb-8 text-center">Our Team</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden bg-gray-200">
-                        <img src="/api/placeholder/160/160" alt="Team member" class="w-full h-full object-cover">
-                    </div>
-                    <h3 class="text-xl font-bold">Alex Johnson</h3>
-                    <p class="text-gray-600">Founder & CEO</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden bg-gray-200">
-                        <img src="/api/placeholder/160/160" alt="Team member" class="w-full h-full object-cover">
-                    </div>
-                    <h3 class="text-xl font-bold">Sophia Chen</h3>
-                    <p class="text-gray-600">Head of Product</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden bg-gray-200">
-                        <img src="/api/placeholder/160/160" alt="Team member" class="w-full h-full object-cover">
-                    </div>
-                    <h3 class="text-xl font-bold">Marcus Williams</h3>
-                    <p class="text-gray-600">Lead Developer</p>
-                </div>
-            </div>
-        </section>
+    <!-- Ankur -->
+    <div class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 text-center p-6 transform hover:-translate-y-1">
+      <div class="w-40 h-40 mx-auto mb-4 rounded-full overflow-hidden bg-gray-200">
+        <img src="/images/ankur.jpg" alt="Ankur Raj" class="w-full h-full object-cover">
+      </div>
+      <h3 class="text-xl font-bold">Ankur Raj</h3>
+      <p class="text-gray-600 mb-3">Content Manager</p>
+      <div class="flex justify-center gap-4 text-xl">
+        <a href="https://github.com/ankurgithub" target="_blank" aria-label="GitHub" class="text-gray-700 hover:text-black transition">
+          <i class="fab fa-github"></i>
+        </a>
+        <a href="https://linkedin.com/in/ankurlinkedin" target="_blank" aria-label="LinkedIn" class="text-blue-600 hover:text-blue-800 transition">
+          <i class="fab fa-linkedin"></i>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 
         <section class="max-w-4xl mx-auto">
             <h2 class="text-3xl font-bold mb-8 text-center">Our Values</h2>

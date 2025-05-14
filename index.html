@@ -184,6 +184,7 @@
         
         <!-- Desktop Menu -->
         <nav class="hidden md:flex items-center space-x-8">
+          <a href="about.html" class="nav-item font-medium">About </a>
           <a href="notes.html" class="nav-item font-medium">Notes</a>
           <a href="coming-soon.html" class="nav-item font-medium">Lectures</a>
           <a href="contact.html" class="nav-item font-medium">Contact</a>
@@ -209,9 +210,9 @@
         </nav>
         
         <!-- Mobile Menu Button -->
-        <button @click="mobileMenu = !mobileMenu" class="md:hidden focus:outline-none">
+        <button @click="mobileMenu = !mobileMenu" class="md:hidden focus:outline-none mt-2">
           <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4"></path>
           </svg>
         </button>
       </div>
@@ -246,6 +247,7 @@
       
       <div class="flex-1 px-6 py-6 overflow-y-auto">
         <nav class="space-y-8">
+          <a href="about.html" class="block text-lg font-medium hover:text-indigo-600">About</a>
           <a href="notes.html" class="block text-lg font-medium hover:text-indigo-600">Notes</a>
           <a href="coming-soon.html" class="block text-lg font-medium hover:text-indigo-600">Lectures</a>
           <a href="contact.html" class="block text-lg font-medium hover:text-indigo-600">Contact</a>
@@ -256,7 +258,7 @@
         </nav>
       </div>
       
-      <div class="px-6 py-6 border-t">
+      <div class="px-6 py-6 ">
         <a href="login.html" id="mobileAuth" class="block w-full text-center py-3 rounded-full bg-gradient text-white font-medium">
           Login
         </a>
@@ -676,7 +678,13 @@
           college: 'GEC Munger',
           quote: 'CollegeNotes helped me stay consistent. My grades improved significantly.',
           rating: 5
-        }
+        },
+        {
+  name: 'Satyam Kumar Jha',
+  college: 'GJU Hisar',
+  quote: 'An excellent platform for focused learning. CollegeNotes helped me study smart and save time.',
+  rating: 5
+}
       ],
       interval: null,
       scrollRight() {
@@ -702,7 +710,13 @@
     <h2 class="text-4xl font-display font-bold mb-6">Meet the Creator</h2>
     <p class="text-lg text-gray-600 mb-12">CollegeNotes is built and maintained by a passionate solo developer dedicated to making studying smarter and more accessible.</p>
     <div class="bg-white p-8 rounded-3xl shadow-md inline-block">
-      <img src="./assets/image/gautam.jpg" alt="Your Photo" class="w-28 h-32 mx-auto rounded-lg object-cover mb-4">
+      <div class="border-4 border-gray-300 rounded-xl p-2 bg-white shadow-lg inline-block">
+  <img 
+    src="./assets/image/gautam.jpg" 
+    alt="Gautam Kumar Sharma" 
+    class="w-28 h-32 rounded-md object-cover transition-transform duration-300 hover:scale-105"
+  />
+</div>
       <h4 class="text-xl font-bold">Gautam Kumar Sharma</h4>
       <p class="text-gray-500 mb-4">Founder & Full-Stack Developer</p>
       <div class="flex justify-center space-x-4">
@@ -745,7 +759,7 @@
         </div>
         <div class="relative">
           <div class="aspect-video overflow-hidden rounded-3xl shadow-lg border border-gray-200">
-            <img src="./assets/image/dashboard-preview.png" alt="Dashboard Preview" class="w-full h-full object-cover">
+            <img src="./assets/image/dashboard.jpg" alt="Dashboard Preview" class="w-full h-full object-cover">
           </div>
         </div>
       </div>
