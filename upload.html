@@ -119,29 +119,38 @@
                             <div id="titleError" class="text-red-500 text-xs mt-1 hidden">Please enter a valid title</div>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="noteSubject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                                <select id="noteSubject" class="p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
-                                    <option value="" disabled selected>Select subject</option>
-                                    <option value="Mathematics">Mathematics</option>
-                                    <option value="Computer Science">Computer Science</option>
-                                    <option value="Physics">Physics</option>
-                                    <option value="Chemistry">Chemistry</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="noteLevel" class="block text-sm font-medium text-gray-700 mb-1">Level</label>
-                                <select id="noteLevel" class="p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
-                                    <option value="" disabled selected>Select level</option>
-                                    <option value="100">100</option>
-                                    <option value="200">200</option>
-                                    <option value="300">300</option>
-                                    <option value="400">400</option>
-                                    <option value="500">500</option>
-                                </select>
-                            </div>
-                        </div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div>
+    <label for="noteSubject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+    <select id="noteSubject" class="p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+        <option value="" disabled selected>Select subject</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="Computer Science">Computer Science</option>
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="noteSemester" class="block text-sm font-medium text-gray-700 mb-1">Semester</label>
+    <select id="noteSemester" class="p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+        <option value="" disabled selected>Select semester</option>
+        <option value="1st">1st</option>
+        <option value="2nd">2nd</option>
+        <option value="3rd">3rd</option>
+        <option value="4th">4th</option>
+        <option value="5th">5th</option>
+        <option value="6th">6th</option>
+        <option value="7th">7th</option>
+        <option value="8th">8th</option>
+    </select>
+  </div>
+</div>
+
+<div class="mt-4">
+  <label for="noteCollege" class="block text-sm font-medium text-gray-700 mb-1">University/College</label>
+  <input type="text" id="noteCollege" placeholder="e.g. AKTU / XYZ College" class="p-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" required>
+</div>
                         
                         <div>
                             <label for="noteDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -273,8 +282,9 @@ const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('noteFile');
 const titleInput = document.getElementById('noteTitle');
 const subjectSelect = document.getElementById('noteSubject');
-const levelSelect = document.getElementById('noteLevel');
+
 const descriptionInput = document.getElementById('noteDescription');
+
 const previewContainer = document.getElementById('previewContainer');
 const progressContainer = document.getElementById('progressContainer');
 const progressBar = document.getElementById('progressBar');
@@ -407,11 +417,11 @@ titleInput.addEventListener('input', () => {
 subjectSelect.addEventListener('change', () => {
     previewSubject.textContent = subjectSelect.value || 'Subject';
 });
-
+/*
 levelSelect.addEventListener('change', () => {
     previewLevel.textContent = `Level ${levelSelect.value}` || 'Level';
 });
-
+*/
 descriptionInput.addEventListener('input', () => {
     previewDescription.textContent = descriptionInput.value || 'No description provided';
     validateField(descriptionInput, descError, (val) => val.length >= 20);
@@ -609,8 +619,10 @@ form.addEventListener('submit', async (e) => {
     // Get form values
     const title = titleInput.value;
     const subject = subjectSelect.value;
-    const level = levelSelect.value;
+    //const level = levelSelect.value;
     const description = descriptionInput.value;
+    const semester = document.getElementById('noteSemester').value;
+const college = document.getElementById('noteCollege').value;
     const file = fileInput.files[0];
 
     // Check file size (max 50MB)
@@ -643,25 +655,26 @@ form.addEventListener('submit', async (e) => {
         
         // Add to database
         await addDoc(collection(db, "notes"), {
-            title,
-            subject,
-            level,
-            description,
-            fileURL,
-            fileName: file.name,
-            fileType: file.name.split('.').pop().toLowerCase(),
-            userId: user.uid,
-            author: user.displayName || user.email.split('@')[0],
-            fileSize: file.size,
-            fileSizeFormatted: formatFileSize(file.size),
-            uploadedAt: new Date(),
-            status: 'Pending Review',
-            downloads: 0,
-            ratings: {
-                average: 0,
-                count: 0
-            }
-        });
+  title,
+  subject,
+  semester,
+  college,
+  description,
+  fileURL,
+  fileName: file.name,
+  fileType: file.name.split('.').pop().toLowerCase(),
+  userId: user.uid,
+  author: user.displayName || user.email.split('@')[0],
+  fileSize: file.size,
+  fileSizeFormatted: formatFileSize(file.size),
+  uploadedAt: new Date(),
+  status: 'pending',
+  downloads: 0,
+  ratings: {
+    average: 0,
+    count: 0
+  }
+});
 
         // Complete the progress
         progressBar.style.width = '100%';

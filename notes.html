@@ -400,7 +400,8 @@
   </footer>
 
   <script type="module" >
-    import {db,getDocs,collection} from './assets/js/firebase-init.js';
+    import {db,getDocs,collection,getDownloadURL, ref,storage} from './assets/js/firebase-init.js';
+
 
     // Simulate loading notes
     document.addEventListener("DOMContentLoaded", () => {
@@ -498,6 +499,12 @@
         }
       ];
       */
+      function formatFileSize(bytes) {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  if (bytes === 0) return '0 Bytes';
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return parseFloat((bytes / Math.pow(1024, i)).toFixed(1)) + ' ' + sizes[i];
+}
       function renderNotes(notes) {
        const notesContainer = document.getElementById("notesContainer");
     notesContainer.innerHTML = "";
@@ -525,6 +532,10 @@
             statusBadgeClass = 'bg-blue-100 text-blue-800';
           } else if (note.status === 'Premium') {
             statusBadgeClass = 'bg-purple-100 text-purple-800';
+          }else if(note.status ==="approved"){
+            statusBadgeClass = 'bg-green-100 text-green-800';
+          }else if(note.status === 'pending'){
+            statusBadgeClass = 'bg-red-100 text-red-800'
           }
           
           notesContainer.innerHTML += `
@@ -533,7 +544,7 @@
                 <div class="flex justify-between items-start mb-4">
                   <div>
                     <h3 class="text-xl font-bold">${note.title}</h3>
-                    <p class="text-sm text-gray-500 mt-1">${note.subject} • ${note.level} Level</p>
+<p class="text-sm text-gray-500 mt-1">${note.subject} • Semester ${note.semester} • ${note.college}</p>
                   </div>
                   <span class="${statusBadgeClass} px-2 py-1 rounded-full text-xs font-medium">${note.status}</span>
                 </div>
@@ -549,8 +560,8 @@
                   </div>
                 </div>
                 <div class="border-t mt-4 pt-4 flex justify-between items-center">
-                  <span class="text-gray-500 flex items-center"><i class="fas fa-file-pdf mr-1"></i> ${note.fileSize}MB</span>
-                  <a href="${note.downloadLink}" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition-colors">Download</a>
+                  <span class="text-gray-500 flex items-center"><i class="fas fa-file-pdf mr-1"></i> ${formatFileSize(note.fileSize)}</span>
+                  <a href="${note.fileURL}" class="bg-primary text-black px-4 py-2 rounded-lg hover:bg-secondary transition-colors">Download</a>
                 </div>
               </div>
             </div>
@@ -559,9 +570,7 @@
       }
 
       
-      console.log("Firebase :", db);
-      //import { db, getDocs, collection } from './assets/js/firebase-init.js';
-
+     
 async function fetchNotes() {
   const notesContainer = document.getElementById("notesContainer");
   const loadingIndicator = document.getElementById("loadingIndicator");
@@ -603,8 +612,10 @@ async function fetchNotes() {
 }
 
 
+  fetchNotes();
+
 });
-      
+
       /*
       // Simulate loading more notes
       loadMoreBtn.addEventListener('click', function() {
