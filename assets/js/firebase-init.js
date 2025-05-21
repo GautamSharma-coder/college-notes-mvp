@@ -10,7 +10,7 @@ const firebaseConfig = {
 };
 
 // 🔹 Firebase Imports
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { 
   getAuth, 
   createUserWithEmailAndPassword, 
@@ -21,7 +21,7 @@ import {
   signInWithPopup,
   sendPasswordResetEmail,
   sendEmailVerification
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { 
   getFirestore, 
   collection, 
@@ -39,13 +39,13 @@ import {
   setDoc,
   serverTimestamp,
   increment
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { 
   getStorage, 
   ref, 
   uploadBytes, 
   getDownloadURL 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-storage.js";
 
 // 🔹 Initialize Firebase Services
 const app = initializeApp(firebaseConfig);
@@ -86,5 +86,6 @@ export {
   signInWithPopup,
   sendPasswordResetEmail,
   increment,
-  sendEmailVerification
+  sendEmailVerification,
+  app
 };

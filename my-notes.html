@@ -49,10 +49,11 @@
   <script type="module">
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
     import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-    import { app } from './firebase-config.js'; // Must export initialized Firebase app
+    import { app } from './assets/js/firebase-init.js'; // Must export initialized Firebase app
 
     const auth = getAuth(app);
     const db = getFirestore(app);
+    console.log("db :"+db);
     const notesContainer = document.getElementById("notesContainer");
     const loader = document.getElementById("loader");
     const errorMsg = document.getElementById("errorMsg");
@@ -70,7 +71,9 @@
       }
 
       try {
-        const q = query(collection(db, "notes"), where("userId", "==", user.uid));
+        //const db = getFirestore(app); // make sure this app is from same version
+const notesRef = collection(db, "notes"); // this must work after fix
+const q = query(notesRef, where("userId", "==", user.uid));
         const querySnapshot = await getDocs(q);
 
         loader.classList.add("hidden");
@@ -96,7 +99,7 @@
         showError("Something went wrong while loading notes.");
       }
     });
-    alert("Hii");
+    //alert("Hii");
   </script>
 </body>
 </html>
